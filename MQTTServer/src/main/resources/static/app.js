@@ -1,6 +1,7 @@
 var socket = new SockJS(':8080/stomp');
 
 var stompClient = Stomp.over(socket);
+
 stompClient.connect({}, function (frame) {
     console.log('Connected: ' + frame);
     //TODO: Change topic name
@@ -14,6 +15,7 @@ stompClient.connect({}, function (frame) {
         vue.updateDetectionImage(response.body);
     });
 });
+
 stompClient.debug = null;
 
 plot = function (x, y, w, h, color, container, imgId, rectId) {
@@ -37,14 +39,102 @@ plot = function (x, y, w, h, color, container, imgId, rectId) {
 var vue = new Vue({
     el: '#app',
     data: {
+        savedPositions: [
+            {
+                name: "Idle",
+                baseTargetPosition: 0.0,
+                mainArmTargetPosition: 0.0,
+                secondArmTargetPosition: 0.0,
+                wristTargetPosition: 0.0,
+                gripperTargetPosition: 0.0
+            },
+            {
+                name: "Approach",
+                baseTargetPosition: 0.0,
+                mainArmTargetPosition: 1.449,
+                secondArmTargetPosition: -0.017,
+                wristTargetPosition: 0.0,
+                gripperTargetPosition: 1.0
+            },
+            {
+                name: "Grip",
+                baseTargetPosition: 0.0,
+                mainArmTargetPosition: 1.449,
+                secondArmTargetPosition: -0.017,
+                wristTargetPosition: 0.0,
+                gripperTargetPosition: -0.65
+            },
+            {
+                name: "Park",
+                baseTargetPosition: 3.142,
+                mainArmTargetPosition: 1.274,
+                secondArmTargetPosition: -1.239,
+                wristTargetPosition: 1.5,
+                gripperTargetPosition: -0.65
+            },
+            {
+                name: "Release",
+                baseTargetPosition: 3.142,
+                mainArmTargetPosition: 1.274,
+                secondArmTargetPosition: -1.239,
+                wristTargetPosition: 1.5,
+                gripperTargetPosition: 0.5
+            },
+            {
+                name: "Standby",
+                baseTargetPosition: 3.142,
+                mainArmTargetPosition: 0.0,
+                secondArmTargetPosition: 0.0,
+                wristTargetPosition: 1.5,
+                gripperTargetPosition: 0.5
+            },
+            {
+                name: "GreenDeposit",
+                baseTargetPosition: -1.745,
+                mainArmTargetPosition: 0.942,
+                secondArmTargetPosition: -0.89,
+                wristTargetPosition: 1.5,
+                gripperTargetPosition: -0.5
+            },
+            {
+                name: "GreenDepositRelease",
+                baseTargetPosition: -1.745,
+                mainArmTargetPosition: 0.942,
+                secondArmTargetPosition: -0.89,
+                wristTargetPosition: 1.5,
+                gripperTargetPosition: 0.5
+            },
+            {
+                name: "RedDeposit",
+                baseTargetPosition: -1.449,
+                mainArmTargetPosition: 0.942,
+                secondArmTargetPosition: -0.89,
+                wristTargetPosition: 1.5,
+                gripperTargetPosition: -0.576
+            },
+            {
+                name: "RedDepositRelease",
+                baseTargetPosition: -1.449,
+                mainArmTargetPosition: 0.942,
+                secondArmTargetPosition: -0.89,
+                wristTargetPosition: 1.5,
+                gripperTargetPosition: 0.5
+            }
+
+        ],
+        savePositionName: "",
         objectClass: '',
         pickupObjects: 0,
         basePosition: 0.0,
         mainArmPosition: 0.0,
         secondArmPosition: 0.0,
+        wristPosition: 0.0,
+        gripperPosition: 0.0,
         baseTargetPosition: 0.0,
         mainArmTargetPosition: 0.0,
         secondArmTargetPosition: 0.0,
+        wristTargetPosition: 0.0,
+        gripperTargetPosition: 0.0,
         pickupImageBase64: "images/canvas.png",
         detectionImageBase64: "images/canvas.png",
         upKey: false,
@@ -54,8 +144,7 @@ var vue = new Vue({
         wKey: false,
         sKey: false
     },
-    init: function () {
-
+    created: function () {
         tracking.ColorTracker.registerColor('red', function (r, g, b) {
             return r > 100 && g < (r / 2) && b < (r / 2);
         });
@@ -109,6 +198,28 @@ var vue = new Vue({
         }
     },
     methods: {
+        savePosition: function (name) {
+            this.savedPositions.push(
+                {
+                    name: name,
+                    baseTargetPosition: this.basePosition,
+                    mainArmTargetPosition: this.mainArmPosition,
+                    secondArmTargetPosition: this.secondArmPosition,
+                    wristTargetPosition: this.wristPosition,
+                    gripperTargetPosition: this.gripperPosition
+                }
+            );
+        },
+        gotoSavedPosition: function (index) {
+            var pos = this.savedPositions[index];
+            this.baseTargetPosition = pos.baseTargetPosition;
+            this.mainArmTargetPosition = pos.mainArmTargetPosition;
+            this.secondArmTargetPosition = pos.secondArmTargetPosition;
+            this.wristTargetPosition = pos.wristTargetPosition;
+            this.gripperTargetPosition = pos.gripperTargetPosition;
+
+            this.allGoto();
+        },
         updateDetectionImage: function (image) {
             this.detectionImageBase64 = 'data:image/png;base64, ' + image;
             var colors = new tracking.ColorTracker(['red', 'green']);
@@ -167,6 +278,12 @@ var vue = new Vue({
                 case 'second_arm':
                     this.secondArmPosition = value;
                     break;
+                case 'wrist':
+                    this.wristPosition = value;
+                    break;
+                case 'gripper':
+                    this.gripperPosition = value;
+                    break;
                 default:
                     console.log("Unknown message type")
             }
@@ -221,6 +338,21 @@ var vue = new Vue({
         secondArmGoto: function () {
             console.log("Setting value");
             this.sendSocketMessage("second-arm-goto " + this.secondArmTargetPosition)
+        },
+        wristGoto: function () {
+            console.log("Setting value");
+            this.sendSocketMessage("wrist-goto " + this.wristTargetPosition)
+        },
+        gripperGoto: function () {
+            console.log("Setting value");
+            this.sendSocketMessage("gripper-goto " + this.gripperTargetPosition)
+        },
+        allGoto: function() {
+            this.baseGoto();
+            this.mainArmGoto();
+            this.secondArmGoto();
+            this.wristGoto();
+            this.gripperGoto();
         }
     }
 });
