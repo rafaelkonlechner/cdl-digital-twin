@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://code.getmdl.io/1.1.3/material.blue_grey-cyan.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body id="app">
+<header>
+    <h1>3-Axis Robotic Arm Demo
+        <small>kuka-kr5-r850</small>
+    </h1>
+</header>
+<main id="main"
+      @keydown.up="keyDownUp()"
+      @keyup.up="keyUpUp()"
+      @keydown.down="keyDownDown()"
+      @keyup.down="keyUpDown()"
+      @keydown.left="keyDownLeft()"
+      @keyup.left="keyUpLeft()"
+      @keydown.right="keyDownRight()"
+      @keyup.right="keyUpRight()"
+      @keydown.w="keyDownW()"
+      @keyup.w="keyUpW()"
+      @keydown.s="keyDownS()"
+      @keyup.s="keyUpS()"
+>
+    <h2>Camera Signals</h2>
+    <div class="container">
+        <h3>Pickup Assist Camera</h3>
+        <div class="pickup-container">
+            <img id="pickup-camera" style="width: 200px; height: 200px;" v-bind:src="pickupImageBase64"/>
+        </div>
+        <span>Detected Objects: {{ pickupObjects }}</span>
+    </div>
+    <div class="container">
+        <h3>Classification Camera</h3>
+        <div class="detection-container">
+            <img id="detection-camera" style="width: 200px; height: 200px;" v-bind:src="detectionImageBase64"/>
+        </div>
+        <span>Classification: {{ objectClass }}</span>
+    </div>
+    <div>
+    </div>
+    <h2>Joint Rotation</h2>
+    <button>Manual</button>
+    <table>
+        <thead>
+        <tr>
+            <td width="100"><strong>Joint</strong></td>
+            <td width="100"><strong>Current</strong></td>
+            <td><strong>Target</strong></td>
+        </tr>
+        </thead>
+        <tr>
+            <td>Base</td>
+            <td>{{basePosition}}</td>
+            <td>
+                <input v-model="baseTargetPosition" type="number" step="0.01"/>
+                <button v-on:click="baseGoto()">Set</button>
+            </td>
+        </tr>
+        <tr>
+            <td>Main Arm</td>
+            <td>{{mainArmPosition}}</td>
+            <td>
+                <input v-model="mainArmTargetPosition" type="number" step="0.01"/>
+                <button v-on:click="mainArmGoto()">Set</button>
+            </td>
+        </tr>
+        <tr>
+            <td>Wrist</td>
+            <td>{{secondArmPosition}}</td>
+            <td>
+                <input v-model="secondArmTargetPosition" type="number" step="0.01"/>
+                <button v-on:click="secondArmGoto()">Set</button>
+            </td>
+        </tr>
+    </table>
+</main>
+
+<script src="bower_components/material-design-lite/material.js"></script>
+<script src="bower_components/stomp-websocket/lib/stomp.js"></script>
+<script src="bower_components/sockjs-client/dist/sockjs-1.1.1.js"></script>
+<script src="bower_components/jquery/dist/jquery.js"></script>
+<script src="bower_components/vue/dist/vue.js"></script>
+<script src="bower_components/tracking/build/tracking-min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

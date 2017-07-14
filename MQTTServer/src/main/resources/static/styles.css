@@ -1,0 +1,38 @@
+header {
+    text-align: center;
+    padding: 5vh;
+}
+
+main {
+    width: 80vw;
+    margin: 0 auto;
+}
+
+canvas {
+    width: 100px;
+    height: 200px;
+}
+
+h2 {
+    font-size: 1.5em;
+    margin: 0.4em;
+}
+
+h3 {
+    font-size: 1.3em;
+    margin: 0.4em;
+    color: darkslategray;
+}
+
+.rect {
+    width: 80px;
+    height: 80px;
+    position: absolute;
+    left: -1000px;
+    top: -1000px;
+}
+
+.container {
+    display: inline-block;
+    margin-right: 20px;
+}
