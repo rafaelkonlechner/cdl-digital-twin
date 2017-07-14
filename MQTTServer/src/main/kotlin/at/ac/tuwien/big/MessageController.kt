@@ -12,6 +12,8 @@ final class MessageController(val webSocket: SimpMessagingTemplate) : MqttCallba
     final val qos = 0
     final val sensorTopic = "Sensor"
     final val actuatorTopic = "Actuator"
+    final val gateGreenTopic = "GateGreen"
+    final val gateRedTopic = "GateRed"
     final val detectionCameraTopic = "DetectionCamera"
     final val pickupCameraTopic = "PickupCamera"
     final val client: MqttClient
@@ -29,25 +31,29 @@ final class MessageController(val webSocket: SimpMessagingTemplate) : MqttCallba
         client.subscribe(sensorTopic)
         client.subscribe(detectionCameraTopic)
         client.subscribe(pickupCameraTopic)
+        client.subscribe(gateGreenTopic)
+        client.subscribe(gateRedTopic)
     }
 
     override fun messageArrived(topic: String?, message: MqttMessage?) {
         when (topic) {
             sensorTopic -> {
-                println("($topic) Received < ${String(message!!.payload)} >")
-                sendWebSocketMessageSensor(String(message.payload))
+                sendWebSocketMessageSensor(String(message!!.payload))
             }
             detectionCameraTopic -> {
-                println("($topic) Received < ${String(message!!.payload).substring(0, 20)} >")
-                sendWebSocketMessageDetectionCamera(String(message.payload))
+                sendWebSocketMessageDetectionCamera(String(message!!.payload))
             }
             pickupCameraTopic -> {
-                println("($topic) Received < ${String(message!!.payload).substring(0, 20)} >")
-                sendWebSocketMessagePickupCamera(String(message.payload))
+                sendWebSocketMessagePickupCamera(String(message!!.payload))
+            }
+            gateGreenTopic -> {
+                println("($topic) Received < ${String(message!!.payload)} >")
+            }
+            gateRedTopic -> {
+                println("($topic) Received < ${String(message!!.payload)} >")
             }
         }
     }
-
 
     override fun connectionLost(cause: Throwable?) {
         throw cause ?: Exception("Connection lost.")
