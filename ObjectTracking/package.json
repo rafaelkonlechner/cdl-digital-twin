@@ -1,0 +1,17 @@
+{
+  "name": "object-tracking",
+  "version": "1.0.0",
+  "description": "Object tracker for identifying and localizing manufactured items in a production unit.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Rafael Konlechner",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.15.3",
+    "express-fileupload": "^0.1.4",
+    "tracking": "^1.1.3"
+  }
+}
