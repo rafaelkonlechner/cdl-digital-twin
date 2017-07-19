@@ -5,20 +5,20 @@ Experience the concept of digital twins in industrial production, first hand, in
 ## Getting Started
 
 ### Install dependencies
+
 You will need to install these dependencies in order to get started:
 * Docker: API version 1.12+
 * Blender: 2.78c
 
 ### Setup Blender
-Blender requires a few extra libraries in order to be able to publish and subscribe to MQTT messages. This can be done by installing the Python package manager `pip` and using it to install further libraries.
 
-TBD
+Blender requires a few extra libraries in order to be able to publish and subscribe to MQTT messages and render images. This can be done by adding scripts and libraries to your *User Preferences*. Go to ***File > User Preferences > File > Scripts*** and select the `blender-scripts/` directory from the project. Save the selection by hitting ***Save User Settings***.
 
-Finally, open `Pick-and-Place-Simulation.blend` with Blender. Make sure to select **"Blender Game"** in the engine selection on the top - it might be set to **"Blender Render"**. Hitting `p` will start the simulation.
+Finally, open the simulation file `Pick-and-Place-Simulation.blend` with Blender. Make sure to select **"Blender Game"** in the engine selection on the top &mdash; it might be set to **"Blender Render"**. Hitting the `p` key will start the simulation.
 
-### Startup Services
+### Start up Services
 
-In the project home directory, run `docker-compose up`. This will start (and install) all required services to control and monitor the robot in your browser. After all services started, visit [http://localhost:8080](http://localhost:8080) for the dashboard.
+In the project home directory, run `docker-compose up`. This will run (and install) all required services to control and monitor the robot in your browser. After all services started, visit [http://localhost:8080](http://localhost:8080) for the dashboard.
 
 ## Documentation
 
