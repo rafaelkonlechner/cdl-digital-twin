@@ -9,7 +9,7 @@ import sun.misc.BASE64Encoder
 
 @RunWith(SpringRunner::class)
 @SpringBootTest
-class MqttserverApplicationTests {
+class MqttServerApplicationTests {
 
     @Test
     fun contextLoads() {
