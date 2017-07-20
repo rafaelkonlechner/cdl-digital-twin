@@ -98,22 +98,31 @@
                             <button @click="gripperGoto()">Set</button>
                         </td>
                     </tr>
+                    <tr>
+                        <td>Hand</td>
+                        <td>{{handPosition}}</td>
+                        <td>
+                            Settings
+                        </td>
+                    </tr>
                 </table>
             </div>
             <div class="mdl-cell mdl-cell--6-col">
                 <h2>Saved Positions</h2>
-                <div v-for="(p, index) in savedPositions" @click="gotoSavedPosition(index)">
-                    {{p.name}}
-                </div>
+                <ul class="state-list">
+                    <li v-for="(p, index) in savedPositions" @click="gotoSavedPosition(index)">
+                        {{p.name}}
+                    </li>
+                </ul>
                 <div>
-                    <input v-model="savePositionName" type="text" />
+                    <input v-model="savePositionName" type="text"/>
                     <button @click="savePosition(savePositionName)">Save</button>
                 </div>
             </div>
         </div>
     </main>
 </div>
-    <script src="bower_components/vue/dist/vue.js"></script>
-    <script src="app.js"></script>
+<script src="bower_components/vue/dist/vue.js"></script>
+<script src="app.js"></script>
 </body>
 </html>

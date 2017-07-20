@@ -36,3 +36,12 @@ h3 {
     display: inline-block;
     margin-right: 20px;
 }
+
+.state-list {
+    list-style-type: none;
+    cursor: default;
+    padding: 0;
+    margin: 0;
+}
+
+

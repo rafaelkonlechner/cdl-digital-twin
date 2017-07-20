@@ -153,6 +153,7 @@ var vue = new Vue({
         mainArmPosition: 0.0,
         secondArmPosition: 0.0,
         wristPosition: 0.0,
+        handPosition: [],
         gripperPosition: 0.0,
         baseTargetPosition: 0.0,
         mainArmTargetPosition: 0.0,
@@ -272,13 +273,17 @@ var vue = new Vue({
                     self.objectClass = '';
                 } else {
                     event.data.forEach(function (rect) {
-                        console.log(rect.x, rect.y, rect.height, rect.width, rect.color);
                         self.objectClass = rect.color;
                         plot(rect.x, rect.y, rect.width, rect.height, rect.color, '.detection-container', 'detection-camera', 'detection-rect');
+                        this.sendTrackingSocketMessage(rect.x + ", " + rect.y + ", " + rect.width + ", " + rect.height + ", " + rect.color)
+                        this.adjustGripper(rect.x, rect.y, rect.width, rect.height)
                     });
                 }
             });
             trackingTask = tracking.track('#detection-camera', colors);
+        },
+        adjustGripper: function(x, y, width, height) {
+
         },
         updatePickupImage: function (image) {
             this.pickupImageBase64 = 'data:image/png;base64, ' + image;
@@ -295,8 +300,8 @@ var vue = new Vue({
                 } else {
                     self.pickupObjects = event.data.length;
                     event.data.forEach(function (rect) {
-                        console.log(rect.x, rect.y, rect.height, rect.width, rect.color);
                         plot(rect.x, rect.y, rect.width, rect.height, 'yellow', '.pickup-container', 'pickup-camera', 'pickup-rect');
+                        this.sendTrackingSocketMessage(rect.x + ", " + rect.y + ", " + rect.width + ", " + rect.height + ", " + rect.color)
                     });
                 }
             });
@@ -305,7 +310,11 @@ var vue = new Vue({
         updateSensorData: function (message) {
             var split = message.split(' ');
             var value = parseFloat(split[1]);
-            value = Math.floor(value * 10000) / 10000;
+            if (!isNaN(value)) {
+                value = Math.floor(value * 10000) / 10000;
+            } else {
+                value = message.slice(message.indexOf(' '), message.length);
+            }
             switch (split[0]) {
                 case 'base':
                     this.basePosition = value;
@@ -319,6 +328,9 @@ var vue = new Vue({
                 case 'wrist':
                     this.wristPosition = value;
                     break;
+                case 'hand':
+                    this.handPosition = value;
+                    break;
                 case 'gripper':
                     this.gripperPosition = value;
                     break;
@@ -328,6 +340,9 @@ var vue = new Vue({
         },
         sendSocketMessage: function (message) {
             stompClient.send("/app/actuator", {}, message);
+        },
+        sendTrackingSocketMessage: function (message) {
+            stompClient.send("/app/tracking", {}, message);
         },
         keyDownUp: function () {
             this.upKey = true;
@@ -385,7 +400,7 @@ var vue = new Vue({
             console.log("Setting value");
             this.sendSocketMessage("gripper-goto " + this.gripperTargetPosition)
         },
-        allGoto: function() {
+        allGoto: function () {
             this.baseGoto();
             this.mainArmGoto();
             this.secondArmGoto();
