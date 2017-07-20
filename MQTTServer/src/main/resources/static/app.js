@@ -236,13 +236,27 @@ var vue = new Vue({
         },
         gotoSavedPosition: function (index) {
             var pos = this.savedPositions[index];
-            this.baseTargetPosition = pos.baseTargetPosition;
-            this.mainArmTargetPosition = pos.mainArmTargetPosition;
-            this.secondArmTargetPosition = pos.secondArmTargetPosition;
-            this.wristTargetPosition = pos.wristTargetPosition;
-            this.gripperTargetPosition = pos.gripperTargetPosition;
-
-            this.allGoto();
+            if (this.baseTargetPosition !== pos.baseTargetPosition) {
+                this.baseTargetPosition = pos.baseTargetPosition;
+                this.baseGoto();
+            }
+            if (this.mainArmTargetPosition !== pos.mainArmTargetPosition) {
+                this.mainArmTargetPosition = pos.mainArmTargetPosition;
+                this.mainArmGoto();
+            }
+            if (this.secondArmTargetPosition !== pos.secondArmTargetPosition) {
+                this.secondArmTargetPosition = pos.secondArmTargetPosition;
+                this.secondArmGoto();
+            }
+            if (this.wristTargetPosition !== pos.wristTargetPosition) {
+                this.wristTargetPosition = pos.wristTargetPosition;
+                this.wristGoto();
+            }
+            if (this.gripperTargetPosition !== pos.gripperTargetPosition) {
+                this.gripperTargetPosition = pos.gripperTargetPosition;
+                this.gripperGoto();
+            }
+            //this.allGoto();
         },
         updateDetectionImage: function (image) {
             this.detectionImageBase64 = 'data:image/png;base64, ' + image;
