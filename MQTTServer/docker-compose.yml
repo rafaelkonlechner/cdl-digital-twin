@@ -1,6 +1,12 @@
-rabbitmq:
-  build: .
-  ports:
-    - "1883:1883"
-    - "5672:5672"
-    - "15672:15672"
+version: '2'
+services:
+  mongodb:
+    image: mongo
+    ports:
+      - "27017:27017"
+  rabbitmq:
+    build: .
+    ports:
+      - "1883:1883"
+      - "5672:5672"
+      - "15672:15672"
