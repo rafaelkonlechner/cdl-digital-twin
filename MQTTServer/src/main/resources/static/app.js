@@ -46,47 +46,71 @@ var vue = new Vue({
                 mainArmTargetPosition: 0.0,
                 secondArmTargetPosition: 0.0,
                 wristTargetPosition: 0.0,
-                gripperTargetPosition: 0.0
+                gripperTargetPosition: 1.0
             },
             {
                 name: "Approach",
                 baseTargetPosition: 0.0,
-                mainArmTargetPosition: 1.449,
-                secondArmTargetPosition: -0.017,
+                mainArmTargetPosition: 1.50,
+                secondArmTargetPosition: -0.12,
                 wristTargetPosition: 0.0,
-                gripperTargetPosition: 1.0
+                gripperTargetPosition: 1.5
             },
             {
                 name: "Grip",
                 baseTargetPosition: 0.0,
-                mainArmTargetPosition: 1.449,
-                secondArmTargetPosition: -0.017,
+                mainArmTargetPosition: 1.50,
+                secondArmTargetPosition: -0.12,
                 wristTargetPosition: 0.0,
-                gripperTargetPosition: -0.65
+                gripperTargetPosition: -0.40
             },
             {
                 name: "Park",
                 baseTargetPosition: 3.142,
-                mainArmTargetPosition: 1.274,
-                secondArmTargetPosition: -1.239,
-                wristTargetPosition: 1.5,
-                gripperTargetPosition: -0.65
+                mainArmTargetPosition: 1.40,
+                secondArmTargetPosition: -1.55,
+                wristTargetPosition: -1.5,
+                gripperTargetPosition: -0.40
             },
             {
-                name: "Release",
+                name: "Release Half",
                 baseTargetPosition: 3.142,
-                mainArmTargetPosition: 1.274,
-                secondArmTargetPosition: -1.239,
-                wristTargetPosition: 1.5,
-                gripperTargetPosition: 0.5
+                mainArmTargetPosition: 1.36,
+                secondArmTargetPosition: -1.34,
+                wristTargetPosition: -1.5,
+                gripperTargetPosition: -0.2
+            },
+            {
+                name: "Release Full",
+                baseTargetPosition: 3.142,
+                mainArmTargetPosition: 1.36,
+                secondArmTargetPosition: -1.334,
+                wristTargetPosition: -1.5,
+                gripperTargetPosition: 1.0
             },
             {
                 name: "Standby",
                 baseTargetPosition: 3.142,
                 mainArmTargetPosition: 0.0,
                 secondArmTargetPosition: 0.0,
-                wristTargetPosition: 1.5,
-                gripperTargetPosition: 0.5
+                wristTargetPosition: -1.5,
+                gripperTargetPosition: 1.0
+            },
+            {
+                name: "Pickup",
+                baseTargetPosition: 3.142,
+                mainArmTargetPosition: 1.22,
+                secondArmTargetPosition: -1.23,
+                wristTargetPosition: -1.5,
+                gripperTargetPosition: 1.0
+            },
+            {
+                name: "Pickup Grip",
+                baseTargetPosition: 3.142,
+                mainArmTargetPosition: 1.22,
+                secondArmTargetPosition: -1.23,
+                wristTargetPosition: -1.5,
+                gripperTargetPosition: -0.4
             },
             {
                 name: "GreenDeposit",
@@ -94,7 +118,7 @@ var vue = new Vue({
                 mainArmTargetPosition: 0.942,
                 secondArmTargetPosition: -0.89,
                 wristTargetPosition: 1.5,
-                gripperTargetPosition: -0.5
+                gripperTargetPosition: -0.4
             },
             {
                 name: "GreenDepositRelease",
@@ -110,7 +134,7 @@ var vue = new Vue({
                 mainArmTargetPosition: 0.942,
                 secondArmTargetPosition: -0.89,
                 wristTargetPosition: 1.5,
-                gripperTargetPosition: -0.576
+                gripperTargetPosition: -0.4
             },
             {
                 name: "RedDepositRelease",
