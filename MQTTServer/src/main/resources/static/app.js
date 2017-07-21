@@ -155,11 +155,13 @@ var vue = new Vue({
         wristPosition: 0.0,
         handPosition: [],
         gripperPosition: 0.0,
+        sliderPosition: 0.0,
         baseTargetPosition: 0.0,
         mainArmTargetPosition: 0.0,
         secondArmTargetPosition: 0.0,
         wristTargetPosition: 0.0,
         gripperTargetPosition: 0.0,
+        sliderTargetPosition: 0.0,
         pickupImageBase64: "images/canvas.png",
         detectionImageBase64: "images/canvas.png",
         upKey: false,
@@ -276,14 +278,14 @@ var vue = new Vue({
                         self.objectClass = rect.color;
                         plot(rect.x, rect.y, rect.width, rect.height, rect.color, '.detection-container', 'detection-camera', 'detection-rect');
                         this.sendTrackingSocketMessage(rect.x + ", " + rect.y + ", " + rect.width + ", " + rect.height + ", " + rect.color)
-                        this.adjustGripper(rect.x, rect.y, rect.width, rect.height)
                     });
                 }
             });
             trackingTask = tracking.track('#detection-camera', colors);
         },
         adjustGripper: function(x, y, width, height) {
-
+            console.log(x, y);
+            console.log(this.handPosition);
         },
         updatePickupImage: function (image) {
             this.pickupImageBase64 = 'data:image/png;base64, ' + image;
@@ -301,7 +303,8 @@ var vue = new Vue({
                     self.pickupObjects = event.data.length;
                     event.data.forEach(function (rect) {
                         plot(rect.x, rect.y, rect.width, rect.height, 'yellow', '.pickup-container', 'pickup-camera', 'pickup-rect');
-                        this.sendTrackingSocketMessage(rect.x + ", " + rect.y + ", " + rect.width + ", " + rect.height + ", " + rect.color)
+                        self.adjustGripper(rect.x, rect.y, rect.width, rect.height)
+                        //this.sendTrackingSocketMessage(rect.x + ", " + rect.y + ", " + rect.width + ", " + rect.height + ", " + rect.color)
                     });
                 }
             });
@@ -333,6 +336,9 @@ var vue = new Vue({
                     break;
                 case 'gripper':
                     this.gripperPosition = value;
+                    break;
+                case 'slider':
+                    this.sliderPosition = value;
                     break;
                 default:
                     console.log("Unknown message type")
@@ -400,12 +406,17 @@ var vue = new Vue({
             console.log("Setting value");
             this.sendSocketMessage("gripper-goto " + this.gripperTargetPosition)
         },
-        allGoto: function () {
-            this.baseGoto();
-            this.mainArmGoto();
-            this.secondArmGoto();
-            this.wristGoto();
-            this.gripperGoto();
+        sliderGoto: function () {
+            console.log("Setting value");
+            this.sendSocketMessage("slider-goto " + this.sliderTargetPosition)
+        },
+        sliderPush: function() {
+            this.sliderTargetPosition = 0.42;
+            this.sliderGoto();
+        },
+        sliderBackUp: function() {
+            this.sliderTargetPosition = 0.08;
+            this.sliderGoto();
         }
     }
 });
