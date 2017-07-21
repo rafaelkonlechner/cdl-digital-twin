@@ -148,6 +148,8 @@ var vue = new Vue({
         ],
         savePositionName: "",
         objectClass: '',
+        greenCount: 0,
+        redCount: 0,
         pickupObjects: 0,
         basePosition: 0.0,
         mainArmPosition: 0.0,
@@ -156,12 +158,14 @@ var vue = new Vue({
         handPosition: [],
         gripperPosition: 0.0,
         sliderPosition: 0.0,
+        adjusterPosition: 0.0,
         baseTargetPosition: 0.0,
         mainArmTargetPosition: 0.0,
         secondArmTargetPosition: 0.0,
         wristTargetPosition: 0.0,
         gripperTargetPosition: 0.0,
         sliderTargetPosition: 0.0,
+        adjusterTargetPosition: 0.0,
         pickupImageBase64: "images/canvas.png",
         detectionImageBase64: "images/canvas.png",
         upKey: false,
@@ -340,6 +344,15 @@ var vue = new Vue({
                 case 'slider':
                     this.sliderPosition = value;
                     break;
+                case 'adjuster':
+                    this.adjusterPosition = value;
+                    break;
+                case 'green-gate':
+                    this.greenCount++;
+                    break;
+                case 'red-gate':
+                    this.redCount++;
+                    break;
                 default:
                     console.log("Unknown message type")
             }
@@ -410,6 +423,10 @@ var vue = new Vue({
             console.log("Setting value");
             this.sendSocketMessage("slider-goto " + this.sliderTargetPosition)
         },
+        adjusterGoto: function () {
+            console.log("Setting value");
+            this.sendSocketMessage("adjuster-goto " + this.adjusterTargetPosition)
+        },
         sliderPush: function() {
             this.sliderTargetPosition = 0.42;
             this.sliderGoto();
@@ -417,6 +434,14 @@ var vue = new Vue({
         sliderBackUp: function() {
             this.sliderTargetPosition = 0.08;
             this.sliderGoto();
+        },
+        adjusterPush: function() {
+            this.adjusterTargetPosition = 1.889;
+            this.adjusterGoto();
+        },
+        adjusterBackUp: function() {
+            this.adjusterTargetPosition = 1.669;
+            this.adjusterGoto();
         }
     }
 });

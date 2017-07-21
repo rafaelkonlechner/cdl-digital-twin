@@ -46,6 +46,11 @@
             </div>
             <span>Classification: {{ objectClass }}</span>
         </div>
+        <div class="container">
+            <h3>Counter</h3>
+            <div>Green: {{ greenCount }}</div>
+            <div>Red: {{ redCount }}</div>
+        </div>
         <div class="mdl-grid">
             <div class="mdl-cell mdl-cell--6-col">
                 <h2>Joint Rotation</h2>
@@ -111,6 +116,14 @@
                         <td>
                             <button @click="sliderPush()">Push</button>
                             <button @click="sliderBackUp()">Back up</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Adjuster</td>
+                        <td>{{adjusterPosition}}</td>
+                        <td>
+                            <button @click="adjusterPush()">Push</button>
+                            <button @click="adjusterBackUp()">Back up</button>
                         </td>
                     </tr>
                 </table>
