@@ -13,6 +13,10 @@ canvas {
     height: 200px;
 }
 
+input {
+    width: 40px;
+}
+
 h2 {
     font-size: 1.5em;
     margin: 0.4em;

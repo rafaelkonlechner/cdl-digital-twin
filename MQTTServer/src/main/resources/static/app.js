@@ -160,6 +160,9 @@ var vue = new Vue({
         sliderPosition: 0.0,
         adjusterPosition: 0.0,
         baseTargetPosition: 0.0,
+        baseTargetSpeed: 1.0,
+        mainArmTargetSpeed: 1.0,
+        secondArmTargetSpeed: 1.0,
         mainArmTargetPosition: 0.0,
         secondArmTargetPosition: 0.0,
         wristTargetPosition: 0.0,
@@ -401,15 +404,15 @@ var vue = new Vue({
         },
         baseGoto: function () {
             console.log("Setting value");
-            this.sendSocketMessage("base-goto " + this.baseTargetPosition)
+            this.sendSocketMessage("base-goto " + this.baseTargetPosition + " " + this.baseTargetSpeed)
         },
         mainArmGoto: function () {
             console.log("Setting value");
-            this.sendSocketMessage("main-arm-goto " + this.mainArmTargetPosition)
+            this.sendSocketMessage("main-arm-goto " + this.mainArmTargetPosition + " " + this.mainArmTargetSpeed)
         },
         secondArmGoto: function () {
             console.log("Setting value");
-            this.sendSocketMessage("second-arm-goto " + this.secondArmTargetPosition)
+            this.sendSocketMessage("second-arm-goto " + this.secondArmTargetPosition + " " + this.secondArmTargetSpeed)
         },
         wristGoto: function () {
             console.log("Setting value");
@@ -436,7 +439,7 @@ var vue = new Vue({
             this.sliderGoto();
         },
         adjusterPush: function() {
-            this.adjusterTargetPosition = 1.889;
+            this.adjusterTargetPosition = 1.909;
             this.adjusterGoto();
         },
         adjusterBackUp: function() {
