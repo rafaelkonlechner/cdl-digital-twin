@@ -1,14 +1,11 @@
 package at.ac.tuwien.big
 
-import at.ac.tuwien.big.entity.SensorLogEntry
 import at.ac.tuwien.big.repository.SensorLogEntryRepository
 import org.eclipse.paho.client.mqttv3.*
 import org.springframework.messaging.handler.annotation.MessageMapping
 import org.springframework.messaging.simp.SimpMessagingTemplate
 import org.springframework.messaging.support.MessageBuilder
 import org.springframework.stereotype.Controller
-import java.time.LocalDateTime
-import java.util.*
 
 @Controller
 final class MessageController(val webSocket: SimpMessagingTemplate, val repository: SensorLogEntryRepository) : MqttCallback {
@@ -16,8 +13,6 @@ final class MessageController(val webSocket: SimpMessagingTemplate, val reposito
     final val qos = 0
     final val sensorTopic = "Sensor"
     final val actuatorTopic = "Actuator"
-    final val gateGreenTopic = "GateGreen"
-    final val gateRedTopic = "GateRed"
     final val detectionCameraTopic = "DetectionCamera"
     final val pickupCameraTopic = "PickupCamera"
     final val client: MqttClient
@@ -35,27 +30,19 @@ final class MessageController(val webSocket: SimpMessagingTemplate, val reposito
         client.subscribe(sensorTopic)
         client.subscribe(detectionCameraTopic)
         client.subscribe(pickupCameraTopic)
-        client.subscribe(gateGreenTopic)
-        client.subscribe(gateRedTopic)
     }
 
     override fun messageArrived(topic: String?, message: MqttMessage?) {
         when (topic) {
             sensorTopic -> {
-                repository.save(SensorLogEntry(UUID.randomUUID().toString(), LocalDateTime.now(), String(message!!.payload)))
-                sendWebSocketMessageSensor(String(message.payload))
+                //repository.save(SensorLogEntry(UUID.randomUUID().toString(), LocalDateTime.now(), String(message!!.payload)))
+                sendWebSocketMessageSensor(String(message!!.payload))
             }
             detectionCameraTopic -> {
                 sendWebSocketMessageDetectionCamera(String(message!!.payload))
             }
             pickupCameraTopic -> {
                 sendWebSocketMessagePickupCamera(String(message!!.payload))
-            }
-            gateGreenTopic -> {
-                println("($topic) Received < ${String(message!!.payload)} >")
-            }
-            gateRedTopic -> {
-                println("($topic) Received < ${String(message!!.payload)} >")
             }
         }
     }
