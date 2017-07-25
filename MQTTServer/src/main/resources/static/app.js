@@ -46,7 +46,7 @@ var vue = new Vue({
                 mainArmTargetPosition: 0.0,
                 secondArmTargetPosition: 0.0,
                 wristTargetPosition: 0.0,
-                gripperTargetPosition: 1.0
+                gripperTargetPosition: 0.0
             },
             {
                 name: "Approach",
@@ -65,6 +65,15 @@ var vue = new Vue({
                 gripperTargetPosition: -0.40
             },
             {
+                name: "Lift",
+                baseTargetPosition: 0.0,
+                mainArmTargetPosition: 1.315,
+                secondArmTargetPosition: -0.12,
+                wristTargetPosition: 0.0,
+                gripperTargetPosition: -0.40,
+                speed: 0.2
+            },
+            {
                 name: "Park",
                 baseTargetPosition: 3.142,
                 mainArmTargetPosition: 1.40,
@@ -78,7 +87,8 @@ var vue = new Vue({
                 mainArmTargetPosition: 1.36,
                 secondArmTargetPosition: -1.34,
                 wristTargetPosition: -1.5,
-                gripperTargetPosition: -0.2
+                gripperTargetPosition: -0.2,
+                speed: 0.1
             },
             {
                 name: "Release Full",
@@ -249,14 +259,29 @@ var vue = new Vue({
             var pos = this.savedPositions[index];
             if (this.baseTargetPosition !== pos.baseTargetPosition) {
                 this.baseTargetPosition = pos.baseTargetPosition;
+                if (pos.speed !== undefined) {
+                    this.baseTargetSpeed = pos.speed;
+                } else {
+                    this.baseTargetSpeed = 1.0
+                }
                 this.baseGoto();
             }
             if (this.mainArmTargetPosition !== pos.mainArmTargetPosition) {
                 this.mainArmTargetPosition = pos.mainArmTargetPosition;
+                if (pos.speed !== undefined) {
+                    this.mainArmTargetSpeed = pos.speed;
+                } else {
+                    this.mainArmTargetSpeed = 1.0
+                }
                 this.mainArmGoto();
             }
             if (this.secondArmTargetPosition !== pos.secondArmTargetPosition) {
                 this.secondArmTargetPosition = pos.secondArmTargetPosition;
+                if (pos.speed !== undefined) {
+                    this.secondArmTargetSpeed = pos.speed;
+                } else {
+                    this.secondArmTargetSpeed = 1.0
+                }
                 this.secondArmGoto();
             }
             if (this.wristTargetPosition !== pos.wristTargetPosition) {
