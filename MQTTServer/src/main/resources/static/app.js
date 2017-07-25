@@ -169,6 +169,7 @@ var vue = new Vue({
         gripperTargetPosition: 0.0,
         sliderTargetPosition: 0.0,
         adjusterTargetPosition: 0.0,
+        gripperHasContact: false,
         pickupImageBase64: "images/canvas.png",
         detectionImageBase64: "images/canvas.png",
         upKey: false,
@@ -356,6 +357,8 @@ var vue = new Vue({
                 case 'red-gate':
                     this.redCount++;
                     break;
+                case 'hand-plate':
+                    this.gripperHasContact = !this.gripperHasContact;
                 default:
                     console.log("Unknown message type")
             }
