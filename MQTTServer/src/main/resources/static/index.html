@@ -49,9 +49,15 @@
         <div class="container">
             <h3>Counter</h3>
             <pre v-if="context">
+                <span v-if="context.roboticArmState">
                 {{ context.roboticArmState.name }}
+                </span>
+                <span v-if="context.sliderState">
                 {{ context.sliderState.name }}
+                </span>
+                <span v-if="context.conveyorState">
                 {{ context.conveyorState.name }}
+                </span>
             </pre>
             <div>Green: {{ greenCount }}</div>
             <div>Red: {{ redCount }}</div>
