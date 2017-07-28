@@ -1,6 +1,6 @@
 package at.ac.tuwien.big.repository
 
-import at.ac.tuwien.big.entity.SensorLogEntry
+import at.ac.tuwien.big.entity.log.SensorLogEntry
 import org.springframework.data.mongodb.repository.MongoRepository
 
 interface SensorLogEntryRepository : MongoRepository<SensorLogEntry, String> {

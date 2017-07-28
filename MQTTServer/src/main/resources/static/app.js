@@ -4,9 +4,12 @@ var stompClient = Stomp.over(socket);
 
 stompClient.connect({}, function (frame) {
     console.log('Connected: ' + frame);
-    //TODO: Change topic name
+
     stompClient.subscribe('/topic/sensor', function (response) {
         vue.updateSensorData(response.body);
+    });
+    stompClient.subscribe('/topic/context', function (response) {
+        vue.updateContextData(response.body);
     });
     stompClient.subscribe('/topic/pickupCamera', function (response) {
         vue.updatePickupImage(response.body);
@@ -36,126 +39,15 @@ plot = function (x, y, w, h, color, container, imgId, rectId) {
     rect.style.top = (img.offsetTop + y) + 'px';
 };
 
+truncate = function (value) {
+    return Math.floor(value * 10000) / 10000;
+};
+
 var vue = new Vue({
     el: '#app',
     data: {
-        savedPositions: [
-            {
-                name: "Idle",
-                baseTargetPosition: 0.0,
-                mainArmTargetPosition: 0.0,
-                secondArmTargetPosition: 0.0,
-                wristTargetPosition: 0.0,
-                gripperTargetPosition: 0.0
-            },
-            {
-                name: "Approach",
-                baseTargetPosition: 0.0,
-                mainArmTargetPosition: 1.50,
-                secondArmTargetPosition: -0.12,
-                wristTargetPosition: 0.0,
-                gripperTargetPosition: 1.5
-            },
-            {
-                name: "Grip",
-                baseTargetPosition: 0.0,
-                mainArmTargetPosition: 1.50,
-                secondArmTargetPosition: -0.12,
-                wristTargetPosition: 0.0,
-                gripperTargetPosition: -0.40
-            },
-            {
-                name: "Lift",
-                baseTargetPosition: 0.0,
-                mainArmTargetPosition: 1.315,
-                secondArmTargetPosition: -0.12,
-                wristTargetPosition: 0.0,
-                gripperTargetPosition: -0.40,
-                speed: 0.2
-            },
-            {
-                name: "Park",
-                baseTargetPosition: 3.142,
-                mainArmTargetPosition: 1.40,
-                secondArmTargetPosition: -1.55,
-                wristTargetPosition: -1.5,
-                gripperTargetPosition: -0.40
-            },
-            {
-                name: "Release Half",
-                baseTargetPosition: 3.142,
-                mainArmTargetPosition: 1.36,
-                secondArmTargetPosition: -1.34,
-                wristTargetPosition: -1.5,
-                gripperTargetPosition: -0.2,
-                speed: 0.1
-            },
-            {
-                name: "Release Full",
-                baseTargetPosition: 3.142,
-                mainArmTargetPosition: 1.36,
-                secondArmTargetPosition: -1.334,
-                wristTargetPosition: -1.5,
-                gripperTargetPosition: 1.0
-            },
-            {
-                name: "Standby",
-                baseTargetPosition: 3.142,
-                mainArmTargetPosition: 0.0,
-                secondArmTargetPosition: 0.0,
-                wristTargetPosition: -1.5,
-                gripperTargetPosition: 1.0
-            },
-            {
-                name: "Pickup",
-                baseTargetPosition: 3.142,
-                mainArmTargetPosition: 1.22,
-                secondArmTargetPosition: -1.23,
-                wristTargetPosition: -1.5,
-                gripperTargetPosition: 1.0
-            },
-            {
-                name: "Pickup Grip",
-                baseTargetPosition: 3.142,
-                mainArmTargetPosition: 1.22,
-                secondArmTargetPosition: -1.23,
-                wristTargetPosition: -1.5,
-                gripperTargetPosition: -0.4
-            },
-            {
-                name: "GreenDeposit",
-                baseTargetPosition: -1.745,
-                mainArmTargetPosition: 0.942,
-                secondArmTargetPosition: -0.89,
-                wristTargetPosition: 1.5,
-                gripperTargetPosition: -0.4
-            },
-            {
-                name: "GreenDepositRelease",
-                baseTargetPosition: -1.745,
-                mainArmTargetPosition: 0.942,
-                secondArmTargetPosition: -0.89,
-                wristTargetPosition: 1.5,
-                gripperTargetPosition: 0.5
-            },
-            {
-                name: "RedDeposit",
-                baseTargetPosition: -1.449,
-                mainArmTargetPosition: 0.942,
-                secondArmTargetPosition: -0.89,
-                wristTargetPosition: 1.5,
-                gripperTargetPosition: -0.4
-            },
-            {
-                name: "RedDepositRelease",
-                baseTargetPosition: -1.449,
-                mainArmTargetPosition: 0.942,
-                secondArmTargetPosition: -0.89,
-                wristTargetPosition: 1.5,
-                gripperTargetPosition: 0.5
-            }
-
-        ],
+        context: null,
+        savedPositions: [],
         savePositionName: "",
         objectClass: '',
         greenCount: 0,
@@ -196,6 +88,14 @@ var vue = new Vue({
 
         tracking.ColorTracker.registerColor('green', function (r, g, b) {
             return r < (g / 2) && g > 100 && b < (g / 2);
+        });
+        var self = this;
+        $.ajax({
+            url: "http://localhost:8080/all"
+        }).then(function (data) {
+            data.forEach(function (x) {
+                self.savedPositions.push(x);
+            });
         });
     },
     watch: {
@@ -247,52 +147,17 @@ var vue = new Vue({
             this.savedPositions.push(
                 {
                     name: name,
-                    baseTargetPosition: this.basePosition,
-                    mainArmTargetPosition: this.mainArmPosition,
-                    secondArmTargetPosition: this.secondArmPosition,
-                    wristTargetPosition: this.wristPosition,
-                    gripperTargetPosition: this.gripperPosition
+                    basePosition: this.basePosition,
+                    mainArmPosition: this.mainArmPosition,
+                    secondArmPosition: this.secondArmPosition,
+                    wristPosition: this.wristPosition,
+                    gripperPosition: this.gripperPosition
                 }
             );
         },
         gotoSavedPosition: function (index) {
             var pos = this.savedPositions[index];
-            if (this.baseTargetPosition !== pos.baseTargetPosition) {
-                this.baseTargetPosition = pos.baseTargetPosition;
-                if (pos.speed !== undefined) {
-                    this.baseTargetSpeed = pos.speed;
-                } else {
-                    this.baseTargetSpeed = 1.0
-                }
-                this.baseGoto();
-            }
-            if (this.mainArmTargetPosition !== pos.mainArmTargetPosition) {
-                this.mainArmTargetPosition = pos.mainArmTargetPosition;
-                if (pos.speed !== undefined) {
-                    this.mainArmTargetSpeed = pos.speed;
-                } else {
-                    this.mainArmTargetSpeed = 1.0
-                }
-                this.mainArmGoto();
-            }
-            if (this.secondArmTargetPosition !== pos.secondArmTargetPosition) {
-                this.secondArmTargetPosition = pos.secondArmTargetPosition;
-                if (pos.speed !== undefined) {
-                    this.secondArmTargetSpeed = pos.speed;
-                } else {
-                    this.secondArmTargetSpeed = 1.0
-                }
-                this.secondArmGoto();
-            }
-            if (this.wristTargetPosition !== pos.wristTargetPosition) {
-                this.wristTargetPosition = pos.wristTargetPosition;
-                this.wristGoto();
-            }
-            if (this.gripperTargetPosition !== pos.gripperTargetPosition) {
-                this.gripperTargetPosition = pos.gripperTargetPosition;
-                this.gripperGoto();
-            }
-            //this.allGoto();
+            this.sendSocketMessage("goto: " + pos.name)
         },
         updateDetectionImage: function (image) {
             this.detectionImageBase64 = 'data:image/png;base64, ' + image;
@@ -310,13 +175,13 @@ var vue = new Vue({
                     event.data.forEach(function (rect) {
                         self.objectClass = rect.color;
                         plot(rect.x, rect.y, rect.width, rect.height, rect.color, '.detection-container', 'detection-camera', 'detection-rect');
-                        this.sendTrackingSocketMessage(rect.x + ", " + rect.y + ", " + rect.width + ", " + rect.height + ", " + rect.color)
+                        //this.sendTrackingSocketMessage(rect.x + ", " + rect.y + ", " + rect.width + ", " + rect.height + ", " + rect.color)
                     });
                 }
             });
             trackingTask = tracking.track('#detection-camera', colors);
         },
-        adjustGripper: function(x, y, width, height) {
+        adjustGripper: function (x, y, width, height) {
             console.log(x, y);
             console.log(this.handPosition);
         },
@@ -336,54 +201,47 @@ var vue = new Vue({
                     self.pickupObjects = event.data.length;
                     event.data.forEach(function (rect) {
                         plot(rect.x, rect.y, rect.width, rect.height, 'yellow', '.pickup-container', 'pickup-camera', 'pickup-rect');
-                        self.adjustGripper(rect.x, rect.y, rect.width, rect.height)
-                        //this.sendTrackingSocketMessage(rect.x + ", " + rect.y + ", " + rect.width + ", " + rect.height + ", " + rect.color)
+                        //self.adjustGripper(rect.x, rect.y, rect.width, rect.height);
+                        this.sendTrackingSocketMessage(JSON.stringify({
+                            x: rect.x,
+                            y: rect.y,
+                            width: rect.width,
+                            height: rect.height
+                        }));
                     });
                 }
             });
             var trackingTask = tracking.track('#pickup-camera', colors);
         },
+        updateContextData: function (message) {
+            this.context = JSON.parse(message);
+        },
         updateSensorData: function (message) {
-            var split = message.split(' ');
-            var value = parseFloat(split[1]);
-            if (!isNaN(value)) {
-                value = Math.floor(value * 10000) / 10000;
-            } else {
-                value = message.slice(message.indexOf(' '), message.length);
-            }
-            switch (split[0]) {
-                case 'base':
-                    this.basePosition = value;
+            json = JSON.parse(message);
+            switch (json.entity) {
+                case 'RoboticArm':
+                    this.basePosition = truncate(json.basePosition);
+                    this.mainArmPosition = truncate(json.mainArmPosition);
+                    this.secondArmPosition = truncate(json.secondArmPosition);
+                    this.wristPosition = truncate(json.wristPosition);
+                    this.handPosition = truncate(json.handPosition);
+                    this.gripperPosition = truncate(json.gripperPosition);
                     break;
-                case 'main_arm':
-                    this.mainArmPosition = value;
+                case 'Slider':
+                    this.sliderPosition = truncate(json.sliderPosition);
                     break;
-                case 'second_arm':
-                    this.secondArmPosition = value;
+                case 'Adjuster':
+                    this.adjusterPosition = truncate(json.adjusterPosition);
                     break;
-                case 'wrist':
-                    this.wristPosition = value;
-                    break;
-                case 'hand':
-                    this.handPosition = value;
-                    break;
-                case 'gripper':
-                    this.gripperPosition = value;
-                    break;
-                case 'slider':
-                    this.sliderPosition = value;
-                    break;
-                case 'adjuster':
-                    this.adjusterPosition = value;
-                    break;
-                case 'green-gate':
+                case 'GreenGate':
                     this.greenCount++;
                     break;
-                case 'red-gate':
+                case 'RedGate':
                     this.redCount++;
                     break;
-                case 'hand-plate':
+                case 'HandPlate':
                     this.gripperHasContact = !this.gripperHasContact;
+                    break;
                 default:
                     console.log("Unknown message type")
             }
@@ -393,6 +251,9 @@ var vue = new Vue({
         },
         sendTrackingSocketMessage: function (message) {
             stompClient.send("/app/tracking", {}, message);
+        },
+        sendCategorySocketMessage: function (message) {
+            stompClient.send("/app/category", {}, message);
         },
         keyDownUp: function () {
             this.upKey = true;
@@ -456,23 +317,7 @@ var vue = new Vue({
         },
         adjusterGoto: function () {
             console.log("Setting value");
-            this.sendSocketMessage("adjuster-goto " + this.adjusterTargetPosition)
-        },
-        sliderPush: function() {
-            this.sliderTargetPosition = 0.42;
-            this.sliderGoto();
-        },
-        sliderBackUp: function() {
-            this.sliderTargetPosition = 0.08;
-            this.sliderGoto();
-        },
-        adjusterPush: function() {
-            this.adjusterTargetPosition = 1.909;
-            this.adjusterGoto();
-        },
-        adjusterBackUp: function() {
-            this.adjusterTargetPosition = 1.669;
-            this.adjusterGoto();
+            this.sendSocketMessage("conveyor-goto " + this.adjusterTargetPosition)
         }
     }
 });

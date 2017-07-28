@@ -7,6 +7,7 @@ def on_connect(client, userdata, flags, rc):
     client.subscribe("Actuator")
 
 def on_message(client, userdata, msg):
+
     print(msg.topic + " " + str(msg.payload))
     payload = str(msg.payload)
     print(payload)

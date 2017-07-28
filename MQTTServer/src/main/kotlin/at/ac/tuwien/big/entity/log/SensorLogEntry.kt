@@ -1,4 +1,4 @@
-package at.ac.tuwien.big.entity
+package at.ac.tuwien.big.entity.log
 
 import java.time.LocalDateTime
 
