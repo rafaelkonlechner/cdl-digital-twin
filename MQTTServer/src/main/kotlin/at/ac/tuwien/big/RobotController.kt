@@ -6,10 +6,31 @@ import at.ac.tuwien.big.States as s
 
 object RobotController {
 
+    /**
+     * This function defines the rules for transitions between states. The basic control loop can be described as:
+     *
+     * Start:
+     * Object on conveyor?
+     *   if no: Slider Push, then Slider Home
+     * Object in pickup window?
+     *  while no: Adjuster Push, then Adjuster Home
+     * then Approach - Grip
+     * if gripped: Lift - Park - Release Half - Release Full - Standby
+     * <Testing Rig will detect category>
+     * then Retrieve - Retrieve Grip
+     * if green: Deposit Green - Release Green
+     * if red: Deposit Red - Release Red
+     * then back to IDLE
+     *
+     * The return value is a pair of a transition and a waiting time in milliseconds. Sometimes it is necessary to wait
+     * for the the next matching, as the expected state change requires time.
+     *
+     * @return a pair of transition and waiting time in milliseconds
+     */
     fun next(c: Context): Pair<Transition, Int>? {
         return when (c) {
             Context(s.idle, s.sliderHomePosition, s.conveyorEmpty, s.none) -> {
-                Pair(s.slider_pushed, 10000)
+                Pair(s.slider_pushed, 80000)
             }
             Context(s.idle, s.sliderPushedPosition, s.conveyorEmpty, s.none),
             Context(s.idle, s.sliderPushedPosition, s.conveyorObjectDetected, s.none),
@@ -82,36 +103,5 @@ object RobotController {
         }
     }
 
-    /**
-     * start:
-     * wait until object on conveyor
-     * while object not in good position:
-     *      push conveyor
-     *      then pull conveyor
-     * then approach
-     * then grip
-     * if gripped: lift
-     * then park
-     * then release half
-     * then release full
-     * then standby
-     * then retrieve
-     * then grip
-     * if green: deposit and release green
-     * if red: deposit and release red
-     * then go back to start
-     *
-     * in the meantime:
-     * push slider
-     * then pull slider
-     */
 
-
-    /**
-     * We need to now:
-     * Which of the all are we in?
-     * Is there an object on the conveyor?
-     * Which color does the object have?
-     * Does the gripper have contact with the object?
-     */
 }

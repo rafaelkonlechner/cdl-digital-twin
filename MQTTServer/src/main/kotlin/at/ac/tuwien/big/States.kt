@@ -3,6 +3,9 @@ package at.ac.tuwien.big
 import at.ac.tuwien.big.entity.state.*
 
 object States {
+    /*
+     * Robotic arm states
+     */
     val idle = RoboticArmState(name = "Idle")
     val approach = RoboticArmState(
             name = "Approach",
@@ -107,6 +110,10 @@ object States {
             wristPosition = 1.5,
             gripperPosition = 0.5
     )
+
+    /*
+     * Slidier states
+     */
     val sliderHomePosition = SliderState(
             "Slider Home", sliderPosition = 0.08
     )
@@ -114,26 +121,32 @@ object States {
             "Slider Push", sliderPosition = 0.42
     )
 
+    /*
+     * Conveyor states
+     */
     val conveyorEmpty = ConveyorState(
             "Conveyor Empty", adjusterPosition = 1.669
     )
-
     val conveyorObjectDetected = ConveyorState(
             "Conveyor Object Detected", adjusterPosition = 1.669, detected = true
     )
-
     val conveyorObjectInWindow = ConveyorState(
             "Conveyor Object In Window", adjusterPosition = 1.669, detected = true, inPickupWindow = true
     )
-
     val conveyorAdjusterPushed = ConveyorState(
             "Conveyor Adjuster Push", adjusterPosition = 1.909, detected = true, inPickupWindow = true
     )
 
+    /*
+     * Testing rig states
+     */
     val none = TestingRigState("None", objectCategory = ObjectCategory.NONE)
     val green = TestingRigState("Green", objectCategory = ObjectCategory.GREEN)
     val red = TestingRigState("Red", objectCategory = ObjectCategory.RED)
 
+    /*
+     * State transitions
+     */
     val slider_pushed = SliderTransition(sliderHomePosition, sliderPushedPosition)
     val slider_home = SliderTransition(sliderPushedPosition, sliderHomePosition)
 
@@ -163,6 +176,9 @@ object States {
     val releasered_idle = RoboticArmTransition(releaseRed, idle)
     val releasegreen_idle = RoboticArmTransition(releaseGreen, idle)
 
+    /*
+     * Maps of states per entity
+     */
     val roboticArm = mapOf(
             Pair(idle.name, idle),
             Pair(approach.name, approach),
@@ -199,18 +215,30 @@ object States {
 
     val all = roboticArm.values union slider.values union conveyor.values union testingRig.values
 
+    /**
+     * Match the given state against all states defined in this class and returns a match, if existent
+     */
     fun matchState(roboticArmState: RoboticArmState): RoboticArmState? {
         return roboticArm.values.filter { match(it, roboticArmState) }.firstOrNull()
     }
 
+    /**
+     * Match the given state against all states defined in this class and returns a match, if existent
+     */
     fun matchState(sliderState: SliderState): SliderState? {
         return slider.values.filter { match(it, sliderState) }.firstOrNull()
     }
 
+    /**
+     * Match the given state against all states defined in this class and returns a match, if existent
+     */
     fun matchState(conveyorState: ConveyorState): ConveyorState? {
         return conveyor.values.filter { match(it, conveyorState) }.firstOrNull()
     }
 
+    /**
+     * Match the given state against all states defined in this class and returns a match, if existent
+     */
     fun matchState(testingRigState: TestingRigState): TestingRigState? {
         return testingRig.values.filter { match(it, testingRigState) }.firstOrNull()
     }
@@ -239,6 +267,9 @@ object States {
         return Math.abs(a - b) <= 0.02
     }
 
+    /**
+     * Transform transitions into 'goto' commands for MQTT API
+     */
     fun transform(transition: Transition): List<String> {
         return when (transition) {
             is RoboticArmTransition -> {

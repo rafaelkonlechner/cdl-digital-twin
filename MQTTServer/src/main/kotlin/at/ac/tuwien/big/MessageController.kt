@@ -168,7 +168,6 @@ final class MessageController(val webSocket: SimpMessagingTemplate) : MqttCallba
         val match = States.matchState(conveyorState?.copy(detected = detected, inPickupWindow = inPickupWindow) ?: ConveyorState(detected = detected, inPickupWindow = inPickupWindow))
         if (match != conveyorState) {
             conveyorState = match
-            println(conveyorState)
         }
     }
 
