@@ -49,15 +49,10 @@
         <div class="container">
             <h3>Counter</h3>
             <pre v-if="context">
-                <span v-if="context.roboticArmState">
-                {{ context.roboticArmState.name }}
-                </span>
-                <span v-if="context.sliderState">
-                {{ context.sliderState.name }}
-                </span>
-                <span v-if="context.conveyorState">
-                {{ context.conveyorState.name }}
-                </span>
+                Robotic Arm: <span v-if="context.roboticArmState">{{ context.roboticArmState.name }}</span>
+                Slider: <span v-if="context.sliderState">{{ context.sliderState.name }}</span>
+                Conveyor: <span v-if="context.conveyorState">{{ context.conveyorState.name }}</span>
+                Testing Rig: <span v-if="context.testingRigState">{{ context.testingRigState.name }}</span>
             </pre>
             <div>Green: {{ greenCount }}</div>
             <div>Red: {{ redCount }}</div>
@@ -66,7 +61,8 @@
             <div class="mdl-cell mdl-cell--6-col">
                 <h2>Joint Rotation</h2>
                 <button>Manual</button>
-                <button @click="toggleAutoPlay()"><span v-if="!autoPlay">AutoPlay</span><span v-if="autoPlay">Stop</span></button>
+                <button @click="toggleAutoPlay()"><span v-if="!autoPlay">AutoPlay</span><span
+                        v-if="autoPlay">Stop</span></button>
                 <table>
                     <thead>
                     <tr>

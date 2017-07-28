@@ -3,7 +3,7 @@ package at.ac.tuwien.big
 import at.ac.tuwien.big.entity.state.*
 
 object States {
-    val idle = RoboticArmState("Idle")
+    val idle = RoboticArmState(name = "Idle")
     val approach = RoboticArmState(
             name = "Approach",
             basePosition = 0.0,
@@ -62,16 +62,16 @@ object States {
     val retrieve = RoboticArmState(
             name = "Retrieve",
             basePosition = 3.142,
-            mainArmPosition = 1.22,
-            secondArmPosition = -1.23,
+            mainArmPosition = 1.30,
+            secondArmPosition = -1.30,
             wristPosition = -1.5,
             gripperPosition = 1.0
     )
     val retrieveGrip = RoboticArmState(
             name = "Retrieve Grip",
             basePosition = 3.142,
-            mainArmPosition = 1.22,
-            secondArmPosition = -1.23,
+            mainArmPosition = 1.30,
+            secondArmPosition = -1.30,
             wristPosition = -1.5,
             gripperPosition = -0.4
     )
@@ -113,11 +113,21 @@ object States {
     val sliderPushedPosition = SliderState(
             "Slider Push", sliderPosition = 0.42
     )
-    val adjusterHomePosition = ConveyorState(
-            "Adjuster Home", adjusterPosition = 1.669
+
+    val conveyorEmpty = ConveyorState(
+            "Conveyor Empty", adjusterPosition = 1.669
     )
-    val adjusterPushedPosition = ConveyorState(
-            "Adjuster Push", adjusterPosition = 1.909
+
+    val conveyorObjectDetected = ConveyorState(
+            "Conveyor Object Detected", adjusterPosition = 1.669, detected = true
+    )
+
+    val conveyorObjectInWindow = ConveyorState(
+            "Conveyor Object In Window", adjusterPosition = 1.669, detected = true, inPickupWindow = true
+    )
+
+    val conveyorAdjusterPushed = ConveyorState(
+            "Conveyor Adjuster Push", adjusterPosition = 1.909, detected = true, inPickupWindow = true
     )
 
     val none = TestingRigState("None", objectCategory = ObjectCategory.NONE)
@@ -126,14 +136,18 @@ object States {
 
     val slider_pushed = SliderTransition(sliderHomePosition, sliderPushedPosition)
     val slider_home = SliderTransition(sliderPushedPosition, sliderHomePosition)
-    val adjuster_pushed = ConveyorTransition(adjusterHomePosition, adjusterPushedPosition)
-    val adjuster_home = ConveyorTransition(adjusterPushedPosition, adjusterHomePosition)
+
+    val adjuster_empty_detected = ConveyorTransition(conveyorEmpty, conveyorObjectDetected)
+    val adjuster_empty_pickup = ConveyorTransition(conveyorEmpty, conveyorObjectInWindow)
+    val adjuster_detected_pushed = ConveyorTransition(conveyorObjectDetected, conveyorAdjusterPushed)
+    val adjuster_pushed_detected = ConveyorTransition(conveyorAdjusterPushed, conveyorObjectDetected)
+    val adjuster_pushed_pickup = ConveyorTransition(conveyorAdjusterPushed, conveyorObjectInWindow)
 
     val none_green = TestingRigTransition(none, green)
     val none_red = TestingRigTransition(none, red)
     val to_none = TestingRigTransition(none, none)
 
-    val idle_approach = RoboticArmTransition(idle, approach)
+    val idle_approach = RoboticArmTransition(idle, approach, mainArmSpeed = 0.6)
     val approach_pickup = RoboticArmTransition(approach, pickup)
     val pickup_lift = RoboticArmTransition(pickup, lift, mainArmSpeed = 0.2, secondArmSpeed = 0.2)
     val lift_park = RoboticArmTransition(lift, park)
@@ -171,8 +185,10 @@ object States {
             Pair(sliderPushedPosition.name, sliderPushedPosition)
     )
     val conveyor = mapOf(
-            Pair(adjusterHomePosition.name, adjusterHomePosition),
-            Pair(adjusterPushedPosition.name, adjusterPushedPosition)
+            Pair(conveyorEmpty.name, conveyorEmpty),
+            Pair(conveyorObjectDetected.name, conveyorObjectDetected),
+            Pair(conveyorObjectInWindow.name, conveyorObjectInWindow),
+            Pair(conveyorAdjusterPushed.name, conveyorAdjusterPushed)
     )
 
     val testingRig = mapOf(
@@ -195,6 +211,10 @@ object States {
         return conveyor.values.filter { match(it, conveyorState) }.firstOrNull()
     }
 
+    fun matchState(testingRigState: TestingRigState): TestingRigState? {
+        return testingRig.values.filter { match(it, testingRigState) }.firstOrNull()
+    }
+
     private fun match(a: State, b: State): Boolean {
         return if (a is RoboticArmState && b is RoboticArmState) {
             similar(a.basePosition, b.basePosition)
@@ -206,6 +226,10 @@ object States {
             similar(a.sliderPosition, b.sliderPosition)
         } else if (a is ConveyorState && b is ConveyorState) {
             similar(a.adjusterPosition, b.adjusterPosition)
+            && a.detected == b.detected
+            && a.inPickupWindow == b.inPickupWindow
+        } else if (a is TestingRigState && b is TestingRigState) {
+            a.objectCategory == b.objectCategory
         } else {
             false
         }

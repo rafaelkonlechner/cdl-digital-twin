@@ -1,5 +1,7 @@
 package at.ac.tuwien.big
 
+import at.ac.tuwien.big.entity.message.Category
+import at.ac.tuwien.big.entity.message.Tracking
 import at.ac.tuwien.big.entity.state.*
 import com.google.gson.Gson
 import org.eclipse.paho.client.mqttv3.*
@@ -20,10 +22,10 @@ final class MessageController(val webSocket: SimpMessagingTemplate) : MqttCallba
     final val pickupCameraTopic = "PickupCamera"
     final val client: MqttClient
     final val gson: Gson
-    var roboticArmState: RoboticArmState? = null
-    var sliderState: SliderState? = null
-    var conveyorState: ConveyorState? = null
-    var testingRigState: TestingRigState? = null
+    var roboticArmState: RoboticArmState? = RoboticArmState()
+    var sliderState: SliderState? = SliderState()
+    var conveyorState: ConveyorState? = ConveyorState()
+    var testingRigState: TestingRigState? = TestingRigState()
     var autoPlay: Boolean = false
     var lock = Any()
 
@@ -94,24 +96,24 @@ final class MessageController(val webSocket: SimpMessagingTemplate) : MqttCallba
                 }
             }
             is ConveyorState -> {
-                val match = States.matchState(state)
-                if (match != null && state != match) {
+                val match = States.matchState(conveyorState?.copy(adjusterPosition = state.adjusterPosition) ?: state)
+                if (match != null && state.adjusterPosition != match.adjusterPosition) {
                     conveyorState = match
                 }
             }
-
         }
     }
 
-    @Scheduled(fixedRate = 200)
+    @Scheduled(fixedDelay = 200)
     fun issueCommands() {
+        val context = Context(roboticArmState?.copy(), sliderState?.copy(), conveyorState?.copy(), testingRigState?.copy())
         if (autoPlay) {
-            val context = Context(roboticArmState?.copy(), sliderState?.copy(), conveyorState?.copy(), States.red)
             val next = RobotController.next(context)
-            println("Next: ${context.roboticArmState?.name}, ${context.sliderState?.name}, ${context.conveyorState?.name} -> ${next?.targetState?.name}")
-            sendMQTTTransitionCommand(next)
-            sendWebSocketMessageContext(gson.toJson(context))
+            println("Next: ${context.roboticArmState?.name}, ${context.sliderState?.name}, ${context.conveyorState?.name} -> ${next?.first?.targetState?.name}")
+            sendMQTTTransitionCommand(next?.first)
+            Thread.sleep(next?.second?.toLong() ?: 0)
         }
+        sendWebSocketMessageContext(gson.toJson(context))
     }
 
     override fun connectionLost(cause: Throwable?) {
@@ -155,6 +157,27 @@ final class MessageController(val webSocket: SimpMessagingTemplate) : MqttCallba
             sendMQTTTransitionCommand(transition)
         } else {
             sendMQTTDirectCommand(command)
+        }
+    }
+
+    @MessageMapping("/tracking")
+    fun receiveTrackingWebSocketMessage(message: String) {
+        val tracking = gson.fromJson(message, Tracking::class.java)
+        val detected = !(tracking.x == 0.0 && tracking.y == 0.0)
+        val inPickupWindow = 36 < tracking.x && tracking.x < 125 && 60 < tracking.y && tracking.y < 105
+        val match = States.matchState(conveyorState?.copy(detected = detected, inPickupWindow = inPickupWindow) ?: ConveyorState(detected = detected, inPickupWindow = inPickupWindow))
+        if (match != conveyorState) {
+            conveyorState = match
+            println(conveyorState)
+        }
+    }
+
+    @MessageMapping("/category")
+    fun receiveCategoryWebSocketMessage(message: String) {
+        val category = gson.fromJson(message, Category::class.java)
+        val match = States.matchState(TestingRigState(objectCategory = category.objectCategory))
+        if (match != testingRigState) {
+            testingRigState = match
         }
     }
 

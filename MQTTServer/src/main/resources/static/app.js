@@ -46,6 +46,8 @@ truncate = function (value) {
 var vue = new Vue({
     el: '#app',
     data: {
+        x: 0.0,
+        y: 0.0,
         autoPlay: false,
         context: null,
         savedPositions: [],
@@ -192,11 +194,12 @@ var vue = new Vue({
                         document.querySelector('.detection-container').removeChild(rect);
                     }
                     self.objectClass = '';
+                    self.sendCategorySocketMessage(JSON.stringify({objectCategory: "NONE"}))
                 } else {
                     event.data.forEach(function (rect) {
                         self.objectClass = rect.color;
                         plot(rect.x, rect.y, rect.width, rect.height, rect.color, '.detection-container', 'detection-camera', 'detection-rect');
-                        //this.sendTrackingSocketMessage(rect.x + ", " + rect.y + ", " + rect.width + ", " + rect.height + ", " + rect.color)
+                        self.sendCategorySocketMessage(JSON.stringify({objectCategory: rect.color.toUpperCase()}))
                     });
                 }
             });
@@ -218,12 +221,20 @@ var vue = new Vue({
                         document.querySelector('.pickup-container').removeChild(rect);
                     }
                     self.pickupObjects = 0;
+                    self.sendTrackingSocketMessage(JSON.stringify({
+                            x: 0,
+                            y: 0
+                        }));
                 } else {
                     self.pickupObjects = event.data.length;
                     event.data.forEach(function (rect) {
                         plot(rect.x, rect.y, rect.width, rect.height, 'yellow', '.pickup-container', 'pickup-camera', 'pickup-rect');
                         //self.adjustGripper(rect.x, rect.y, rect.width, rect.height);
-                        this.sendTrackingSocketMessage(JSON.stringify({
+                        self.x = rect.x;
+                        self.y = rect.y;
+                        self.width = rect.width;
+                        self.height = rect.height;
+                        self.sendTrackingSocketMessage(JSON.stringify({
                             x: rect.x,
                             y: rect.y,
                             width: rect.width,
