@@ -103,13 +103,15 @@ final class MessageController(val webSocket: SimpMessagingTemplate) : MqttCallba
         }
     }
 
-    @Scheduled(fixedRate = 1000)
+    @Scheduled(fixedRate = 200)
     fun issueCommands() {
-        val context = Context(roboticArmState?.copy(), sliderState?.copy(), conveyorState?.copy(), States.red)
-        val next = RobotController.next(context)
-        println("Next: ${context.roboticArmState?.name}, ${context.sliderState?.name}, ${context.conveyorState?.name} -> ${next?.targetState?.name}")
-        sendMQTTTransitionCommand(next)
-        sendWebSocketMessageContext(gson.toJson(context))
+        if (autoPlay) {
+            val context = Context(roboticArmState?.copy(), sliderState?.copy(), conveyorState?.copy(), States.red)
+            val next = RobotController.next(context)
+            println("Next: ${context.roboticArmState?.name}, ${context.sliderState?.name}, ${context.conveyorState?.name} -> ${next?.targetState?.name}")
+            sendMQTTTransitionCommand(next)
+            sendWebSocketMessageContext(gson.toJson(context))
+        }
     }
 
     override fun connectionLost(cause: Throwable?) {

@@ -46,6 +46,7 @@ truncate = function (value) {
 var vue = new Vue({
     el: '#app',
     data: {
+        autoPlay: false,
         context: null,
         savedPositions: [],
         savePositionName: "",
@@ -97,6 +98,15 @@ var vue = new Vue({
                 self.savedPositions.push(x);
             });
         });
+
+        $.ajax({
+            url: "http://localhost:8080/autoPlay"
+        }).then(function (data) {
+            self.autoPlay = data
+        });
+    },
+    mounted: function () {
+        plot(35, 60, 113, 68, 'yellow', '.pickup-container', 'pickup-camera', 'pickup-window-rect');
     },
     watch: {
         upKey: function (newUpKey) {
@@ -143,6 +153,17 @@ var vue = new Vue({
         }
     },
     methods: {
+        toggleAutoPlay: function() {
+            console.log("Toggle AutoPlay");
+            this.autoPlay = !this.autoPlay;
+            var self = this;
+            $.ajax({
+                url: "http://localhost:8080/autoPlay",
+                type: "PUT",
+                contentType: "application/json",
+                data: JSON.stringify(self.autoPlay)
+            });
+        },
         savePosition: function (name) {
             this.savedPositions.push(
                 {

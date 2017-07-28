@@ -66,6 +66,7 @@
             <div class="mdl-cell mdl-cell--6-col">
                 <h2>Joint Rotation</h2>
                 <button>Manual</button>
+                <button @click="toggleAutoPlay()"><span v-if="!autoPlay">AutoPlay</span><span v-if="autoPlay">Stop</span></button>
                 <table>
                     <thead>
                     <tr>
