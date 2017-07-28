@@ -39,6 +39,7 @@ dependencies {
     compile("org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}")
     compile("org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.1.1")
     compile("com.google.code.gson:gson:2.8.1")
+    compile("com.espertech:esper:6.1.0")
     runtime('org.springframework.boot:spring-boot-devtools')
     testCompile('junit:junit:4.12')
     testCompile('org.springframework.boot:spring-boot-starter-test')
