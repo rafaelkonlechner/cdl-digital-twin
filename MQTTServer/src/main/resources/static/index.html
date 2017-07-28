@@ -31,33 +31,47 @@
           @keydown.83="keyDownS()"
           @keyup.83="keyUpS()"
     >
-        <h2>Camera Signals</h2>
-        <div class="container">
-            <h3>Pickup Assist Camera</h3>
-            <div class="pickup-container">
-                <img id="pickup-camera" style="width: 200px; height: 200px;" v-bind:src="pickupImageBase64"/>
-            </div>
-            <span>Detected Objects: {{ pickupObjects }}</span>
-        </div>
-        <div class="container">
-            <h3>Classification Camera</h3>
-            <div class="detection-container">
-                <img id="detection-camera" style="width: 200px; height: 200px;" v-bind:src="detectionImageBase64"/>
-            </div>
-            <span>Classification: {{ objectClass }}</span>
-        </div>
-        <div class="container">
-            <h3>Counter</h3>
-            <pre v-if="context">
-                Robotic Arm: <span v-if="context.roboticArmState">{{ context.roboticArmState.name }}</span>
-                Slider: <span v-if="context.sliderState">{{ context.sliderState.name }}</span>
-                Conveyor: <span v-if="context.conveyorState">{{ context.conveyorState.name }}</span>
-                Testing Rig: <span v-if="context.testingRigState">{{ context.testingRigState.name }}</span>
-            </pre>
-            <div>Green: {{ greenCount }}</div>
-            <div>Red: {{ redCount }}</div>
-        </div>
         <div class="mdl-grid">
+            <div class="mdl-cell mdl-cell--8-col">
+                <h2>Camera Signals</h2>
+                <div class="mdl-grid">
+                    <div class="mdl-cell mdl-cell--6-col">
+                        <h3>Pickup Assist Camera</h3>
+                        <div class="pickup-container">
+                            <img id="pickup-camera" style="width: 200px; height: 200px;"
+                                 v-bind:src="pickupImageBase64"/>
+                        </div>
+                        <span>Detected Objects: {{ pickupObjects }}</span>
+                    </div>
+                    <div class="mdl-cell mdl-cell--6-col">
+                        <h3>Classification Camera</h3>
+                        <div class="detection-container">
+                            <img id="detection-camera" style="width: 200px; height: 200px;"
+                                 v-bind:src="detectionImageBase64"/>
+                        </div>
+                        <span>Classification: {{ objectClass }}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="container mdl-cell mdl-cell--4-col">
+                <h2>States and Transitions</h2>
+                <div class="mdl-grid">
+                    <div class="container mdl-cell mdl-cell--12-col">
+                        <h3>Inferred States</h3>
+                        <ul class="state-list">
+                            <li>Robotic Arm: {{ context.roboticArmState.name }}</li>
+                            <li>Slider: {{ context.sliderState.name }}</li>
+                            <li>Conveyor: {{ context.conveyorState.name }}</li>
+                            <li>Testing Rig: {{ context.testingRigState.name }}</li>
+                        </ul>
+                        <h3>Category Check</h3>
+                        <ul class="state-list">
+                            <li>Green: {{ greenCount }}</li>
+                            <li>Red: {{ redCount }}</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
             <div class="mdl-cell mdl-cell--6-col">
                 <h2>Joint Rotation</h2>
                 <button>Manual</button>
