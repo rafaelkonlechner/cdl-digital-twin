@@ -30,7 +30,7 @@ object RobotController {
     fun next(c: Context): Pair<Transition, Int>? {
         return when (c) {
             Context(s.idle, s.sliderHomePosition, s.conveyorEmpty, s.none) -> {
-                Pair(s.slider_pushed, 80000)
+                Pair(s.slider_pushed, 8000)
             }
             Context(s.idle, s.sliderPushedPosition, s.conveyorEmpty, s.none),
             Context(s.idle, s.sliderPushedPosition, s.conveyorObjectDetected, s.none),
