@@ -59,10 +59,10 @@
                     <div class="container mdl-cell mdl-cell--12-col">
                         <h3>Inferred States</h3>
                         <ul class="state-list">
-                            <li>Robotic Arm: {{ context.roboticArmState.name }}</li>
-                            <li>Slider: {{ context.sliderState.name }}</li>
-                            <li>Conveyor: {{ context.conveyorState.name }}</li>
-                            <li>Testing Rig: {{ context.testingRigState.name }}</li>
+                            <li v-if="context">Robotic Arm: {{ context.roboticArmState.name }}</li>
+                            <li v-if="context">Slider: {{ context.sliderState.name }}</li>
+                            <li v-if="context">Conveyor: {{ context.conveyorState.name }}</li>
+                            <li v-if="context">Testing Rig: {{ context.testingRigState.name }}</li>
                         </ul>
                         <h3>Category Check</h3>
                         <ul class="state-list">
