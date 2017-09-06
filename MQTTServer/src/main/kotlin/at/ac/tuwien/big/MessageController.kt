@@ -1,8 +1,10 @@
 package at.ac.tuwien.big
 
+import at.ac.tuwien.big.entity.log.SensorLogEntry
 import at.ac.tuwien.big.entity.message.Category
 import at.ac.tuwien.big.entity.message.Tracking
 import at.ac.tuwien.big.entity.state.*
+import at.ac.tuwien.big.repository.SensorLogEntryRepository
 import com.google.gson.Gson
 import org.eclipse.paho.client.mqttv3.*
 import org.springframework.messaging.handler.annotation.MessageMapping
@@ -10,10 +12,12 @@ import org.springframework.messaging.simp.SimpMessagingTemplate
 import org.springframework.messaging.support.MessageBuilder
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Controller
+import java.time.LocalDateTime
+import java.util.*
 import javax.annotation.PreDestroy
 
 @Controller
-final class MessageController(val webSocket: SimpMessagingTemplate) : MqttCallback {
+final class MessageController(val webSocket: SimpMessagingTemplate, val logRepository: SensorLogEntryRepository) : MqttCallback {
 
     final val qos = 0
     final val sensorTopic = "Sensor"
@@ -87,7 +91,7 @@ final class MessageController(val webSocket: SimpMessagingTemplate) : MqttCallba
                 if (match != null && state != match) {
                     roboticArmState = match
                 }
-
+                // logRepository.save(SensorLogEntry(UUID.randomUUID().toString().substring(0..7), LocalDateTime.now(), gson.toJson(state)))
             }
             is SliderState -> {
                 val match = States.matchState(state)
