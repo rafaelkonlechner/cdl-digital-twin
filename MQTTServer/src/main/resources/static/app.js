@@ -40,7 +40,7 @@ plot = function (x, y, w, h, color, container, imgId, rectId) {
 };
 
 truncate = function (value) {
-    return Math.floor(value * 10000) / 10000;
+    return Math.floor(value * 1000) / 1000;
 };
 
 var vue = new Vue({
@@ -60,7 +60,11 @@ var vue = new Vue({
         mainArmPosition: 0.0,
         secondArmPosition: 0.0,
         wristPosition: 0.0,
-        handPosition: [],
+        handPosition: {
+            x: 0.0,
+            y: 0.0,
+            z: 0.0
+        },
         gripperPosition: 0.0,
         sliderPosition: 0.0,
         adjusterPosition: 0.0,
@@ -82,7 +86,39 @@ var vue = new Vue({
         leftKey: false,
         rightKey: false,
         wKey: false,
-        sKey: false
+        sKey: false,
+    },
+    computed: {
+        idlePathIsActive: function () {
+            return this.context !== null ? this.context.roboticArmState.name === "Idle" : false;
+        },
+        readyPathIsActive: function () {
+            return this.context !== null ? this.context.conveyorState.name === "Conveyor Object In Window" : false;
+        },
+        approachPathIsActive: function () {
+            return this.context !== null ? this.context.roboticArmState.name === "Approach" : false;
+        },
+        pickupPathIsActive: function () {
+            return this.context !== null ? this.context.roboticArmState.name === "Pickup" : false;
+        },
+        parkPathIsActive: function () {
+            return this.context !== null ? this.context.roboticArmState.name === "Park" : false;
+        },
+        releasePathIsActive: function () {
+            return this.context !== null ? this.context.roboticArmState.name === "Full Release" : false;
+        },
+        parkGreenPathIsActive: function () {
+            return this.context !== null ? this.context.roboticArmState.name === "Deposit Green" : false;
+        },
+        parkRedPathIsActive: function () {
+            return this.context !== null ? this.context.roboticArmState.name === "Deposit Red" : false;
+        },
+        depositGreenPathIsActive: function () {
+            return this.context !== null ? this.context.roboticArmState.name === "Release Green" : false;
+        },
+        depositRedPathIsActive: function () {
+            return this.context !== null ? this.context.roboticArmState.name === "Release Red" : false;
+        }
     },
     created: function () {
         tracking.ColorTracker.registerColor('red', function (r, g, b) {
@@ -109,6 +145,38 @@ var vue = new Vue({
     },
     mounted: function () {
         plot(35, 60, 113, 68, 'yellow', '.pickup-container', 'pickup-camera', 'pickup-window-rect');
+        var time = new Date();
+        var data1 = [
+            {
+                x: [time],
+                y: [0.0],
+                mode: 'lines',
+                name: "Main Arm",
+                line: {color: '#2196F3'}
+            }];
+        var data2 = [{
+            x: [time],
+            y: [0.0],
+            mode: 'lines',
+            name: "Second Arm",
+            line: {color: '#4CAF50'}
+        }];
+        var layout = {
+            yaxis: {
+                nticks: 10,
+                range: [-3.15, 3.15]
+            },
+            margin: {
+                l: 15,
+                r: 15,
+                b: 15,
+                t: 15,
+                pad: 0
+            },
+            showlegend: false
+        };
+        Plotly.plot('monitor-1', data1, layout);
+        Plotly.plot('monitor-2', data2, layout);
     },
     watch: {
         upKey: function (newUpKey) {
@@ -155,7 +223,7 @@ var vue = new Vue({
         }
     },
     methods: {
-        toggleAutoPlay: function() {
+        toggleAutoPlay: function () {
             console.log("Toggle AutoPlay");
             this.autoPlay = !this.autoPlay;
             var self = this;
@@ -181,6 +249,9 @@ var vue = new Vue({
         gotoSavedPosition: function (index) {
             var pos = this.savedPositions[index];
             this.sendSocketMessage("goto: " + pos.name)
+        },
+        gotoIdlePosition: function () {
+            this.sendSocketMessage("goto: Idle")
         },
         updateDetectionImage: function (image) {
             this.detectionImageBase64 = 'data:image/png;base64, ' + image;
@@ -222,14 +293,13 @@ var vue = new Vue({
                     }
                     self.pickupObjects = 0;
                     self.sendTrackingSocketMessage(JSON.stringify({
-                            x: 0,
-                            y: 0
-                        }));
+                        x: 0,
+                        y: 0
+                    }));
                 } else {
                     self.pickupObjects = event.data.length;
                     event.data.forEach(function (rect) {
                         plot(rect.x, rect.y, rect.width, rect.height, 'yellow', '.pickup-container', 'pickup-camera', 'pickup-rect');
-                        //self.adjustGripper(rect.x, rect.y, rect.width, rect.height);
                         self.x = rect.x;
                         self.y = rect.y;
                         self.width = rect.width;
@@ -256,7 +326,12 @@ var vue = new Vue({
                     this.mainArmPosition = truncate(json.mainArmPosition);
                     this.secondArmPosition = truncate(json.secondArmPosition);
                     this.wristPosition = truncate(json.wristPosition);
-                    this.handPosition = truncate(json.handPosition);
+                    var vector = json.handPosition;
+                    vector = vector.substring(vector.indexOf('(') + 1, vector.indexOf(')'));
+                    vector = vector.split(',');
+                    this.handPosition.x = truncate(vector[0]);
+                    this.handPosition.y = truncate(vector[1]);
+                    this.handPosition.z = truncate(vector[2]);
                     this.gripperPosition = truncate(json.gripperPosition);
                     break;
                 case 'Slider':
@@ -275,8 +350,38 @@ var vue = new Vue({
                     this.gripperHasContact = !this.gripperHasContact;
                     break;
                 default:
-                    console.log("Unknown message type")
+                    console.log("Unknown message type: " + json.entity)
             }
+            var time = new Date();
+            var updateBase = {
+                x: [[time]],
+                y: [[this.basePosition]]
+            };
+            var updateMainArm = {
+                x: [[time]],
+                y: [[this.mainArmPosition]]
+            };
+            var updateSecondArm = {
+                x: [[time]],
+                y: [[this.secondArmPosition]]
+            };
+            var updateGripper = {
+                x: [[time]],
+                y: [[this.gripperPosition]]
+            };
+            var olderTime = time.setMinutes(time.getMinutes() - 1);
+            var futureTime = time.setMinutes(time.getMinutes() + 1);
+            var minuteView = {
+                xaxis: {
+                    type: 'date',
+                    range: [olderTime, futureTime]
+                }
+            };
+
+            Plotly.relayout('monitor-1', minuteView);
+            Plotly.relayout('monitor-2', minuteView);
+            Plotly.extendTraces('monitor-1', updateMainArm, [0]);
+            Plotly.extendTraces('monitor-2', updateBase, [0]);
         },
         sendSocketMessage: function (message) {
             stompClient.send("/app/actuator", {}, message);
@@ -313,9 +418,11 @@ var vue = new Vue({
         },
         keyDownW: function () {
             this.wKey = true;
+            console.log("down")
         },
         keyUpW: function () {
             this.wKey = false;
+            console.log("up")
         },
         keyDownS: function () {
             this.sKey = true;
