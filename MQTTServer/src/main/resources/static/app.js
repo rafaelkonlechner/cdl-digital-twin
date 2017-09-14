@@ -68,6 +68,7 @@ var vue = new Vue({
         gripperPosition: 0.0,
         sliderPosition: 0.0,
         adjusterPosition: 0.0,
+        platformPosition: 0.0,
         baseTargetPosition: 0.0,
         baseTargetSpeed: 1.0,
         mainArmTargetSpeed: 1.0,
@@ -78,6 +79,7 @@ var vue = new Vue({
         gripperTargetPosition: 0.0,
         sliderTargetPosition: 0.0,
         adjusterTargetPosition: 0.0,
+        platformTargetPosition: 0.0,
         gripperHasContact: false,
         pickupImageBase64: "images/canvas.png",
         detectionImageBase64: "images/canvas.png",
@@ -86,7 +88,7 @@ var vue = new Vue({
         leftKey: false,
         rightKey: false,
         wKey: false,
-        sKey: false,
+        sKey: false
     },
     computed: {
         idlePathIsActive: function () {
@@ -179,6 +181,9 @@ var vue = new Vue({
         Plotly.plot('monitor-2', data2, layout);
     },
     watch: {
+        platformTargetPosition: function(newTargetPosition) {
+          this.platformGoto();
+        },
         upKey: function (newUpKey) {
             if (newUpKey === true) {
                 this.sendSocketMessage("lower-main-arm")
@@ -337,8 +342,11 @@ var vue = new Vue({
                 case 'Slider':
                     this.sliderPosition = truncate(json.sliderPosition);
                     break;
-                case 'Adjuster':
+                case 'Conveyor':
                     this.adjusterPosition = truncate(json.adjusterPosition);
+                    break;
+                case 'TestingRig':
+                    this.platformPosition = truncate(json.platformPosition);
                     break;
                 case 'GreenGate':
                     this.greenCount++;
@@ -418,11 +426,9 @@ var vue = new Vue({
         },
         keyDownW: function () {
             this.wKey = true;
-            console.log("down")
         },
         keyUpW: function () {
             this.wKey = false;
-            console.log("up")
         },
         keyDownS: function () {
             this.sKey = true;
@@ -457,6 +463,10 @@ var vue = new Vue({
         adjusterGoto: function () {
             console.log("Setting value");
             this.sendSocketMessage("conveyor-goto " + this.adjusterTargetPosition)
+        },
+        platformGoto: function () {
+            console.log("Setting value");
+            this.sendSocketMessage("platform-goto " + -this.platformTargetPosition)
         }
     }
 });

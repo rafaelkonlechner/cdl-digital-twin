@@ -3,9 +3,26 @@ header {
     padding: 2vh;
 }
 
+footer {
+    text-align: center;
+    padding: 3vh;
+    background-color: #F5F5F5;
+    color: #9E9E9E;
+    box-shadow: inset 0 0 1px #BDBDBD;
+}
+
+footer h5 {
+    font-family: 'Roboto Mono', monospace;
+    line-height: 1.4;
+}
+
+footer h5 small {
+    font-size: .7em;
+}
+
 main {
     width: 80vw;
-    margin: 0 auto;
+    margin: 0 auto 10vh auto;
 }
 
 input {
@@ -89,6 +106,16 @@ img {
 .arrow-controls {
     position: absolute;
     z-index: 10;
+}
+
+.absolute {
+    position: absolute;
+    z-index: 10;
+}
+
+.small {
+    font-size: 0.8em;
+    line-height: 1.2em;
 }
 
 .title-bar {
