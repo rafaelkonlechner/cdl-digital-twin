@@ -1,6 +1,5 @@
 package at.ac.tuwien.big
 
-import at.ac.tuwien.big.entity.log.SensorLogEntry
 import at.ac.tuwien.big.entity.message.Category
 import at.ac.tuwien.big.entity.message.Tracking
 import at.ac.tuwien.big.entity.state.*
@@ -12,8 +11,6 @@ import org.springframework.messaging.simp.SimpMessagingTemplate
 import org.springframework.messaging.support.MessageBuilder
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Controller
-import java.time.LocalDateTime
-import java.util.*
 import javax.annotation.PreDestroy
 
 @Controller
@@ -76,6 +73,7 @@ final class MessageController(val webSocket: SimpMessagingTemplate, val logRepos
                 "RoboticArm" -> gson.fromJson(payload, RoboticArmState::class.java)
                 "Slider" -> gson.fromJson(payload, SliderState::class.java)
                 "Conveyor" -> gson.fromJson(payload, ConveyorState::class.java)
+                "TestingRig" -> gson.fromJson(payload, TestingRigState::class.java)
                 else -> BasicState()
             }
         } catch(e: Exception) {
@@ -103,6 +101,12 @@ final class MessageController(val webSocket: SimpMessagingTemplate, val logRepos
                 val match = States.matchState(conveyorState?.copy(adjusterPosition = state.adjusterPosition) ?: state)
                 if (match != null && state.adjusterPosition != match.adjusterPosition) {
                     conveyorState = match
+                }
+            }
+            is TestingRigState -> {
+                val match = States.matchState(testingRigState?.copy(platformPosition = state.platformPosition) ?: state)
+                if (match != null && state.platformPosition != match.platformPosition) {
+                    testingRigState = match
                 }
             }
         }

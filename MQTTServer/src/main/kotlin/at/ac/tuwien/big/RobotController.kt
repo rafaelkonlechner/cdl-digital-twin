@@ -87,6 +87,16 @@ object RobotController {
             Context(s.retrieveGrip, s.sliderHomePosition, s.conveyorEmpty, s.green) -> {
                 Pair(s.retrievegrip_depositgreen, 0)
             }
+            Context(s.depositRed, s.sliderHomePosition, s.conveyorEmpty, s.red) -> {
+                Pair(s.red_tilt, 0)
+            }
+            Context(s.depositGreen, s.sliderHomePosition, s.conveyorEmpty, s.green) -> {
+                Pair(s.green_tilt, 0)
+            }
+            Context(s.depositRed, s.sliderHomePosition, s.conveyorEmpty, s.tilted),
+            Context(s.depositGreen, s.sliderHomePosition, s.conveyorEmpty, s.tilted) -> {
+                Pair(s.tilted_none, 0)
+            }
             Context(s.depositRed, s.sliderHomePosition, s.conveyorEmpty, s.none) -> {
                 Pair(s.depositred_releasered, 0)
             }
@@ -102,6 +112,4 @@ object RobotController {
             else -> null
         }
     }
-
-
 }

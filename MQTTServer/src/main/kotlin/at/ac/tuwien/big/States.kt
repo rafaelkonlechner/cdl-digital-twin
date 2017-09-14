@@ -143,6 +143,7 @@ object States {
     val none = TestingRigState("None", objectCategory = ObjectCategory.NONE)
     val green = TestingRigState("Green", objectCategory = ObjectCategory.GREEN)
     val red = TestingRigState("Red", objectCategory = ObjectCategory.RED)
+    val tilted = TestingRigState("Tilted", platformPosition = -1.0)
 
     /*
      * State transitions
@@ -159,6 +160,9 @@ object States {
     val none_green = TestingRigTransition(none, green)
     val none_red = TestingRigTransition(none, red)
     val to_none = TestingRigTransition(none, none)
+    val red_tilt = TestingRigTransition(red, tilted)
+    val green_tilt = TestingRigTransition(green, tilted)
+    val tilted_none = TestingRigTransition(tilted, none)
 
     val idle_approach = RoboticArmTransition(idle, approach, mainArmSpeed = 0.6)
     val approach_pickup = RoboticArmTransition(approach, pickup)
@@ -210,7 +214,8 @@ object States {
     val testingRig = mapOf(
             Pair(none.name, none),
             Pair(green.name, green),
-            Pair(red.name, red)
+            Pair(red.name, red),
+            Pair(tilted.name, tilted)
     )
 
     val all = roboticArm.values union slider.values union conveyor.values union testingRig.values
@@ -254,10 +259,11 @@ object States {
             similar(a.sliderPosition, b.sliderPosition)
         } else if (a is ConveyorState && b is ConveyorState) {
             similar(a.adjusterPosition, b.adjusterPosition)
-            && a.detected == b.detected
-            && a.inPickupWindow == b.inPickupWindow
+                    && a.detected == b.detected
+                    && a.inPickupWindow == b.inPickupWindow
         } else if (a is TestingRigState && b is TestingRigState) {
             a.objectCategory == b.objectCategory
+                    && similar(a.platformPosition, b.platformPosition)
         } else {
             false
         }
@@ -287,6 +293,9 @@ object States {
             }
             is ConveyorTransition -> {
                 listOf("adjuster-goto ${transition.targetState.adjusterPosition}")
+            }
+            is TestingRigTransition -> {
+                listOf("platform-goto ${transition.targetState.platformPosition}")
             }
             else -> emptyList()
         }
