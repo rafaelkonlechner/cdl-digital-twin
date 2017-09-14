@@ -64,6 +64,10 @@ def on_goto_message(message):
         GameLogic.adjuster_target_position = position
         print("New adjuster target position: " + str(GameLogic.adjuster_target_position))
         GameLogic.adjuster_target = True
+    elif msg_type == "b'platform-goto":
+        GameLogic.platform_target_position = position
+        print("New platform target position: " + str(GameLogic.platform_target_position))
+        GameLogic.platform_target = True
 
 def on_goto_speed_control_message(message):
     print(message)
@@ -112,6 +116,7 @@ def main():
     GameLogic.gripper_target_position = 0.0
     GameLogic.slider_target_position = 0.0
     GameLogic.adjuster_target_position = 0.0
+    GameLogic.platform_target_position = 0.0
     GameLogic.base_target_speed = 0.0
     GameLogic.main_arm_target_speed = 0.0
     GameLogic.second_arm_target_speed = 0.0
@@ -132,5 +137,8 @@ def main():
     GameLogic.gripper_target = False
     GameLogic.slider_target = False
     GameLogic.adjuster_target = False
+    GameLogic.platform_target = False
+    GameLogic.greenCounter = 0
+    GameLogic.redCounter = 0
 
     GameLogic.server = Server()

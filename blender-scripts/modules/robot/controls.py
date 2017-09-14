@@ -46,7 +46,6 @@ def calc_speed(position, target, speed, max_speed, acceleration, deceleration):
         new_speed = 0
     return new_speed
 def main():
-
     base_joint = GameLogic.getCurrentScene().objects["base_joint"]
     main_arm = GameLogic.getCurrentScene().objects["main_arm"]
     second_arm = GameLogic.getCurrentScene().objects["second_arm"]
@@ -54,6 +53,7 @@ def main():
     gripper = GameLogic.getCurrentScene().objects["Finger1.1"]
     slider = GameLogic.getCurrentScene().objects["SliderPanel"]
     adjuster = GameLogic.getCurrentScene().objects["Adjuster1"]
+    tilt = GameLogic.getCurrentScene().objects["Platform"]
     base_position = base_joint.localOrientation.to_euler().z
     main_arm_position = main_arm.localOrientation.to_euler().y
     second_arm_position = second_arm.localOrientation.to_euler().y
@@ -61,6 +61,7 @@ def main():
     gripper_position = gripper.localOrientation.to_euler().y
     slider_position = slider.worldPosition.x
     adjuster_position = adjuster.worldPosition.x
+    platform_position = tilt.localOrientation.to_euler().y
     base_speed = GameLogic.base_rotation_speed
     base_target_speed = GameLogic.base_target_speed
     main_arm_speed = GameLogic.main_arm_rotation_speed
@@ -117,3 +118,11 @@ def main():
         GameLogic.sendMessage("push-adjuster")
     if GameLogic.adjuster_target and adjuster_position > GameLogic.adjuster_target_position:
         GameLogic.sendMessage("backup-adjuster")
+
+
+    if math.isclose(platform_position, GameLogic.platform_target_position, rel_tol=0.003, abs_tol=0.003):
+        GameLogic.platform_target = False
+    if GameLogic.platform_target and platform_position > GameLogic.platform_target_position:
+        GameLogic.sendMessage("tilt-platform")
+    if GameLogic.platform_target and platform_position < GameLogic.platform_target_position:
+        GameLogic.sendMessage("untilt-platform")

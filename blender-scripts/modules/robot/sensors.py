@@ -9,6 +9,7 @@ def main():
     gripper = GameLogic.getCurrentScene().objects["Finger1.1"]
     slider = GameLogic.getCurrentScene().objects["SliderPanel"]
     adjuster = GameLogic.getCurrentScene().objects["Adjuster1"]
+    platform = GameLogic.getCurrentScene().objects["Platform"]
 
     base_position = base_joint.localOrientation.to_euler().z
     main_arm_position = main_arm.localOrientation.to_euler().y
@@ -18,6 +19,7 @@ def main():
     gripper_position = gripper.localOrientation.to_euler().y
     slider_position = slider.worldPosition.x
     adjuster_position = adjuster.worldPosition.x
+    platform_position = platform.localOrientation.to_euler().y
 
     message_roboticarm = """
     {
@@ -40,10 +42,12 @@ def main():
 
     message_slider = "{ \"entity\": \"Slider\", \"sliderPosition\": %s }" % (str(slider_position))
     message_adjuster = "{ \"entity\": \"Conveyor\", \"adjusterPosition\": %s }" % (str(adjuster_position))
+    message_platform = "{ \"entity\": \"TestingRig\", \"platformPosition\": %s }" % (str(platform_position))
 
     GameLogic.server.client.publish("Sensor", payload=message_roboticarm, qos=0, retain=False)
     GameLogic.server.client.publish("Sensor", payload=message_slider, qos=0, retain=False)
     GameLogic.server.client.publish("Sensor", payload=message_adjuster, qos=0, retain=False)
+    GameLogic.server.client.publish("Sensor", payload=message_platform, qos=0, retain=False)
     #GameLogic.server.client.publish("Sensor", payload=message_slider, qos=0, retain=False)
     #GameLogic.server.client.publish("Sensor", payload=message_adjuster, qos=0, retain=False)
     #GameLogic.server.client.publish("Sensor", payload="main_arm " + str(main_arm_position), qos=0, retain=False)
