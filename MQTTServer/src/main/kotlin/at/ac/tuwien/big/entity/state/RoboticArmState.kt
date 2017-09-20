@@ -7,5 +7,6 @@ data class RoboticArmState (
         var mainArmPosition: Double = 0.0,
         var secondArmPosition: Double = 0.0,
         var wristPosition: Double = 0.0,
-        var gripperPosition: Double = 0.0
-) : State
+        var gripperPosition: Double = 0.0,
+        var gripperHasContact: Boolean = false
+) : StateEvent

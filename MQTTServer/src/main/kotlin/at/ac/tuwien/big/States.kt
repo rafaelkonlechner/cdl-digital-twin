@@ -146,7 +146,7 @@ object States {
     val tilted = TestingRigState("Tilted", platformPosition = -1.0)
 
     /*
-     * State transitions
+     * StateEvent transitions
      */
     val slider_pushed = SliderTransition(sliderHomePosition, sliderPushedPosition)
     val slider_home = SliderTransition(sliderPushedPosition, sliderHomePosition)
@@ -248,7 +248,7 @@ object States {
         return testingRig.values.filter { match(it, testingRigState) }.firstOrNull()
     }
 
-    private fun match(a: State, b: State): Boolean {
+    private fun match(a: StateEvent, b: StateEvent): Boolean {
         return if (a is RoboticArmState && b is RoboticArmState) {
             similar(a.basePosition, b.basePosition)
                     && similar(a.mainArmPosition, b.mainArmPosition)

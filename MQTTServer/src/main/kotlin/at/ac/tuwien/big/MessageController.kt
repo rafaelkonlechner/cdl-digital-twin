@@ -1,9 +1,7 @@
 package at.ac.tuwien.big
 
-import at.ac.tuwien.big.entity.message.Category
 import at.ac.tuwien.big.entity.message.Tracking
 import at.ac.tuwien.big.entity.state.*
-import at.ac.tuwien.big.repository.SensorLogEntryRepository
 import com.google.gson.Gson
 import org.eclipse.paho.client.mqttv3.*
 import org.springframework.messaging.handler.annotation.MessageMapping
@@ -14,7 +12,7 @@ import org.springframework.stereotype.Controller
 import javax.annotation.PreDestroy
 
 @Controller
-final class MessageController(val webSocket: SimpMessagingTemplate, val logRepository: SensorLogEntryRepository) : MqttCallback {
+final class MessageController(val webSocket: SimpMessagingTemplate) : MqttCallback {
 
     final val qos = 0
     final val sensorTopic = "Sensor"
@@ -28,6 +26,7 @@ final class MessageController(val webSocket: SimpMessagingTemplate, val logRepos
     var conveyorState: ConveyorState? = ConveyorState()
     var testingRigState: TestingRigState? = TestingRigState()
     var autoPlay: Boolean = false
+    var recording: Boolean = false
     var lock = Any()
 
     init {
@@ -58,7 +57,16 @@ final class MessageController(val webSocket: SimpMessagingTemplate, val logRepos
                 handle(parse(String(message.payload)))
             }
             detectionCameraTopic -> {
-                sendWebSocketMessageDetectionCamera(String(message!!.payload))
+                val code = QRCodeReader.readText(String(message!!.payload))
+                if (code != null) {
+                    sendWebSocketMessageQRCodeScanner(gson.toJson(code).toString())
+                }
+                val color = if (code == null) ObjectCategory.NONE else if (code.color == "red") ObjectCategory.RED else ObjectCategory.GREEN
+                val match = States.matchState(TestingRigState(objectCategory = color))
+                if (match != testingRigState) {
+                    testingRigState = match
+                }
+                sendWebSocketMessageDetectionCamera(String(message.payload))
             }
             pickupCameraTopic -> {
                 sendWebSocketMessagePickupCamera(String(message!!.payload))
@@ -66,30 +74,33 @@ final class MessageController(val webSocket: SimpMessagingTemplate, val logRepos
         }
     }
 
-    fun parse(payload: String): State {
+    fun parse(payload: String): StateEvent {
         try {
-            val basicState = gson.fromJson(payload, BasicState::class.java)
+            val basicState = gson.fromJson(payload, BasicStateEvent::class.java)
             return when (basicState.entity) {
                 "RoboticArm" -> gson.fromJson(payload, RoboticArmState::class.java)
                 "Slider" -> gson.fromJson(payload, SliderState::class.java)
                 "Conveyor" -> gson.fromJson(payload, ConveyorState::class.java)
                 "TestingRig" -> gson.fromJson(payload, TestingRigState::class.java)
-                else -> BasicState()
+                "Gate" -> gson.fromJson(payload, GatePassed::class.java)
+                else -> BasicStateEvent()
             }
         } catch(e: Exception) {
             println(e.message)
         }
-        return BasicState()
+        return BasicStateEvent()
     }
 
-    fun handle(state: State) {
+    fun handle(state: StateEvent) {
         when (state) {
             is RoboticArmState -> {
                 val match = States.matchState(state)
                 if (match != null && state != match) {
                     roboticArmState = match
                 }
-                // logRepository.save(SensorLogEntry(UUID.randomUUID().toString().substring(0..7), LocalDateTime.now(), gson.toJson(state)))
+                if (recording) {
+                    TimeSeriesCollectionService.savePoint(state)
+                }
             }
             is SliderState -> {
                 val match = States.matchState(state)
@@ -102,11 +113,22 @@ final class MessageController(val webSocket: SimpMessagingTemplate, val logRepos
                 if (match != null && state.adjusterPosition != match.adjusterPosition) {
                     conveyorState = match
                 }
+                if (recording) {
+                    TimeSeriesCollectionService.savePoint(state)
+                }
             }
             is TestingRigState -> {
                 val match = States.matchState(testingRigState?.copy(platformPosition = state.platformPosition) ?: state)
                 if (match != null && state.platformPosition != match.platformPosition) {
                     testingRigState = match
+                }
+                if (recording) {
+                    TimeSeriesCollectionService.savePoint(state)
+                }
+            }
+            is GatePassed -> {
+                if (recording) {
+                    TimeSeriesCollectionService.savePoint(state)
                 }
             }
         }
@@ -179,15 +201,6 @@ final class MessageController(val webSocket: SimpMessagingTemplate, val logRepos
         }
     }
 
-    @MessageMapping("/category")
-    fun receiveCategoryWebSocketMessage(message: String) {
-        val category = gson.fromJson(message, Category::class.java)
-        val match = States.matchState(TestingRigState(objectCategory = category.objectCategory))
-        if (match != testingRigState) {
-            testingRigState = match
-        }
-    }
-
     private fun sendWebSocketMessageSensor(message: String) {
         sendWebSocketMessage("/topic/sensor", message)
     }
@@ -202,6 +215,10 @@ final class MessageController(val webSocket: SimpMessagingTemplate, val logRepos
 
     private fun sendWebSocketMessageDetectionCamera(message: String) {
         sendWebSocketMessage("/topic/detectionCamera", message)
+    }
+
+    private fun sendWebSocketMessageQRCodeScanner(message: String) {
+        sendWebSocketMessage("/topic/qrCode", message)
     }
 
     private fun sendWebSocketMessage(topic: String, message: String) {

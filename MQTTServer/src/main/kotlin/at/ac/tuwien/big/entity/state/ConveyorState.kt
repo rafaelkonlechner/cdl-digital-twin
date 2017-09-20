@@ -6,4 +6,4 @@ data class ConveyorState(
         var adjusterPosition: Double = 0.0,
         var detected: Boolean = false,
         var inPickupWindow: Boolean = false
-) : State
+) : StateEvent

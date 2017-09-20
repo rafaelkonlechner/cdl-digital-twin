@@ -1,6 +1,6 @@
 package at.ac.tuwien.big.entity.state
 
 interface Transition {
-    val startState: State
-    val targetState: State
+    val startState: StateEvent
+    val targetState: StateEvent
 }

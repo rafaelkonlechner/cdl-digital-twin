@@ -5,4 +5,4 @@ data class TestingRigState(
         override var entity: String = "TestingRig",
         var platformPosition: Double = 0.0,
         var objectCategory: ObjectCategory = ObjectCategory.NONE
-) : State
+) : StateEvent

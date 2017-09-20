@@ -19,8 +19,6 @@ class ProductionTest {
 
         val production = mutableListOf<Pair<Transition, Long>>()
 
-        production.add(Pair(States.adjuster_pushed, 2000))
-        production.add(Pair(States.adjuster_home, 500))
         production.add(Pair(States.idle_approach, 3000))
         production.add(Pair(States.approach_pickup, 4000))
         production.add(Pair(States.pickup_lift, 200))

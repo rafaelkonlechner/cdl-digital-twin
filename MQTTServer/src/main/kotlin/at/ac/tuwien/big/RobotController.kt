@@ -50,22 +50,28 @@ object RobotController {
             Context(s.approach, s.sliderHomePosition, s.conveyorObjectInWindow, s.none) -> {
                 Pair(s.approach_pickup, 0)
             }
-            Context(s.pickup, s.sliderHomePosition, s.conveyorObjectInWindow, s.none) -> {
+            Context(s.pickup, s.sliderHomePosition, s.conveyorObjectInWindow, s.none),
+            Context(s.pickup, s.sliderHomePosition, s.conveyorObjectDetected, s.none) -> {
                 Pair(s.pickup_lift, 0)
             }
             Context(s.lift, s.sliderHomePosition, s.conveyorObjectInWindow, s.none) -> {
                 Pair(s.lift_park, 0)
             }
+            Context(s.park, s.sliderHomePosition, s.conveyorEmpty, s.none),
             Context(s.park, s.sliderHomePosition, s.conveyorEmpty, s.red),
             Context(s.park, s.sliderHomePosition, s.conveyorEmpty, s.green)
             -> {
                 Pair(s.park_halfrelease, 0)
             }
+            Context(s.halfRelease, s.sliderHomePosition, s.conveyorEmpty, s.none),
             Context(s.halfRelease, s.sliderHomePosition, s.conveyorEmpty, s.red),
             Context(s.halfRelease, s.sliderHomePosition, s.conveyorEmpty, s.green)
             -> {
                 Pair(s.halfrelease_fullrelease, 0)
             }
+            Context(s.idle, s.sliderHomePosition, s.conveyorEmpty, s.red),
+            Context(s.idle, s.sliderHomePosition, s.conveyorEmpty, s.green),
+            Context(s.fullRelease, s.sliderHomePosition, s.conveyorEmpty, s.none),
             Context(s.fullRelease, s.sliderHomePosition, s.conveyorEmpty, s.red),
             Context(s.fullRelease, s.sliderHomePosition, s.conveyorEmpty, s.green)
             -> {
@@ -95,6 +101,9 @@ object RobotController {
             }
             Context(s.depositRed, s.sliderHomePosition, s.conveyorEmpty, s.tilted),
             Context(s.depositGreen, s.sliderHomePosition, s.conveyorEmpty, s.tilted) -> {
+                Pair(s.tilted_none, 0)
+            }
+            Context(s.idle, s.sliderHomePosition, s.conveyorEmpty, s.tilted) -> {
                 Pair(s.tilted_none, 0)
             }
             Context(s.depositRed, s.sliderHomePosition, s.conveyorEmpty, s.none) -> {
