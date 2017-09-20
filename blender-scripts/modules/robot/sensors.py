@@ -1,6 +1,7 @@
 import GameLogic
 
 def main():
+
     base_joint = GameLogic.getCurrentScene().objects["base_joint"]
     main_arm = GameLogic.getCurrentScene().objects["main_arm"]
     second_arm = GameLogic.getCurrentScene().objects["second_arm"]
@@ -21,6 +22,11 @@ def main():
     adjuster_position = adjuster.worldPosition.x
     platform_position = platform.localOrientation.to_euler().y
 
+    if (GameLogic.handContact % 2 == 1):
+        hand_contact = True
+    else:
+        hand_contact = False
+
     message_roboticarm = """
     {
     "entity": "RoboticArm",
@@ -29,7 +35,8 @@ def main():
     "secondArmPosition": %s,
     "wristPosition": %s,
     "gripperPosition": %s,
-    "handPosition": "%s"
+    "handPosition": "%s",
+    "gripperHasContact": "%s"
     }
     """ % (
     str(base_position),
@@ -38,6 +45,7 @@ def main():
     str(wrist_position),
     str(gripper_position),
     str(hand_position),
+    str(hand_contact)
     )
 
     message_slider = "{ \"entity\": \"Slider\", \"sliderPosition\": %s }" % (str(slider_position))
