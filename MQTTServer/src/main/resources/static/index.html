@@ -16,8 +16,9 @@
 <div id="app">
     <header>
         <h1>5-Axis Robotic Arm Twin
-            <small>kuka-kr5-r850</small>
+            <small>Kuka KR5-R850</small>
         </h1>
+        <a href="#">Setup Instructions</a>
     </header>
     <div class="blueprint">
         <div id="second-arm-controls" class="arrow-controls" style="top: 28%; left: 41%; width: 24px;">
@@ -35,7 +36,7 @@
             y: {{handPosition.y}}<br/>
             z: {{handPosition.z}}
         </div>
-        <div class="absolute blueprint-text small" style="top: 37%; left: 44%; height: 35px; text-align: left;">
+        <div class="absolute blueprint-text small" style="top: 36%; left: 44%; height: 35px; text-align: left;">
             contact: {{gripperHasContact}}
         </div>
         <div class="absolute blueprint-text small" style="top: 31%; left: 22%; height: 35px;">
@@ -87,7 +88,13 @@
     <main id="main">
         <div class="mdl-grid">
             <div class="mdl-cell mdl-cell--8-col">
-                <h2>Sensor Monitors</h2>
+                <h2 style="display: inline-block;">Sensor Monitors</h2>
+                <button @click="toggleRecording()">
+                    <i class="material-icons" v-bind:class="{ red: recording }"
+                       style="font-size: 12px; position: relative; top: 2px;">fiber_manual_record</i>
+                    <span v-if="!recording" style="font-size: 12px;">Record</span>
+                    <span v-if="recording" style="font-size: 12px;">Stop Recording</span>
+                </button>
             </div>
             <div class="mdl-cell mdl-cell--4-col">
                 <h2>Camera Signals</h2>
@@ -106,7 +113,6 @@
                     <img id="pickup-camera" style="width: 200px; height: 200px;"
                          v-bind:src="pickupImageBase64"/>
                 </div>
-                <span>Detected Objects: {{ pickupObjects }}</span>
             </div>
             <div class="mdl-cell mdl-cell--2-col">
                 <p>Testing Rig</p>
@@ -114,9 +120,9 @@
                     <img id="detection-camera" style="width: 200px; height: 200px;"
                          v-bind:src="detectionImageBase64"/>
                 </div>
-                <span>Classification: {{ objectClass }}</span>
             </div>
-            <div class="mdl-cell mdl-cell--6-col">
+            <span>Classification: {{ objectClass }}</span>
+            <div class="mdl-cell mdl-cell--4-col">
                 <h2>Precision Controls</h2>
                 <table>
                     <thead>
@@ -205,10 +211,39 @@
                     </tr>
                 </table>
             </div>
+            <div class="mdl-cell mdl-cell--4-col">
+                <h2>Work Item Information</h2>
+                <div style="display: inline-block;">
+                    <table>
+                        <tr>
+                            <td width="100"><strong>ID</strong></td>
+                            <td>{{qrCode.id}}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Batch-ID</strong></td>
+                            <td>{{qrCode.batchId}}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Color</strong></td>
+                            <td>{{qrCode.color}}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>URL</strong></td>
+                            <td><span v-if="qrCode.id === '-'">{{qrCode.id}}</span><a v-if="qrCode.id !== '-'" href="#">http://cdl.io/{{qrCode.id}}</a></td>
+                        </tr>
+                    </table>
+                </div>
+                <div style="display: inline-block; float: right;">
+                    <img v-if="qrCode.base64" style="width: 75px; height: 75px; margin: 0;" v-bind:src="qrCode.base64"/>
+                </div>
+            </div>
         </div>
+
     </main>
     <footer>
-        <h5><strong>Christian Doppler Laboratory</strong><br/><small>on Model-Integrated Smart Production</small></h5>
+        <h5><strong>Christian Doppler Laboratory</strong><br/>
+            <small>on Model-Integrated Smart Production</small>
+        </h5>
     </footer>
 </div>
 <script src="bower_components/vue/dist/vue.js"></script>

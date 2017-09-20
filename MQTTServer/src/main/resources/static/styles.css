@@ -3,6 +3,14 @@ header {
     padding: 2vh;
 }
 
+header h1 {
+    line-height: 1em;
+}
+
+a {
+    color: #90A4AE;
+}
+
 footer {
     text-align: center;
     padding: 3vh;
@@ -84,6 +92,13 @@ img {
     top: -1000px;
 }
 
+.analog-text {
+    position: absolute;
+    font-family: 'Roboto Mono', monospace;
+    font-size: 0.8em;
+    color: yellow;
+}
+
 .state-list {
     list-style-type: none;
     cursor: default;
@@ -139,14 +154,13 @@ img {
 }
 
 .active-path {
-    stroke:#0d47a1;
+    stroke: #0d47a1;
     stroke-width: 12.5px;
 }
 
 .tabs {
     border-radius: 5px;
-    border: solid 2px;
-    border-color: white;
+    border: 2px solid white;
     color: white;
     padding: 2px 5px;
     margin-top: 10px;
@@ -159,4 +173,8 @@ img {
 .tabs.active-tab {
     color: #1E88E5;
     background-color: white;
+}
+
+.red {
+    color: red;
 }

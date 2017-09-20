@@ -17,11 +17,14 @@ stompClient.connect({}, function (frame) {
     stompClient.subscribe('/topic/detectionCamera', function (response) {
         vue.updateDetectionImage(response.body);
     });
+    stompClient.subscribe('/topic/qrCode', function (response) {
+        vue.updateQRCodeData(response.body);
+    });
 });
 
 stompClient.debug = null;
 
-plot = function (x, y, w, h, color, container, imgId, rectId) {
+plot = function (x, y, w, h, color, container, imgId, rectId, textId, text) {
     var img = document.getElementById(imgId);
     var rect;
     if (document.getElementById(rectId) === null) {
@@ -37,6 +40,20 @@ plot = function (x, y, w, h, color, container, imgId, rectId) {
     rect.style.height = (h + 2) + 'px';
     rect.style.left = (img.offsetLeft + x) + 'px';
     rect.style.top = (img.offsetTop + y) + 'px';
+    if (text !== undefined) {
+        if (document.getElementById(textId) !== null) {
+            textElement = document.getElementById(textId);
+            document.querySelector(container).removeChild(textElement);
+        }
+        var textElement = document.createElement('p');
+        textElement.id = textId;
+        document.querySelector(container).appendChild(textElement);
+        var node = document.createTextNode(text);
+        textElement.appendChild(node);
+        textElement.classList.add('analog-text');
+        textElement.style.left = (img.offsetLeft + x) + 'px';
+        textElement.style.top = (img.offsetTop + y - 25) + 'px';
+    }
 };
 
 truncate = function (value) {
@@ -49,6 +66,7 @@ var vue = new Vue({
         x: 0.0,
         y: 0.0,
         autoPlay: false,
+        recording: false,
         context: null,
         savedPositions: [],
         savePositionName: "",
@@ -88,7 +106,14 @@ var vue = new Vue({
         leftKey: false,
         rightKey: false,
         wKey: false,
-        sKey: false
+        sKey: false,
+        qrCode: {
+            id: "-",
+            batchId: "-",
+            color: "-",
+            base64: "images/code-1.png",
+            url: "-"
+        }
     },
     computed: {
         idlePathIsActive: function () {
@@ -123,13 +148,10 @@ var vue = new Vue({
         }
     },
     created: function () {
-        tracking.ColorTracker.registerColor('red', function (r, g, b) {
-            return r > 100 && g < (r / 2) && b < (r / 2);
+        tracking.ColorTracker.registerColor('white', function (r, g, b) {
+            return r > 253 && g > 253 && b > 253;
         });
 
-        tracking.ColorTracker.registerColor('green', function (r, g, b) {
-            return r < (g / 2) && g > 100 && b < (g / 2);
-        });
         var self = this;
         $.ajax({
             url: "http://localhost:8080/all"
@@ -144,9 +166,15 @@ var vue = new Vue({
         }).then(function (data) {
             self.autoPlay = data
         });
+
+        $.ajax({
+            url: "http://localhost:8080/recording"
+        }).then(function (data) {
+            self.recording = data
+        });
     },
     mounted: function () {
-        plot(35, 60, 113, 68, 'yellow', '.pickup-container', 'pickup-camera', 'pickup-window-rect');
+        plot(35, 60, 113, 68, 'yellow', '.pickup-container', 'pickup-camera', 'pickup-window-rect', "pickup-text", "Pickup Window");
         var time = new Date();
         var data1 = [
             {
@@ -181,8 +209,8 @@ var vue = new Vue({
         Plotly.plot('monitor-2', data2, layout);
     },
     watch: {
-        platformTargetPosition: function(newTargetPosition) {
-          this.platformGoto();
+        platformTargetPosition: function (newTargetPosition) {
+            this.platformGoto();
         },
         upKey: function (newUpKey) {
             if (newUpKey === true) {
@@ -239,6 +267,17 @@ var vue = new Vue({
                 data: JSON.stringify(self.autoPlay)
             });
         },
+        toggleRecording: function () {
+            console.log("Toggle Recordindg");
+            this.recording = !this.recording;
+            var self = this;
+            $.ajax({
+                url: "http://localhost:8080/recording",
+                type: "PUT",
+                contentType: "application/json",
+                data: JSON.stringify(self.recording)
+            });
+        },
         savePosition: function (name) {
             this.savedPositions.push(
                 {
@@ -260,22 +299,20 @@ var vue = new Vue({
         },
         updateDetectionImage: function (image) {
             this.detectionImageBase64 = 'data:image/png;base64, ' + image;
-            var colors = new tracking.ColorTracker(['red', 'green']);
+            var colors = new tracking.ColorTracker(['white']);
             var self = this;
             colors.on('track', function (event) {
                 if (event.data.length === 0) {
                     // No colors were detected in this frame.
                     var rect = document.getElementById("detection-rect");
+                    var text = document.getElementById("detection-text");
                     if (rect !== null) {
                         document.querySelector('.detection-container').removeChild(rect);
+                        document.querySelector('.detection-container').removeChild(text);
                     }
-                    self.objectClass = '';
-                    self.sendCategorySocketMessage(JSON.stringify({objectCategory: "NONE"}))
                 } else {
                     event.data.forEach(function (rect) {
-                        self.objectClass = rect.color;
-                        plot(rect.x, rect.y, rect.width, rect.height, rect.color, '.detection-container', 'detection-camera', 'detection-rect');
-                        self.sendCategorySocketMessage(JSON.stringify({objectCategory: rect.color.toUpperCase()}))
+                        plot(rect.x, rect.y, rect.width, rect.height, 'yellow', '.detection-container', 'detection-camera', 'detection-rect', "detection-text", 'object');
                     });
                 }
             });
@@ -287,7 +324,7 @@ var vue = new Vue({
         },
         updatePickupImage: function (image) {
             this.pickupImageBase64 = 'data:image/png;base64, ' + image;
-            var colors = new tracking.ColorTracker(['red', 'green']);
+            var colors = new tracking.ColorTracker(['white']);
             var self = this;
             colors.on('track', function (event) {
                 if (event.data.length === 0) {
@@ -323,6 +360,10 @@ var vue = new Vue({
         updateContextData: function (message) {
             this.context = JSON.parse(message);
         },
+        updateQRCodeData: function (message) {
+            this.qrCode = JSON.parse(message);
+            this.qrCode.base64 = 'data:image/png;base64, ' + this.qrCode.base64;
+        },
         updateSensorData: function (message) {
             json = JSON.parse(message);
             switch (json.entity) {
@@ -338,6 +379,7 @@ var vue = new Vue({
                     this.handPosition.y = truncate(vector[1]);
                     this.handPosition.z = truncate(vector[2]);
                     this.gripperPosition = truncate(json.gripperPosition);
+                    this.gripperHasContact = json.gripperHasContact;
                     break;
                 case 'Slider':
                     this.sliderPosition = truncate(json.sliderPosition);
@@ -396,9 +438,6 @@ var vue = new Vue({
         },
         sendTrackingSocketMessage: function (message) {
             stompClient.send("/app/tracking", {}, message);
-        },
-        sendCategorySocketMessage: function (message) {
-            stompClient.send("/app/category", {}, message);
         },
         keyDownUp: function () {
             this.upKey = true;
@@ -467,6 +506,13 @@ var vue = new Vue({
         platformGoto: function () {
             console.log("Setting value");
             this.sendSocketMessage("platform-goto " + -this.platformTargetPosition)
+        },
+        resetData: function () {
+            $.ajax({
+                url: "http://localhost:8080/resetData",
+                type: "PUT",
+                contentType: "application/json"
+            });
         }
     }
 });
