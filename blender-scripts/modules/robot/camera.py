@@ -29,8 +29,8 @@ class Worker: #(threading.Thread):
         GameLogic.server.client.publish("PickupCamera", payload=rgb_pickup, qos=0, retain=False)
 
 def main():
-    imgDetectorX= 64
-    imgDetectorY = 36
+    imgDetectorX= 64*5
+    imgDetectorY = 36*5
     imgPickupX = 256
     imgPickupY = 144
     if hasattr(GameLogic, 'detector') and hasattr(GameLogic, 'pickup'):
