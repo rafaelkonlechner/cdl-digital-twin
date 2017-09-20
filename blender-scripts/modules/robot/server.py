@@ -1,6 +1,7 @@
 import paho.mqtt.client as mqtt
 import GameLogic
 import re
+import bpy
 
 def on_connect(client, userdata, flags, rc):
     print("Connected with result code "+str(rc))
@@ -140,5 +141,15 @@ def main():
     GameLogic.platform_target = False
     GameLogic.greenCounter = 0
     GameLogic.redCounter = 0
+    GameLogic.handContact = 0
+
+    # Paint QR-Code textures
+    for i in range(1, 9):
+        qr_code = bpy.data.images.load("//qr-codes/code-" + str(i) + ".png")
+        material = bpy.data.objects["Object" + str(i)].active_material.copy()
+        texture = bpy.data.objects["Object" + str(i)].active_material.active_texture.copy()
+        texture.image = qr_code
+        material.active_texture = texture
+        bpy.data.objects["Object" + str(i)].active_material = material
 
     GameLogic.server = Server()
