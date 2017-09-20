@@ -1,9 +1,13 @@
 version: '2'
 services:
-  mongodb:
-    image: mongo
+  influx:
+    image: influxdb
     ports:
-      - "27017:27017"
+      - "8086:8086"
+#  chronograf:
+#      image: chronograf
+#      ports:
+#        - "8888:8888"
   rabbitmq:
     build: .
     ports:
