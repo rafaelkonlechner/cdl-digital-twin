@@ -1,6 +1,6 @@
 import GameLogic
 import bge
-import bpyp
+import bpy
 import random
 
 def main():
@@ -11,7 +11,8 @@ def main():
         controller = bge.logic.getCurrentController()
         owner = controller.owner
         scene = bge.logic.getCurrentScene()
-        source = scene.objectsInactive[1]
+        source = scene.objectsInactive[0]
+        print(source)
         new_object = scene.addObject(source, owner, 0)
         new_object.worldPosition = source.worldPosition
         new_object.localScale = [1.0,1.0,1.0]
@@ -22,4 +23,4 @@ def main():
         texture = bpy.data.objects["ObjectSource"].active_material.active_texture.copy()
         texture.image = qr_code
         material.active_texture = texture
-        bpy.data.objects["ObjectSource")].active_material = material
+        bpy.data.objects["ObjectSource"].active_material = material
