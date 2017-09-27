@@ -1,6 +1,6 @@
 package at.ac.tuwien.big
 
-import at.ac.tuwien.big.entity.message.Tracking
+import at.ac.tuwien.big.entity.message.ItemPosition
 import at.ac.tuwien.big.entity.state.*
 import com.google.gson.Gson
 import org.eclipse.paho.client.mqttv3.*
@@ -11,6 +11,9 @@ import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Controller
 import javax.annotation.PreDestroy
 
+/**
+ * Coordinates the flow of messages between the simulation and the client
+ */
 @Controller
 final class MessageController(val webSocket: SimpMessagingTemplate) : MqttCallback {
 
@@ -57,7 +60,7 @@ final class MessageController(val webSocket: SimpMessagingTemplate) : MqttCallba
                 handle(parse(String(message.payload)))
             }
             detectionCameraTopic -> {
-                val code = QRCodeReader.readText(String(message!!.payload))
+                val code = QRCode.read(String(message!!.payload))
                 if (code != null) {
                     sendWebSocketMessageQRCodeScanner(gson.toJson(code).toString())
                 }
@@ -96,6 +99,9 @@ final class MessageController(val webSocket: SimpMessagingTemplate) : MqttCallba
             is RoboticArmState -> {
                 val match = States.matchState(state)
                 if (match != null && state != match) {
+                    if (roboticArmState != null) {
+                        TimeSeriesCollectionService.savePoint(RoboticArmTransition(startState = roboticArmState!!, targetState = match))
+                    }
                     roboticArmState = match
                 }
                 if (recording) {
@@ -192,7 +198,7 @@ final class MessageController(val webSocket: SimpMessagingTemplate) : MqttCallba
 
     @MessageMapping("/tracking")
     fun receiveTrackingWebSocketMessage(message: String) {
-        val tracking = gson.fromJson(message, Tracking::class.java)
+        val tracking = gson.fromJson(message, ItemPosition::class.java)
         val detected = !(tracking.x == 0.0 && tracking.y == 0.0)
         val inPickupWindow = 36 < tracking.x && tracking.x < 125 && 60 < tracking.y && tracking.y < 105
         val match = States.matchState(conveyorState?.copy(detected = detected, inPickupWindow = inPickupWindow) ?: ConveyorState(detected = detected, inPickupWindow = inPickupWindow))

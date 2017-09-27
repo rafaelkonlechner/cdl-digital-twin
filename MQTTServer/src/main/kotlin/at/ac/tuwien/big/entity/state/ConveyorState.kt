@@ -1,5 +1,8 @@
 package at.ac.tuwien.big.entity.state
 
+/**
+ * State of the conveyor
+ */
 data class ConveyorState(
         override var name: String = "Snapshot",
         override var entity: String = "Conveyor",

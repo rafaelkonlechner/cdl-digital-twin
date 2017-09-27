@@ -1,26 +1,31 @@
 package at.ac.tuwien.big
 
+import at.ac.tuwien.big.States as s
 import at.ac.tuwien.big.entity.state.Context
 import at.ac.tuwien.big.entity.state.Transition
-import at.ac.tuwien.big.States as s
 
+/**
+ * This controller holds the core logic of the production steps during a simulation by searching the defined successor
+ * state for a given input state.
+ */
 object RobotController {
 
     /**
-     * This function defines the rules for transitions between states. The basic control loop can be described as:
+     * Defines the rules for transitions between states. The basic control loop can be described as:
      *
      * Start:
-     * Object on conveyor?
-     *   if no: Slider Push, then Slider Home
-     * Object in pickup window?
-     *  while no: Adjuster Push, then Adjuster Home
-     * then Approach - Grip
-     * if gripped: Lift - Park - Release Half - Release Full - Standby
-     * <Testing Rig will detect category>
-     * then Retrieve - Retrieve Grip
-     * if green: Deposit Green - Release Green
-     * if red: Deposit Red - Release Red
-     * then back to IDLE
+     * + Is there an item on the conveyor?
+     *      + If yes: Do nothing
+     *      + If no: *Slider Push*, then *Slider Home*
+     * + Is the item in the pickup window?
+     *      + While no: *Adjuster Push*, then *Adjuster Home*
+     * + *Approach* - *Grip* - *Lift* - *Park* - *Release Half* - *Release Full* - *Standby*
+     * + ... Testing Rig will detect category ...
+     * + *Retrieve* - *Retrieve Grip*
+     * + What color is the item?
+     *      + If green: *Deposit Green* - *Release Green*
+     *      + If red: *Deposit Red* - *Release Red*
+     * + *IDLE*
      *
      * The return value is a pair of a transition and a waiting time in milliseconds. Sometimes it is necessary to wait
      * for the the next matching, as the expected state change requires time.

@@ -1,5 +1,8 @@
 package at.ac.tuwien.big.entity.state
 
+/**
+ * State change of the robotic arm
+ */
 data class RoboticArmTransition(
         override val startState: RoboticArmState,
         override val targetState: RoboticArmState,

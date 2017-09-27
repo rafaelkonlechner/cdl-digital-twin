@@ -1,6 +1,6 @@
 package at.ac.tuwien.big.entity.message
 
-data class Tracking(
+data class ItemPosition(
         val x: Double = 0.0,
         val y: Double = 0.0,
         val width: Double = 0.0,

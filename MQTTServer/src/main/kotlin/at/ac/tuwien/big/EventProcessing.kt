@@ -7,6 +7,9 @@ import com.espertech.esper.client.Configuration
 import com.espertech.esper.client.EPRuntime
 import com.espertech.esper.client.EPServiceProviderManager
 
+/**
+ * Service for complex event processing
+ */
 object EventProcessing {
 
     fun setupCEP(): EPRuntime {

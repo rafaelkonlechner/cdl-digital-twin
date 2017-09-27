@@ -1,9 +1,6 @@
 package at.ac.tuwien.big
 
-import at.ac.tuwien.big.entity.state.ConveyorState
-import at.ac.tuwien.big.entity.state.GatePassed
-import at.ac.tuwien.big.entity.state.RoboticArmState
-import at.ac.tuwien.big.entity.state.TestingRigState
+import at.ac.tuwien.big.entity.state.*
 import org.influxdb.InfluxDB
 import org.influxdb.InfluxDB.ConsistencyLevel
 import org.influxdb.InfluxDBFactory
@@ -11,9 +8,12 @@ import org.influxdb.dto.BatchPoints
 import org.influxdb.dto.Point
 import java.util.concurrent.TimeUnit
 
+/**
+ * Service for storing data points in a time series database
+ */
 object TimeSeriesCollectionService {
 
-    val dbName = "aTimeSeries"
+    val dbName = "pick-and-place"
     var influxDB: InfluxDB = InfluxDBFactory.connect("http://127.0.0.1:8086", "root", "root")
 
     init {
@@ -21,15 +21,20 @@ object TimeSeriesCollectionService {
         influxDB.enableBatch(100, 100, TimeUnit.MILLISECONDS)
     }
 
+    /**
+     * Reset the database
+     */
     fun resetDatabase() {
         influxDB.deleteDatabase(dbName)
         influxDB.createDatabase(dbName)
     }
 
+    /**
+     * Saves the event of an item passing through a gate
+     */
     fun savePoint(state: GatePassed) {
         val batchPoints = BatchPoints
                 .database(dbName)
-                .tag("async", "true")
                 .consistency(ConsistencyLevel.ALL)
                 .build()
         val point = Point.measurement("gate")
@@ -40,10 +45,12 @@ object TimeSeriesCollectionService {
         influxDB.write(batchPoints)
     }
 
+    /**
+     * Saves the state of the conveyor
+     */
     fun savePoint(state: ConveyorState) {
         val batchPoints = BatchPoints
                 .database(dbName)
-                .tag("async", "true")
                 .consistency(ConsistencyLevel.ALL)
                 .build()
         val point = Point.measurement("conveyor")
@@ -56,10 +63,12 @@ object TimeSeriesCollectionService {
         influxDB.write(batchPoints)
     }
 
+    /**
+     * Saves the state of the testing rig
+     */
     fun savePoint(state: TestingRigState) {
         val batchPoints = BatchPoints
                 .database(dbName)
-                .tag("async", "true")
                 .consistency(ConsistencyLevel.ALL)
                 .build()
         val point = Point.measurement("testing_rig")
@@ -71,19 +80,45 @@ object TimeSeriesCollectionService {
         influxDB.write(batchPoints)
     }
 
+    /**
+     * Saves the state of the robotic arm
+     */
     fun savePoint(state: RoboticArmState) {
         val batchPoints = BatchPoints
                 .database(dbName)
-                .tag("async", "true")
                 .consistency(ConsistencyLevel.ALL)
                 .build()
-        val point = Point.measurement("actuators")
+        val point = Point.measurement("robotic_arm")
                 .time(System.currentTimeMillis(), TimeUnit.MILLISECONDS)
                 .addField("base", state.basePosition)
                 .addField("main_arm", state.mainArmPosition)
                 .addField("second_arm", state.secondArmPosition)
                 .addField("wrist", state.wristPosition)
                 .addField("gripper", state.gripperPosition)
+                .build()
+        batchPoints.point(point)
+        influxDB.write(batchPoints)
+    }
+
+    /**
+     * Saves the event of a state transition
+     */
+    fun savePoint(transition: Transition) {
+        val batchPoints = BatchPoints
+                .database(dbName)
+                .consistency(ConsistencyLevel.ALL)
+                .build()
+        val tag = when (transition) {
+            is RoboticArmTransition -> "robotic_arm"
+            is ConveyorTransition -> "conveyor"
+            is TestingRigTransition -> "testing_rig"
+            else -> ""
+        }
+        val point = Point.measurement("transitions")
+                .time(System.currentTimeMillis(), TimeUnit.MILLISECONDS)
+                .tag("unit", tag)
+                .addField("state", transition.targetState.name)
+                .addField("progress", 1)
                 .build()
         batchPoints.point(point)
         influxDB.write(batchPoints)

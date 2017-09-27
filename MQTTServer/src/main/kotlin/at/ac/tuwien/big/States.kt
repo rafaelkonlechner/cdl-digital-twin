@@ -2,6 +2,9 @@ package at.ac.tuwien.big
 
 import at.ac.tuwien.big.entity.state.*
 
+/**
+ * Holds all defined states of the environment
+ */
 object States {
     /*
      * Robotic arm states
@@ -112,7 +115,7 @@ object States {
     )
 
     /*
-     * Slidier states
+     * Slider states
      */
     val sliderHomePosition = SliderState(
             "Slider Home", sliderPosition = 0.08
@@ -181,7 +184,7 @@ object States {
     val releasegreen_idle = RoboticArmTransition(releaseGreen, idle)
 
     /*
-     * Maps of states per entity
+     * Maps of state names to states, per entity
      */
     val roboticArm = mapOf(
             Pair(idle.name, idle),
@@ -221,33 +224,41 @@ object States {
     val all = roboticArm.values union slider.values union conveyor.values union testingRig.values
 
     /**
-     * Match the given state against all states defined in this class and returns a match, if existent
+     * Match the given state against all states defined in this class and returns a match
+     * @return the matching state or null, if no match was found
      */
     fun matchState(roboticArmState: RoboticArmState): RoboticArmState? {
         return roboticArm.values.filter { match(it, roboticArmState) }.firstOrNull()
     }
 
     /**
-     * Match the given state against all states defined in this class and returns a match, if existent
+     * Match the given state against all states defined in this class and returns a match
+     * @return the matching state or null, if no match was found
      */
     fun matchState(sliderState: SliderState): SliderState? {
         return slider.values.filter { match(it, sliderState) }.firstOrNull()
     }
 
     /**
-     * Match the given state against all states defined in this class and returns a match, if existent
+     * Match the given state against all states defined in this class and returns a match
+     * @return the matching state or null, if no match was found
      */
     fun matchState(conveyorState: ConveyorState): ConveyorState? {
         return conveyor.values.filter { match(it, conveyorState) }.firstOrNull()
     }
 
     /**
-     * Match the given state against all states defined in this class and returns a match, if existent
+     * Match the given state against all states defined in this class and returns a match
+     * @return the matching state or null, if no match was found
      */
     fun matchState(testingRigState: TestingRigState): TestingRigState? {
         return testingRig.values.filter { match(it, testingRigState) }.firstOrNull()
     }
 
+    /**
+     * Matches two given states
+     * @return true, if the states are equal with a certain tolerance for real values and false otherwise
+     */
     private fun match(a: StateEvent, b: StateEvent): Boolean {
         return if (a is RoboticArmState && b is RoboticArmState) {
             similar(a.basePosition, b.basePosition)
@@ -269,12 +280,16 @@ object States {
         }
     }
 
+    /**
+     * Equality check with an epsilon of 0.02
+     * @return true, if the distance between the two real numbers is < 0.02 and false otherwise
+     */
     private fun similar(a: Double, b: Double): Boolean {
         return Math.abs(a - b) <= 0.02
     }
 
     /**
-     * Transform transitions into 'goto' commands for MQTT API
+     * Transform transitions into 'goto' commands for the MQTT API
      */
     fun transform(transition: Transition): List<String> {
         return when (transition) {

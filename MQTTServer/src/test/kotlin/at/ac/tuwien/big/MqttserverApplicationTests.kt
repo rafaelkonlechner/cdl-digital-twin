@@ -18,6 +18,6 @@ class MqttServerApplicationTests {
     @Test
     @Ignore
     fun testAnalyzeImage() {
-        analyzeImage(ClassPathResource("images/test.png").file)
+        CameraSignal.analyzeImage(ClassPathResource("images/test.png").file)
     }
 }

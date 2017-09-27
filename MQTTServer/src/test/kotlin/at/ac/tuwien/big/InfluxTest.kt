@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit
 
 class InfluxTest {
 
-    val dbName = "aTimeSeries"
+    val dbName = "pick-and-place-test"
     var influxDB: InfluxDB = InfluxDBFactory.connect("http://localhost:8086", "root", "root")
 
     @Test

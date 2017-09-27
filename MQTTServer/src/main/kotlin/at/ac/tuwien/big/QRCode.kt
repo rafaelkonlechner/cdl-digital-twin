@@ -15,9 +15,17 @@ import java.io.ByteArrayOutputStream
 import java.util.*
 import javax.imageio.ImageIO
 
-object QRCodeReader {
+/**
+ * Service for handling QR codes
+ */
+object QRCode {
 
-    fun readText(base64Image: String): ProductCode? {
+    /**
+     * Reads a QR code and creates a textual code representation
+     * @param base64Image the encoded image
+     * @return the code in [ProductCode], or [null] if an error occurred
+     */
+    fun read(base64Image: String): ProductCode? {
 
         val imageBytes = BASE64Decoder().decodeBuffer(base64Image)
         val inputStream = ByteArrayInputStream(imageBytes)
@@ -31,7 +39,7 @@ object QRCodeReader {
             val text = result.text.split(",")
             if (text.size == 3) {
                 val code = ProductCode(text[0], text[1], text[2], null)
-                code.base64 = toBase64(writeText(code))
+                code.base64 = CameraSignal.toBase64(write(code))
                 return code
             } else {
                 return null
@@ -41,7 +49,12 @@ object QRCodeReader {
         }
     }
 
-    fun writeText(code: ProductCode): ByteArray {
+    /**
+     * Encodes the given object into a QR code and creates an image
+     * @param code the product code
+     * @return a byte array, representing the QR code image in the *png* file format
+     */
+    fun write(code: ProductCode): ByteArray {
 
         val hintMap = EnumMap<EncodeHintType, Any>(EncodeHintType::class.java)
         hintMap.put(EncodeHintType.CHARACTER_SET, "UTF-8")
