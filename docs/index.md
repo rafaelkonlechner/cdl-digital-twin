@@ -155,12 +155,14 @@ Das Regelwerk für definierte Zustandsänderungen ist in der Klasse `RobotContro
 (*Anmerkung:* Das Pattern-Matching basiert im Moment nur auf Equality-Checks und ist daher sehr wortreich. Entsprechende Vergleichsfunktionen sollen in Zukunft dabei Abhilfe schaffen.)
 
 #### Kommunikation mit Web-Dashboard und Simulation
-Der gesamte Nachrichtenverkehr des Servers (MQTT, Websockets) ist derzeit in der Klasse `MessageController.kt` definiert (siehe [MessageController.kt]
-(https://github.com/rafaelkonlechner/cdl-pick-and-place/blob/master/MQTTServer/src/main/kotlin/at/ac/tuwien/big/MessageController.kt)). Für das Tracking der Werkstücke auf den Kamerabildern wird die Library [tracking.js](https://trackingjs.com/) verwendet. Diese Library wird derzeit im Web-Client ausgeführt und liefert die Ergebnisse mit Websocket-Messages zurück an den Server. Der Websocket Endpoint `/tracking` wird für die Objekterkennung am Förderband verwendet. Aus Sicht der Software-Architektur ist das nicht ideal und soll geändert werden. Dafür wurde im Repository das Projekt [ObjectTracking](https://github.com/rafaelkonlechner/cdl-pick-and-place/tree/master/ObjectTracking) angelegt. Es soll später als eigenständiger Service laufen.
+Der gesamte Nachrichtenverkehr des Servers (MQTT, Websockets) ist derzeit in der Klasse `MessageController.kt` definiert. Siehe [MessageController.kt]
+(https://github.com/rafaelkonlechner/cdl-pick-and-place/blob/master/MQTTServer/src/main/kotlin/at/ac/tuwien/big/MessageController.kt). Für das Tracking der Werkstücke auf den Kamerabildern wird die Library [tracking.js](https://trackingjs.com/) verwendet. Diese Library wird derzeit im Web-Client ausgeführt und liefert die Ergebnisse mit Websocket-Messages zurück an den Server. Der Websocket Endpoint `/tracking` wird für die Objekterkennung am Förderband verwendet. Aus Sicht der Software-Architektur ist das nicht ideal und soll geändert werden. Dafür wurde im Repository das Projekt [ObjectTracking](https://github.com/rafaelkonlechner/cdl-pick-and-place/tree/master/ObjectTracking) angelegt. Es soll später als eigenständiger Service laufen.
 
 ### REST API
 
-Die aktuellen Zustände der einzelnen Einheiten in der Simulation können über eine REST API abgefragt und manipuliert werden.
+Die Steuerung der Produktionsanlage ist nicht nur durch MQTT-Nachrichten des Servers möglich, sondern auch durch eine REST-API, die der Server zur Verfügung stellt. Über eine REST API können die aktuellen Zustände der einzelnen Einheiten in der Simulation abgefragt und manipuliert werden.
+
+**Beispiel:**
 
 Um den Zustand einer Einheit -- in diesem Fall des Roboterarmes -- abzufragen, ist folgender Request über HTTP notwendig:
 
@@ -193,7 +195,7 @@ Jedes Werkstück ist mit einem QR-Code versehen. Die verwendeten QR-Codes (100 S
 
 Generierte QR-Codes: [https://github.com/rafaelkonlechner/cdl-digital-twin/tree/master/qr-codes](https://github.com/rafaelkonlechner/cdl-digital-twin/tree/master/qr-codes)
 
-Das Lesen der QR-Codes erfolgt am Server in der Klasse [https://github.com/rafaelkonlechner/cdl-digital-twin/blob/master/MQTTServer/src/main/kotlin/at/ac/tuwien/big/QRCodeReader.kt](https://github.com/rafaelkonlechner/cdl-digital-twin/blob/master/MQTTServer/src/main/kotlin/at/ac/tuwien/big/QRCodeReader.kt)
+Das Lesen der QR-Codes erfolgt am Server in der Klasse [https://github.com/rafaelkonlechner/cdl-digital-twin/blob/master/MQTTServer/src/main/kotlin/at/ac/tuwien/big/QRCodeReader.kt](https://github.com/rafaelkonlechner/cdl-digital-twin/blob/master/MQTTServer/src/main/kotlin/at/ac/tuwien/big/QRCode.kt)
 
 ### Logs
 
@@ -234,10 +236,10 @@ Konzept:
 
 ```
 ProductionStream:  - - - - - - - - - - - - - - - - - - - * - >
-													    /			
+													   /			
 													  / Production
 StateStream:        - - - - * - - - * - - - - * - - * - - - - >
-						   /        /       /      /
+						  /        /       /      /
 						 / Idle   / Grip  / Park / Deposit
 SensorStream:      * - * - * - * - * - * - * - * - * - * - * >
 ```
@@ -247,6 +249,8 @@ In der Klasse `EventProcessing.kt` (Siehe: [EventProcessing.kt](https://github.c
 ```
 pattern (IDLE APPROACH ARBITRARY* ( DEPOSIT_GREEN RELEASE_GREEN | DEPOSIT_RED RELEASE_RED))
 ```
+
+In der Testklasse [EventProcessingTest](https://github.com/rafaelkonlechner/cdl-digital-twin/blob/master/MQTTServer/src/test/kotlin/at/ac/tuwien/big/EventProcessingTest.kt) ist eine Beispielabfolge von Events definiert, die an die Engine übergeben wird und ein Match-Event erzeugt.
 
 ## Cheat Sheet für Keyboard-Shortcuts
 
