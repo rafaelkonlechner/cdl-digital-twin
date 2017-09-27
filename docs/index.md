@@ -158,6 +158,33 @@ Das Regelwerk für definierte Zustandsänderungen ist in der Klasse `RobotContro
 Der gesamte Nachrichtenverkehr des Servers (MQTT, Websockets) ist derzeit in der Klasse `MessageController.kt` definiert (siehe [MessageController.kt]
 (https://github.com/rafaelkonlechner/cdl-pick-and-place/blob/master/MQTTServer/src/main/kotlin/at/ac/tuwien/big/MessageController.kt)). Für das Tracking der Werkstücke auf den Kamerabildern wird die Library [tracking.js](https://trackingjs.com/) verwendet. Diese Library wird derzeit im Web-Client ausgeführt und liefert die Ergebnisse mit Websocket-Messages zurück an den Server. Der Websocket Endpoint `/tracking` wird für die Objekterkennung am Förderband verwendet. Aus Sicht der Software-Architektur ist das nicht ideal und soll geändert werden. Dafür wurde im Repository das Projekt [ObjectTracking](https://github.com/rafaelkonlechner/cdl-pick-and-place/tree/master/ObjectTracking) angelegt. Es soll später als eigenständiger Service laufen.
 
+### REST API
+
+Die aktuellen Zustände der einzelnen Einheiten in der Simulation können über eine REST API abgefragt und manipuliert werden.
+
+Um den Zustand einer Einheit -- in diesem Fall des Roboterarmes -- abzufragen, ist folgender Request über HTTP notwendig:
+
+```
+GET /roboticArm
+Host: localhost:8080
+accept: application/json
+```
+
+Zurückgeliefert wird ein JSON-Objekt, das den zuletzt erkannten, definierten Zustand beschreibt. Gleichartige Requests können auch für die anderen beiden Einheiten abgesetzt werden.
+
+* Prüfstand: `/testingRig`
+* Förderband: `/conveyor`
+
+`localhost:8080/all` liefert eine Liste aller definierten Zustände. Um einen Zustand zu setzten, wird ein HTTP PUT Request an die jeweilige Ressource abgesetzt.
+
+Soll beispielsweise der Roboterarm in den Zustand *Appraoch* übergehen, wird folgender Request verwendet:
+```
+GET /roboticArm
+Host: localhost:8080
+accept: application/json
+payload: Approach
+```
+
 ## QR-Codes
 
 ![](code-1.png)
@@ -206,13 +233,13 @@ Für das erstellen von hierachischen Sichten auf Events, Zustandsänderungen und
 Konzept:
 
 ```
-ProductionStream: - - - - - - - - - - - - - - - - - - - - * - >
+ProductionStream:  - - - - - - - - - - - - - - - - - - - * - >
 													    /			
 													  / Production
-StateStream:       - - - - - * - - - * - - - - * - - * - - - - >
+StateStream:        - - - - * - - - * - - - - * - - * - - - - >
 						   /        /       /      /
 						 / Idle   / Grip  / Park / Deposit
-SensorStream:     - * - * - * - * - * - * - * - * - * - * - * >
+SensorStream:      * - * - * - * - * - * - * - * - * - * - * >
 ```
 
 In der Klasse `EventProcessing.kt` (Siehe: [EventProcessing.kt](https://github.com/rafaelkonlechner/cdl-pick-and-place/blob/master/MQTTServer/src/main/kotlin/at/ac/tuwien/big/EventProcessing.kt)) ist bereits eine einfache Query implementiert, die die Zustandsabfolge mit einem Regulären Ausdruck überprüft:
@@ -223,79 +250,18 @@ pattern (IDLE APPROACH ARBITRARY* ( DEPOSIT_GREEN RELEASE_GREEN | DEPOSIT_RED RE
 
 ## Cheat Sheet für Keyboard-Shortcuts
 
-WASD + Pfeiltasten: Roboterarm
-Y: Greifer zusammen
-X: Greifer auseinander
-H: Greifer parallel zusammen
-G: Greifer parallel auseinander
-P: Schieber vor
-L: Schieber zurück
-I: Gleichrichter zusammen
-K: Gleichrichter auseinander
-
-## Implementierung
-
-### Blender
-Der Programmcode für Simulationen in Blender (*Python*) wird in der Regel direkt im Blender-File selbst gespeichert. Durch die Verwendung von Git als Versionierung ist es aber sinnvoller,
-
-Das bedeutete, dass mit jeder kleinen Code-Änderung das gesamte Blender-File (3.5 MB) eingecheckt werden musste. Ich konnte den Controller-Code in das Modul [robot](https://github.com/rafaelkonlechner/cdl-pick-and-place/tree/master/blender-scripts/modules/robot) auslagern. Dadurch kann er in jedem beliebigen Editor bearbeitet und separat eingecheckt werden und wird live von Blender geladen - es gibt also keine Einschränkungen beim Entwickeln.
-
-## Allgemeine Notizen
-
-**Digital Twin:** Andauernder Datenaustausch zwischen realer Maschine und digitalem Repika. Wo ist das Schema für die Maschine gespeichert - speichern ihr digitales Abbild selbst und können es bei Kontaktaufnahme übertragen.
-
-Die Hersteller der Roboter / Maschinen / Anlagen werden oft nicht wollen, dass ihre Interna / 3D-Pläne / Schaltungspläne freigegeben werden. Daher werden die Daten für AutomationML oft nicht zur Verfügung stehen.
-
-Welche Rolle spielt modellgetriebene Entwicklung in diesem Zusammenhang?
-Auf welcher Abstraktionsebene ist eine Modellierung sinnvoll / erstrebenswert?
-Mit dem Internet Of Things Hintergedanke hat ein Ding, genauso wie ein Programm eine API - dh. die Komponente selbst kann beliebig entwickelt werden. ZB. war das beim Pi-Car noch nicht so - das Auto wurde nicht mit einer API, sondern mit generiertem Code angesteuert. Dementsprechend ist es auch egal, was sich hinter der Roboter-API verbirgt - in diesem Fall ist es eine Robotersimulation in einer Games-Engine.
-
-Der eigentliche Plan müsste sein, dass Hardwareentwickler eine API über MQTT / AMQP / REST zur Verfügung stellen, die alle Sensoren und Aktoren zur Verfügung stellt. Die Orchestrierung der Komponenten hin zu größeren funktionalen Einheiten, z.B. Fertigungsstraßen, erfolgt dann auf Ebene der APIs und modellgetrieben.
-
-## Automatisierte Anlagen: Workflow
-
-Wie sieht der praktische Workflow für das Design und die Konstruktion von automatisierten Fertigungsanlagen im Industriekontext aus? Wie verläuft eine (eventuell modellgetriebene) Entwicklung eines Roboters? Gibt es ausreichend 3D-Modelle, ist die Software präzise spezifiziert.
-Traditionell:
-
-* Konstruktion mit CAD-Programm
-* Programmierung (i.d.R. nicht modellgetrieben)
-* Hardware Simulation (e.g. Mathworks SimScape)
-* Nicht völlig spezifiziert
-* Nachträgliche Veränderungen / Adaptionen an der Maschine
-
-## Flow-Based Programming in Robotics
-Clemens Koza beschäftigt sich mit Dataflow Programming als deklaratives Programmierparadigma in der Robotik. In diesem Paradigma wird ein Programm als gerichteter Graph verstanden, dessen Knoten einfache, in sich abgeschlossene Rechenoperationen ausführen und den Output an ihre Ausgangskanten weitergeben. So lassen sich Sensoren und Aktoren mit einem Netz an Rechenschritten zu komplexeren Systemen zusammenfügen. In Verbindung mit Raspberry Pi lassen sich Roboter so live programmieren. Das heißt, das Kontrollprogramm am Roboter kann wie im üblichen Programmierzyklus live auf der Hardware ausprobiert werden.
-
-Links:
-
-* [https://noflojs.org](https://noflojs.org)
-* [https://flowhub.io](https://flowhub.io)
+* WASD + Pfeiltasten: Roboterarm
+* Y: Greifer zusammen
+* X: Greifer auseinander
+* H: Greifer parallel zusammen
+* G: Greifer parallel auseinander
+* P: Schieber vor
+* L: Schieber zurück
+* I: Gleichrichter zusammen
+* K: Gleichrichter auseinander
 
 ## Wie man heutzutage einen KUKA Roboter steuert
 
-KUKA Roboter sind mit einem BUS-System mit einer Steuereinheit verbunden. Diese wiederum ist internetfähig.
-
-KUKA bietet eine Java-API und eine eigene Entwicklungsumgebung (Sunrise OS) an. Um ein Steuerungsprogramm am Roboter auszuführen, wird das Java-Programm über das Netzwerk auf die Steuereinheit übertragen und schließlich von dieser ausgeführt.
-
-Bieten Schnittstellen für Ein- und Ausgehende Signale für übergeordnete Steuerungen.
+KUKA Roboter sind mit einem BUS-System mit einer Steuereinheit verbunden. Diese wiederum ist internetfähig. KUKA bietet eine Java-API und eine eigene Entwicklungsumgebung (Sunrise OS) an. Um ein Steuerungsprogramm am Roboter auszuführen, wird das Java-Programm über das Netzwerk auf die Steuereinheit übertragen und schließlich von dieser ausgeführt. Sie bieten auch Schnittstellen für ein- und ausgehende Signale, um die Steuerung mit übergeordneten Steuerungen zu integrieren.
 
 [SunriseOS](http://www.in.tum.de/fileadmin/user_upload/Lehrstuehle/Lehrstuhl_XXIII/Layout/KUKA_SunriseOS_1.7_de.pdf)
-
-
-**MQTT vs AMPQ**
-
-Wahl des richtigen Message Protokolls:
-[http://www.sic-software.com/iot-protokolle-mqtt-vs-amqp/](link)
-
-Elastic Search and Kibana für Log-Analyse / Zeitreihen
-
-
-Übergangswahrscheinlichkeiten zwischen:
-Greifen und erfolgreich abstellen
-Holen und erfolgreich in den richtigen Korb werfen
-Adjuster aktivieren und Objekt ist in.
-
-* FMU: Functional Mockup Unit
-* FMI: Functional Mockup Interface
-
-KMUs interessiert die Informationsgewinnung aus IoT Sensoren wenig. Wichtig ist eigentlich eine benutzerfreundliche Automatisierung. Einfach und gute API übers Internet.
