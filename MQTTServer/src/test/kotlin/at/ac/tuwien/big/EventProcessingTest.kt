@@ -1,12 +1,18 @@
 package at.ac.tuwien.big
 
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.test.context.junit4.SpringRunner
+import java.time.Duration
 
+@RunWith(SpringRunner::class)
+@SpringBootTest
 class EventProcessingTest {
 
     @Test
     fun basicCEPTest() {
-        val cep = EventProcessing.setupCEP()
+        val cep = EventProcessing.runtime
         cep.sendEvent(States.idle)
         cep.sendEvent(States.approach)
         cep.sendEvent(States.pickup)
@@ -16,5 +22,7 @@ class EventProcessingTest {
         cep.sendEvent(States.fullRelease)
         cep.sendEvent(States.depositGreen)
         cep.sendEvent(States.releaseGreen)
+
+        println(TimeSeriesCollectionService.getSuccessfulProductions(Duration.ofHours(1), Duration.ofHours(1)))
     }
 }

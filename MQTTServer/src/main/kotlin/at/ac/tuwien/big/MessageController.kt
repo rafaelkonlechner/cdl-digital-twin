@@ -101,6 +101,7 @@ final class MessageController(val webSocket: SimpMessagingTemplate) : MqttCallba
                 if (match != null && state != match) {
                     if (roboticArmState != null) {
                         TimeSeriesCollectionService.savePoint(RoboticArmTransition(startState = roboticArmState!!, targetState = match))
+                        EventProcessing.submitEvent(match)
                     }
                     roboticArmState = match
                 }

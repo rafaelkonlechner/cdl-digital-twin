@@ -6,6 +6,9 @@ import org.influxdb.InfluxDB.ConsistencyLevel
 import org.influxdb.InfluxDBFactory
 import org.influxdb.dto.BatchPoints
 import org.influxdb.dto.Point
+import org.influxdb.dto.Query
+import org.influxdb.dto.QueryResult
+import java.time.Duration
 import java.util.concurrent.TimeUnit
 
 /**
@@ -122,5 +125,32 @@ object TimeSeriesCollectionService {
                 .build()
         batchPoints.point(point)
         influxDB.write(batchPoints)
+    }
+
+    /**
+     * Logs a successful production cycle, i.e. from picking up the item to dropping it
+     */
+    fun logSuccessfulProduction() {
+        val batchPoints = BatchPoints
+                .database(dbName)
+                .consistency(ConsistencyLevel.ALL)
+                .build()
+        val point = Point.measurement("productions")
+                .time(System.currentTimeMillis(), TimeUnit.MILLISECONDS)
+                .addField("count", 1)
+                .build()
+        batchPoints.point(point)
+        influxDB.write(batchPoints)
+    }
+
+    /**
+     * Returns the number of successful productions
+     * @param since the duration for the query window into the past, starting from now
+     * @param groupBy the duration for grouping the aggregation values
+     */
+    fun getSuccessfulProductions(since: Duration, groupBy: Duration): QueryResult {
+        val query = Query("SELECT SUM(count) FROM productions WHERE time > now() - ${since.toMinutes()}m GROUP BY time(${groupBy.toMinutes()}m)", dbName)
+        val result = influxDB.query(query)
+        return result
     }
 }

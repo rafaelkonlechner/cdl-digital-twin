@@ -1,8 +1,6 @@
 package at.ac.tuwien.big
 
-import at.ac.tuwien.big.entity.state.ConveyorState
-import at.ac.tuwien.big.entity.state.RoboticArmState
-import at.ac.tuwien.big.entity.state.SliderState
+import at.ac.tuwien.big.entity.state.*
 import com.espertech.esper.client.Configuration
 import com.espertech.esper.client.EPRuntime
 import com.espertech.esper.client.EPServiceProviderManager
@@ -12,13 +10,16 @@ import com.espertech.esper.client.EPServiceProviderManager
  */
 object EventProcessing {
 
-    fun setupCEP(): EPRuntime {
+    val runtime: EPRuntime
+
+    init {
         val config = Configuration()
         config.addEventType("RoboticArmState", RoboticArmState::class.java.name)
         config.addEventType("SliderState", SliderState::class.java.name)
         config.addEventType("ConveyorState", ConveyorState::class.java.name)
+        config.addEventType("Gate", GatePassed::class.java.name)
         val cep = EPServiceProviderManager.getProvider("CEPEngine", config)
-        val runtime = cep.epRuntime
+        runtime = cep.epRuntime
         val cepAdm = cep.epAdministrator
 
         val sensorUpdates = cepAdm.createEPL(
@@ -38,13 +39,20 @@ object EventProcessing {
             )
             """)
 
-        sensorUpdates.addListener { newEvents, oldEvents ->
+        /*
+         * Register event listeners here
+         */
+        sensorUpdates.addListener { _, _ ->
             run {
-                println("Match:")
-                println(newEvents)
-                println(oldEvents)
+                TimeSeriesCollectionService.logSuccessfulProduction()
             }
         }
-        return runtime
+    }
+
+    /**
+     * Submit event to the CEP engine
+     */
+    fun submitEvent(event: StateEvent) {
+        runtime.sendEvent(event)
     }
 }
