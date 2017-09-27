@@ -66,11 +66,11 @@ var vue = new Vue({
         x: 0.0,
         y: 0.0,
         autoPlay: false,
+        manualMode: false,
         recording: false,
         context: null,
         savedPositions: [],
         savePositionName: "",
-        objectClass: '',
         greenCount: 0,
         redCount: 0,
         pickupObjects: 0,
@@ -113,7 +113,8 @@ var vue = new Vue({
             color: "-",
             base64: "images/code-1.png",
             url: "-"
-        }
+        },
+        pickupImageInitialized: false
     },
     computed: {
         idlePathIsActive: function () {
@@ -174,7 +175,6 @@ var vue = new Vue({
         });
     },
     mounted: function () {
-        plot(35, 60, 113, 68, 'yellow', '.pickup-container', 'pickup-camera', 'pickup-window-rect', "pickup-text", "Pickup Window");
         var time = new Date();
         var data1 = [
             {
@@ -206,7 +206,6 @@ var vue = new Vue({
             showlegend: false
         };
         Plotly.plot('monitor-1', data1, layout);
-        Plotly.plot('monitor-2', data2, layout);
     },
     watch: {
         platformTargetPosition: function (newTargetPosition) {
@@ -278,22 +277,6 @@ var vue = new Vue({
                 data: JSON.stringify(self.recording)
             });
         },
-        savePosition: function (name) {
-            this.savedPositions.push(
-                {
-                    name: name,
-                    basePosition: this.basePosition,
-                    mainArmPosition: this.mainArmPosition,
-                    secondArmPosition: this.secondArmPosition,
-                    wristPosition: this.wristPosition,
-                    gripperPosition: this.gripperPosition
-                }
-            );
-        },
-        gotoSavedPosition: function (index) {
-            var pos = this.savedPositions[index];
-            this.sendSocketMessage("goto: " + pos.name)
-        },
         gotoIdlePosition: function () {
             this.sendSocketMessage("goto: Idle")
         },
@@ -312,17 +295,17 @@ var vue = new Vue({
                     }
                 } else {
                     event.data.forEach(function (rect) {
-                        plot(rect.x, rect.y, rect.width, rect.height, 'yellow', '.detection-container', 'detection-camera', 'detection-rect', "detection-text", 'object');
+                        plot(rect.x, rect.y, rect.width, rect.height, 'yellow', '.detection-container', 'detection-camera', 'detection-rect', "detection-text", 'Item');
                     });
                 }
             });
             trackingTask = tracking.track('#detection-camera', colors);
         },
-        adjustGripper: function (x, y, width, height) {
-            console.log(x, y);
-            console.log(this.handPosition);
-        },
         updatePickupImage: function (image) {
+            if (!this.pickupImageInitialized) {
+                plot(35, 60, 113, 68, 'yellow', '.pickup-container', 'pickup-camera', 'pickup-window-rect', "pickup-text", "Pickup Window");
+                this.pickupImageInitialized = true;
+            }
             this.pickupImageBase64 = 'data:image/png;base64, ' + image;
             var colors = new tracking.ColorTracker(['white']);
             var self = this;
@@ -403,21 +386,9 @@ var vue = new Vue({
                     console.log("Unknown message type: " + json.entity)
             }
             var time = new Date();
-            var updateBase = {
-                x: [[time]],
-                y: [[this.basePosition]]
-            };
             var updateMainArm = {
                 x: [[time]],
                 y: [[this.mainArmPosition]]
-            };
-            var updateSecondArm = {
-                x: [[time]],
-                y: [[this.secondArmPosition]]
-            };
-            var updateGripper = {
-                x: [[time]],
-                y: [[this.gripperPosition]]
             };
             var olderTime = time.setMinutes(time.getMinutes() - 1);
             var futureTime = time.setMinutes(time.getMinutes() + 1);
@@ -429,9 +400,7 @@ var vue = new Vue({
             };
 
             Plotly.relayout('monitor-1', minuteView);
-            Plotly.relayout('monitor-2', minuteView);
             Plotly.extendTraces('monitor-1', updateMainArm, [0]);
-            Plotly.extendTraces('monitor-2', updateBase, [0]);
         },
         sendSocketMessage: function (message) {
             stompClient.send("/app/actuator", {}, message);

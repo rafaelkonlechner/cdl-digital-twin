@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <title>CDL Digital Twin Dashboard</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Mono">
     <link rel="stylesheet" href="https://code.getmdl.io/1.1.3/material.blue_grey-cyan.min.css">
@@ -10,28 +11,28 @@
     <script src="bower_components/sockjs-client/dist/sockjs-1.1.1.js"></script>
     <script src="bower_components/jquery/dist/jquery.js"></script>
     <script src="bower_components/tracking/build/tracking-min.js"></script>
-    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="bower_components/plotly/plotly.js"></script>
 </head>
 <body>
 <div id="app">
     <header>
-        <h1>5-Axis Robotic Arm Twin
+        <h1>6-Axis Robotic Arm Twin
             <small>Kuka KR5-R850</small>
         </h1>
-        <a href="#">Setup Instructions</a>
+        <a href="https://github.com/rafaelkonlechner/cdl-digital-twin/blob/master/README.md" target="_blank">Setup Instructions</a>
     </header>
     <div class="blueprint">
-        <div id="second-arm-controls" class="arrow-controls" style="top: 28%; left: 41%; width: 24px;">
-            <svg width="100%" height="100%" viewBox="0 0 1667 4167" version="1.1" xmlns="http://www.w3.org/2000/svg"  xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;"><path @mousedown="keyDownW" @mouseup="keyUpW" d="M1293.52,2659.72l0,-806.474l-230.093,0l0,806.474l-345.139,0l460.185,459.035l460.185,-459.035l-345.138,0l0,0Zm-805.325,-1611.8l-460.185,459.034l345.139,0l0,806.475l230.093,0l0,-806.475l345.139,0l-460.186,-459.034Z" style="fill:#fff;fill-rule:nonzero;"/></svg>
+        <div id="second-arm-controls" class="arrow-controls" style="top: 27%; left: 41%; width: 24px;">
+            <svg width="100%" height="100%" viewBox="0 0 1667 4167" version="1.1" xmlns="http://www.w3.org/2000/svg" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;"><path @mousedown="keyDownW()" @mouseup="keyUpW()" d="M673.646,918.75l-296.563,0l456.25,-456.25l456.25,456.25l-296.562,0l0,952.083l-319.375,0l0,-952.083Z" style="fill:#fff;"/><path @mousedown="keyDownS()" @mouseup="keyUpS()" d="M993.021,3247.92l296.562,0l-456.25,456.25l-456.25,-456.25l296.563,0l0,-952.084l319.375,0l0,952.084Z" style="fill:#fff;"/></svg>
         </div>
         <div id="main-arm-controls" class="arrow-controls"
-             style="top: 58%; left: 32.5%; width: 24px; transform: rotate(-45deg);">
-            <svg width="100%" height="100%" viewBox="0 0 1667 4167" version="1.1" xmlns="http://www.w3.org/2000/svg"  xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;"><path @mousedown="keyDownUp" @mouseup="keyUpUp" d="M1293.52,2659.72l0,-806.474l-230.093,0l0,806.474l-345.139,0l460.185,459.035l460.185,-459.035l-345.138,0l0,0Zm-805.325,-1611.8l-460.185,459.034l345.139,0l0,806.475l230.093,0l0,-806.475l345.139,0l-460.186,-459.034Z" style="fill:#fff;fill-rule:nonzero;"/></svg>
+             style="top: 56%; left: 32.5%; width: 24px; transform: rotate(-45deg);">
+            <svg width="100%" height="100%" viewBox="0 0 1667 4167" version="1.1" xmlns="http://www.w3.org/2000/svg" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;"><path @mousedown="keyDownUp()" @mouseup="keyUpUp()" d="M673.646,918.75l-296.563,0l456.25,-456.25l456.25,456.25l-296.562,0l0,952.083l-319.375,0l0,-952.083Z" style="fill:#fff;"/><path @mousedown="keyDownDown()" @mouseup="keyUpDown()" d="M993.021,3247.92l296.562,0l-456.25,456.25l-456.25,-456.25l296.563,0l0,-952.084l319.375,0l0,952.084Z" style="fill:#fff;"/></svg>
         </div>
         <div id="base-controls" class="arrow-controls" style="top: 85%; left: 30.5%; height: 35px;">
             <svg width="100%" height="100%" viewBox="0 0 2500 2500" version="1.1" xmlns="http://www.w3.org/2000/svg"  xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;"><path @mousedown="keyDownRight" @mouseup="keyUpRight" d="M2123.45,1821.75c138.842,-159.539 224.217,-366.509 224.217,-595.038c0,-401.004 -261.299,-739.917 -622.634,-858.924l-67.265,203.52c275.097,90.549 474.306,349.261 474.306,655.404c0,168.163 -62.091,321.665 -162.127,441.535l-312.179,-312.179l0,776.136l776.137,0l-310.455,-310.454Z" style="fill:#fff;fill-rule:nonzero;"/><path @mousedown="keyDownLeft" @mouseup="keyUpLeft" d="M376.553,1821.75c-138.842,-159.539 -224.217,-366.509 -224.217,-595.038c0,-401.004 261.299,-739.917 622.634,-858.924l67.265,203.52c-275.097,90.549 -474.306,349.261 -474.306,655.404c0,168.163 62.091,321.665 162.127,441.535l312.179,-312.179l0,776.136l-776.137,0l310.455,-310.454Z" style="fill:#fff;fill-rule:nonzero;"/></svg>
         </div>
-        <div class="absolute blueprint-text small" style="top: 55%; left: 44%; height: 35px; text-align: left;">
+        <div class="absolute blueprint-text small" style="top: 56%; left: 44%; height: 35px; text-align: left;">
             x: {{handPosition.x}}<br/>
             y: {{handPosition.y}}<br/>
             z: {{handPosition.z}}
@@ -45,7 +46,7 @@
         <div class="absolute blueprint-text small" style="top: 34%; left: 56%; height: 35px;">
             Pickup Camera
         </div>
-        <div style="width: 85vw; margin: 0 auto">
+        <div class="blueprint-main">
             <div class="mdl-grid">
                 <div class="mdl-cell mdl-cell--9-col">
                     <div class="blueprint-img">
@@ -68,26 +69,112 @@
                     </div>
                 </div>
                 <div class="mdl-cell mdl-cell--2-col mdl-cell--1-offset">
-                    <button class="tabs active-tab">
-                        State Diagram
+                    <h2 class="blueprint-text">Controls</h2>
+                    <button class="tabs" v-bind:class="{'active-tab': !manualMode}" style="width: 68px"
+                            @click="manualMode = false">Automatic
                     </button>
-                    <button class="tabs">
-                        Sensor Monitoring
+                    <button class="tabs" v-bind:class="{'active-tab': manualMode}" @click="manualMode = true">
+                        Manual
                     </button>
-                    <svg width="100%" height="80%" viewBox="0 0 1667 2200" version="1.1" xmlns="http://www.w3.org/2000/svg"  xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.5;"><g><clipPath id="_clip1"><path d="M1666.67,2200l0,-2200l-1666.67,0l0,2200l1666.67,0Z"/></clipPath><g clip-path="url(#_clip1)"><rect x="0" y="0" width="1666.67" height="2200" style="fill:#1e88e5;"/></g></g><g><path id="ready-path" v-bind:class="{'active-path': readyPathIsActive}" d="M1133.33,494.792c0,-20.122 -16.336,-36.459 -36.458,-36.459l-527.083,0c-20.122,0 -36.459,16.337 -36.459,36.459l0,72.916c0,20.122 16.337,36.459 36.459,36.459l527.083,0c20.122,0 36.458,-16.337 36.458,-36.459l0,-72.916Z" style="fill:#fff;"/><g transform="matrix(5.02008,0,0,2,37.6506,244.25)"><g transform="matrix(0.83,0,0,2.08333,19.89,-141.917)"><text x="124.59px" y="141.028px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:14px;fill:none;">Ready to pick</text></g><g transform="matrix(0.83,0,0,2.08333,19.89,-141.917)"><text x="124.59px" y="141.028px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:14px;fill:#1e88e5;">Ready to pick</text></g></g></g><g><path id="approach-path" v-bind:class="{'active-path': approachPathIsActive}"  d="M1133.33,744.792c0,-20.122 -16.336,-36.459 -36.458,-36.459l-527.083,0c-20.122,0 -36.459,16.337 -36.459,36.459l0,72.916c0,20.122 16.337,36.459 36.459,36.459l527.083,0c20.122,0 36.458,-16.337 36.458,-36.459l0,-72.916Z" style="fill:#fff;"/><g transform="matrix(5.02008,0,0,2,37.6506,494.25)"><g transform="matrix(0.83,0,0,2.08333,19.89,-141.917)"><text x="137.035px" y="141.028px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:14px;fill:none;">Approach</text></g><g transform="matrix(0.83,0,0,2.08333,19.89,-141.917)"><text x="137.035px" y="141.028px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:14px;fill:#1e88e5;">Approach</text></g></g></g><g><path id="pickup-path" v-bind:class="{'active-path': pickupPathIsActive}" d="M1133.33,994.792c0,-20.122 -16.336,-36.459 -36.458,-36.459l-527.083,0c-20.122,0 -36.459,16.337 -36.459,36.459l0,72.916c0,20.122 16.337,36.459 36.459,36.459l527.083,0c20.122,0 36.458,-16.337 36.458,-36.459l0,-72.916Z" style="fill:#fff;"/><g transform="matrix(5.02008,0,0,2,37.6506,744.25)"><g transform="matrix(0.83,0,0,2.08333,19.89,-141.917)"><text x="145.99px" y="141.028px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:14px;fill:none;">Pickup</text></g><g transform="matrix(0.83,0,0,2.08333,19.89,-141.917)"><text x="145.99px" y="141.028px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:14px;fill:#1e88e5;">Pickup</text></g></g></g><g><path id="park-path" v-bind:class="{'active-path': parkPathIsActive}" d="M1133.33,1244.79c0,-20.122 -16.336,-36.459 -36.458,-36.459l-527.083,0c-20.122,0 -36.459,16.337 -36.459,36.459l0,72.916c0,20.122 16.337,36.459 36.459,36.459l527.083,0c20.122,0 36.458,-16.337 36.458,-36.459l0,-72.916Z" style="fill:#fff;"/><g transform="matrix(5.02008,0,0,2,37.6506,994.25)"><g transform="matrix(0.83,0,0,2.08333,19.89,-141.917)"><text x="125.502px" y="141.028px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:14px;fill:none;">Park <tspan x="157.925px 164.925px 172.711px " y="141.028px 141.028px 141.028px ">Tes</tspan>t Rig</text></g><g transform="matrix(0.83,0,0,2.08333,19.89,-141.917)"><text x="125.502px" y="141.028px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:14px;fill:#1e88e5;">Park <tspan x="157.925px 164.925px 172.711px " y="141.028px 141.028px 141.028px ">Tes</tspan>t Rig</text></g></g></g><g><path id="release-path" v-bind:class="{'active-path': releasePathIsActive }" d="M1133.33,1494.79c0,-20.122 -16.336,-36.459 -36.458,-36.459l-527.083,0c-20.122,0 -36.459,16.337 -36.459,36.459l0,72.916c0,20.122 16.337,36.459 36.459,36.459l527.083,0c20.122,0 36.458,-16.337 36.458,-36.459l0,-72.916Z" style="fill:#fff;"/><g transform="matrix(5.02008,0,0,2,37.6506,1244.25)"><g transform="matrix(0.83,0,0,2.08333,19.89,-141.917)"><text x="141.317px" y="141.028px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:14px;fill:none;">Release</text></g><g transform="matrix(0.83,0,0,2.08333,19.89,-141.917)"><text x="141.317px" y="141.028px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:14px;fill:#1e88e5;">Release</text></g></g></g><g><path id="idle-path" @click="gotoIdlePosition()" v-bind:class="{'active-path': idlePathIsActive }" d="M1133.33,244.792c0,-20.122 -16.336,-36.459 -36.458,-36.459l-527.083,0c-20.122,0 -36.459,16.337 -36.459,36.459l0,72.916c0,20.122 16.337,36.459 36.459,36.459l527.083,0c20.122,0 36.458,-16.337 36.458,-36.459l0,-72.916Z" style="fill:#fff;"/><g transform="matrix(5.02008,0,0,2,37.6506,-5.75)"><g transform="matrix(0.83,0,0,2.08333,19.89,-141.917)"><text x="155.714px" y="141.028px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:14px;fill:none;">Idle</text></g><g transform="matrix(0.83,0,0,2.08333,19.89,-141.917)"><text x="155.714px" y="141.028px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:14px;fill:#1e88e5;">Idle</text></g></g></g><g><path id="deposit-green-path" v-bind:class="{'active-path': depositGreenPathIsActive}" d="M743.75,1990.62c0,-20.122 -16.336,-36.458 -36.458,-36.458l-527.084,0c-20.122,0 -36.458,16.336 -36.458,36.458l0,72.917c0,20.122 16.336,36.458 36.458,36.458l527.084,0c20.122,0 36.458,-16.336 36.458,-36.458l0,-72.917Z" style="fill:#fff;"/><g transform="matrix(5.02008,0,0,2,-351.933,1740.08)"><g transform="matrix(0.83,0,0,2.08333,19.89,-141.917)"><text x="121.866px" y="141.028px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:14px;fill:none;">Deposit Green</text></g><g transform="matrix(0.83,0,0,2.08333,19.89,-141.917)"><text x="121.866px" y="141.028px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:14px;fill:#1e88e5;">Deposit Green</text></g></g></g><g><path id="park-red-path" v-bind:class="{'active-path': parkRedPathIsActive}" d="M1522.92,1744.79c0,-20.122 -16.337,-36.459 -36.459,-36.459l-527.083,0c-20.122,0 -36.458,16.337 -36.458,36.459l0,72.916c0,20.122 16.336,36.459 36.458,36.459l527.083,0c20.122,0 36.459,-16.337 36.459,-36.459l0,-72.916Z" style="fill:#fff;"/><g transform="matrix(5.02008,0,0,2,427.234,1494.25)"><g transform="matrix(0.83,0,0,2.08333,19.89,-141.917)"><text x="137.821px" y="141.028px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:14px;fill:none;">Park Red</text></g><g transform="matrix(0.83,0,0,2.08333,19.89,-141.917)"><text x="137.821px" y="141.028px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:14px;fill:#1e88e5;">Park Red</text></g></g></g><g><path id="park-green-path" v-bind:class="{'active-path': parkGreenPathIsActive}" d="M743.75,1744.79c0,-20.122 -16.336,-36.459 -36.458,-36.459l-527.084,0c-20.122,0 -36.458,16.337 -36.458,36.459l0,72.916c0,20.122 16.336,36.459 36.458,36.459l527.084,0c20.122,0 36.458,-16.337 36.458,-36.459l0,-72.916Z" style="fill:#fff;"/><g transform="matrix(5.02008,0,0,2,-351.933,1494.25)"><g transform="matrix(0.83,0,0,2.08333,19.89,-141.917)"><text x="131.207px" y="141.028px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:14px;fill:none;">Park Green</text></g><g transform="matrix(0.83,0,0,2.08333,19.89,-141.917)"><text x="131.207px" y="141.028px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:14px;fill:#1e88e5;">Park Green</text></g></g></g><g><path id="deposit-red-path" v-bind:class="{'active-path': depositRedPathIsActive}" d="M1522.92,1990.62c0,-20.122 -16.337,-36.458 -36.459,-36.458l-527.083,0c-20.122,0 -36.458,16.336 -36.458,36.458l0,72.917c0,20.122 16.336,36.458 36.458,36.458l527.083,0c20.122,0 36.459,-16.336 36.459,-36.458l0,-72.917Z" style="fill:#fff;"/><g transform="matrix(5.02008,0,0,2,427.234,1740.08)"><g transform="matrix(0.83,0,0,2.08333,19.89,-141.917)"><text x="128.479px" y="141.028px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:14px;fill:none;">Deposit Red</text></g><g transform="matrix(0.83,0,0,2.08333,19.89,-141.917)"><text x="128.479px" y="141.028px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:14px;fill:#1e88e5;">Deposit Red</text></g></g></g><path d="M1230.21,1925l13.542,0l-20.833,20.833l-20.834,-20.833l13.542,0l0,-62.5l14.583,0l0,62.5Z" style="fill:#fff;"/><path d="M451.042,1925l13.541,0l-20.833,20.833l-20.833,-20.833l13.541,0l0,-62.5l14.584,0l0,62.5Z" style="fill:#fff;"/><path d="M840.625,429.167l13.542,0l-20.834,20.833l-20.833,-20.833l13.542,0l0,-62.5l14.583,0l0,62.5Z" style="fill:#fff;"/><path d="M848.958,175l13.542,0l-20.833,20.833l-20.834,-20.833l13.542,0l0,-62.5l14.583,0l0,62.5Z" style="fill:#fff;"/><path d="M840.625,679.167l13.542,0l-20.834,20.833l-20.833,-20.833l13.542,0l0,-62.5l14.583,0l0,62.5Z" style="fill:#fff;"/><path d="M840.625,929.167l13.542,0l-20.834,20.833l-20.833,-20.833l13.542,0l0,-62.5l14.583,0l0,62.5Z" style="fill:#fff;"/><path d="M840.625,1179.17l13.542,0l-20.834,20.833l-20.833,-20.833l13.542,0l0,-62.5l14.583,0l0,62.5Z" style="fill:#fff;"/><path d="M840.625,1429.17l13.542,0l-20.834,20.833l-20.833,-20.833l13.542,0l0,-62.5l14.583,0l0,62.5Z" style="fill:#fff;"/><g><path d="M1071.88,1679.17l13.542,0l-20.834,20.833l-20.833,-20.833l13.542,0l0,-62.5l14.583,0l0,62.5Z" style="fill:#fff;"/><path d="M609.375,1679.17l13.542,0l-20.834,20.833l-20.833,-20.833l13.542,0l0,-62.5l14.583,0l0,62.5Z" style="fill:#fff;"/></g><g><path d="M504.167,273.958l0,-13.541l20.833,20.833l-20.833,20.833l0,-13.541l-430.209,0l0,-14.584l430.209,0Z" style="fill:#fff;"/><path d="M73.958,275l14.584,0l0,1912.5l-14.584,0l0,-1912.5Z" style="fill:#fff;"/><rect x="73.958" y="2172.92" width="375" height="14.583" style="fill:#fff;"/><path d="M434.375,2112.5l14.583,0l0,75l-14.583,0l0,-75Z" style="fill:#fff;"/></g><g><path d="M1162.5,269.792l0,-13.542l-20.833,20.833l20.833,20.834l0,-13.542l430.208,0l0,-14.583l-430.208,0Z" style="fill:#fff;"/><path d="M1592.71,270.833l-14.583,0l0,1912.5l14.583,0l0,-1912.5Z" style="fill:#fff;"/><rect x="1217.71" y="2168.75" width="375" height="14.583" style="fill:#fff;"/><path d="M1232.29,2108.33l-14.584,0l0,75l14.584,0l0,-75Z" style="fill:#fff;"/></g></svg>
-                    <div>
-                        <button class="tabs">Manual</button>
-                        <button class="tabs active-tab" style="width: 68px" @click="toggleAutoPlay()"><span
-                                v-if="!autoPlay">Automatic</span><span
-                                v-if="autoPlay">Stop</span></button>
+                    <div class="tab" v-if="!manualMode">
+                        <svg width="90%" height="100%" viewBox="0 0 1667 2200" version="1.1" xmlns="http://www.w3.org/2000/svg"  xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.5;"><g><clipPath id="_clip1"><path d="M1666.67,2200l0,-2200l-1666.67,0l0,2200l1666.67,0Z"/></clipPath><g clip-path="url(#_clip1)"><rect x="0" y="0" width="1666.67" height="2200" style="fill:#1e88e5;"/></g></g><g><path id="ready-path" v-bind:class="{'active-path': readyPathIsActive}" d="M1133.33,494.792c0,-20.122 -16.336,-36.459 -36.458,-36.459l-527.083,0c-20.122,0 -36.459,16.337 -36.459,36.459l0,72.916c0,20.122 16.337,36.459 36.459,36.459l527.083,0c20.122,0 36.458,-16.337 36.458,-36.459l0,-72.916Z" style="fill:#fff;"/><g transform="matrix(5.02008,0,0,2,37.6506,244.25)"><g transform="matrix(0.83,0,0,2.08333,19.89,-141.917)"><text x="124.59px" y="141.028px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:14px;fill:none;">Ready to pick</text></g><g transform="matrix(0.83,0,0,2.08333,19.89,-141.917)"><text x="124.59px" y="141.028px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:14px;fill:#1e88e5;">Ready to pick</text></g></g></g><g><path id="approach-path" v-bind:class="{'active-path': approachPathIsActive}"  d="M1133.33,744.792c0,-20.122 -16.336,-36.459 -36.458,-36.459l-527.083,0c-20.122,0 -36.459,16.337 -36.459,36.459l0,72.916c0,20.122 16.337,36.459 36.459,36.459l527.083,0c20.122,0 36.458,-16.337 36.458,-36.459l0,-72.916Z" style="fill:#fff;"/><g transform="matrix(5.02008,0,0,2,37.6506,494.25)"><g transform="matrix(0.83,0,0,2.08333,19.89,-141.917)"><text x="137.035px" y="141.028px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:14px;fill:none;">Approach</text></g><g transform="matrix(0.83,0,0,2.08333,19.89,-141.917)"><text x="137.035px" y="141.028px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:14px;fill:#1e88e5;">Approach</text></g></g></g><g><path id="pickup-path" v-bind:class="{'active-path': pickupPathIsActive}" d="M1133.33,994.792c0,-20.122 -16.336,-36.459 -36.458,-36.459l-527.083,0c-20.122,0 -36.459,16.337 -36.459,36.459l0,72.916c0,20.122 16.337,36.459 36.459,36.459l527.083,0c20.122,0 36.458,-16.337 36.458,-36.459l0,-72.916Z" style="fill:#fff;"/><g transform="matrix(5.02008,0,0,2,37.6506,744.25)"><g transform="matrix(0.83,0,0,2.08333,19.89,-141.917)"><text x="145.99px" y="141.028px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:14px;fill:none;">Pickup</text></g><g transform="matrix(0.83,0,0,2.08333,19.89,-141.917)"><text x="145.99px" y="141.028px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:14px;fill:#1e88e5;">Pickup</text></g></g></g><g><path id="park-path" v-bind:class="{'active-path': parkPathIsActive}" d="M1133.33,1244.79c0,-20.122 -16.336,-36.459 -36.458,-36.459l-527.083,0c-20.122,0 -36.459,16.337 -36.459,36.459l0,72.916c0,20.122 16.337,36.459 36.459,36.459l527.083,0c20.122,0 36.458,-16.337 36.458,-36.459l0,-72.916Z" style="fill:#fff;"/><g transform="matrix(5.02008,0,0,2,37.6506,994.25)"><g transform="matrix(0.83,0,0,2.08333,19.89,-141.917)"><text x="125.502px" y="141.028px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:14px;fill:none;">Park <tspan x="157.925px 164.925px 172.711px " y="141.028px 141.028px 141.028px ">Tes</tspan>t Rig</text></g><g transform="matrix(0.83,0,0,2.08333,19.89,-141.917)"><text x="125.502px" y="141.028px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:14px;fill:#1e88e5;">Park <tspan x="157.925px 164.925px 172.711px " y="141.028px 141.028px 141.028px ">Tes</tspan>t Rig</text></g></g></g><g><path id="release-path" v-bind:class="{'active-path': releasePathIsActive }" d="M1133.33,1494.79c0,-20.122 -16.336,-36.459 -36.458,-36.459l-527.083,0c-20.122,0 -36.459,16.337 -36.459,36.459l0,72.916c0,20.122 16.337,36.459 36.459,36.459l527.083,0c20.122,0 36.458,-16.337 36.458,-36.459l0,-72.916Z" style="fill:#fff;"/><g transform="matrix(5.02008,0,0,2,37.6506,1244.25)"><g transform="matrix(0.83,0,0,2.08333,19.89,-141.917)"><text x="141.317px" y="141.028px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:14px;fill:none;">Release</text></g><g transform="matrix(0.83,0,0,2.08333,19.89,-141.917)"><text x="141.317px" y="141.028px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:14px;fill:#1e88e5;">Release</text></g></g></g><g><path id="idle-path" @click="gotoIdlePosition()" v-bind:class="{'active-path': idlePathIsActive }" d="M1133.33,244.792c0,-20.122 -16.336,-36.459 -36.458,-36.459l-527.083,0c-20.122,0 -36.459,16.337 -36.459,36.459l0,72.916c0,20.122 16.337,36.459 36.459,36.459l527.083,0c20.122,0 36.458,-16.337 36.458,-36.459l0,-72.916Z" style="fill:#fff;"/><g transform="matrix(5.02008,0,0,2,37.6506,-5.75)"><g transform="matrix(0.83,0,0,2.08333,19.89,-141.917)"><text x="155.714px" y="141.028px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:14px;fill:none;">Idle</text></g><g transform="matrix(0.83,0,0,2.08333,19.89,-141.917)"><text x="155.714px" y="141.028px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:14px;fill:#1e88e5;">Idle</text></g></g></g><g><path id="deposit-green-path" v-bind:class="{'active-path': depositGreenPathIsActive}" d="M743.75,1990.62c0,-20.122 -16.336,-36.458 -36.458,-36.458l-527.084,0c-20.122,0 -36.458,16.336 -36.458,36.458l0,72.917c0,20.122 16.336,36.458 36.458,36.458l527.084,0c20.122,0 36.458,-16.336 36.458,-36.458l0,-72.917Z" style="fill:#fff;"/><g transform="matrix(5.02008,0,0,2,-351.933,1740.08)"><g transform="matrix(0.83,0,0,2.08333,19.89,-141.917)"><text x="121.866px" y="141.028px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:14px;fill:none;">Deposit Green</text></g><g transform="matrix(0.83,0,0,2.08333,19.89,-141.917)"><text x="121.866px" y="141.028px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:14px;fill:#1e88e5;">Deposit Green</text></g></g></g><g><path id="park-red-path" v-bind:class="{'active-path': parkRedPathIsActive}" d="M1522.92,1744.79c0,-20.122 -16.337,-36.459 -36.459,-36.459l-527.083,0c-20.122,0 -36.458,16.337 -36.458,36.459l0,72.916c0,20.122 16.336,36.459 36.458,36.459l527.083,0c20.122,0 36.459,-16.337 36.459,-36.459l0,-72.916Z" style="fill:#fff;"/><g transform="matrix(5.02008,0,0,2,427.234,1494.25)"><g transform="matrix(0.83,0,0,2.08333,19.89,-141.917)"><text x="137.821px" y="141.028px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:14px;fill:none;">Park Red</text></g><g transform="matrix(0.83,0,0,2.08333,19.89,-141.917)"><text x="137.821px" y="141.028px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:14px;fill:#1e88e5;">Park Red</text></g></g></g><g><path id="park-green-path" v-bind:class="{'active-path': parkGreenPathIsActive}" d="M743.75,1744.79c0,-20.122 -16.336,-36.459 -36.458,-36.459l-527.084,0c-20.122,0 -36.458,16.337 -36.458,36.459l0,72.916c0,20.122 16.336,36.459 36.458,36.459l527.084,0c20.122,0 36.458,-16.337 36.458,-36.459l0,-72.916Z" style="fill:#fff;"/><g transform="matrix(5.02008,0,0,2,-351.933,1494.25)"><g transform="matrix(0.83,0,0,2.08333,19.89,-141.917)"><text x="131.207px" y="141.028px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:14px;fill:none;">Park Green</text></g><g transform="matrix(0.83,0,0,2.08333,19.89,-141.917)"><text x="131.207px" y="141.028px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:14px;fill:#1e88e5;">Park Green</text></g></g></g><g><path id="deposit-red-path" v-bind:class="{'active-path': depositRedPathIsActive}" d="M1522.92,1990.62c0,-20.122 -16.337,-36.458 -36.459,-36.458l-527.083,0c-20.122,0 -36.458,16.336 -36.458,36.458l0,72.917c0,20.122 16.336,36.458 36.458,36.458l527.083,0c20.122,0 36.459,-16.336 36.459,-36.458l0,-72.917Z" style="fill:#fff;"/><g transform="matrix(5.02008,0,0,2,427.234,1740.08)"><g transform="matrix(0.83,0,0,2.08333,19.89,-141.917)"><text x="128.479px" y="141.028px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:14px;fill:none;">Deposit Red</text></g><g transform="matrix(0.83,0,0,2.08333,19.89,-141.917)"><text x="128.479px" y="141.028px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:14px;fill:#1e88e5;">Deposit Red</text></g></g></g><path d="M1230.21,1925l13.542,0l-20.833,20.833l-20.834,-20.833l13.542,0l0,-62.5l14.583,0l0,62.5Z" style="fill:#fff;"/><path d="M451.042,1925l13.541,0l-20.833,20.833l-20.833,-20.833l13.541,0l0,-62.5l14.584,0l0,62.5Z" style="fill:#fff;"/><path d="M840.625,429.167l13.542,0l-20.834,20.833l-20.833,-20.833l13.542,0l0,-62.5l14.583,0l0,62.5Z" style="fill:#fff;"/><path d="M848.958,175l13.542,0l-20.833,20.833l-20.834,-20.833l13.542,0l0,-62.5l14.583,0l0,62.5Z" style="fill:#fff;"/><path d="M840.625,679.167l13.542,0l-20.834,20.833l-20.833,-20.833l13.542,0l0,-62.5l14.583,0l0,62.5Z" style="fill:#fff;"/><path d="M840.625,929.167l13.542,0l-20.834,20.833l-20.833,-20.833l13.542,0l0,-62.5l14.583,0l0,62.5Z" style="fill:#fff;"/><path d="M840.625,1179.17l13.542,0l-20.834,20.833l-20.833,-20.833l13.542,0l0,-62.5l14.583,0l0,62.5Z" style="fill:#fff;"/><path d="M840.625,1429.17l13.542,0l-20.834,20.833l-20.833,-20.833l13.542,0l0,-62.5l14.583,0l0,62.5Z" style="fill:#fff;"/><g><path d="M1071.88,1679.17l13.542,0l-20.834,20.833l-20.833,-20.833l13.542,0l0,-62.5l14.583,0l0,62.5Z" style="fill:#fff;"/><path d="M609.375,1679.17l13.542,0l-20.834,20.833l-20.833,-20.833l13.542,0l0,-62.5l14.583,0l0,62.5Z" style="fill:#fff;"/></g><g><path d="M504.167,273.958l0,-13.541l20.833,20.833l-20.833,20.833l0,-13.541l-430.209,0l0,-14.584l430.209,0Z" style="fill:#fff;"/><path d="M73.958,275l14.584,0l0,1912.5l-14.584,0l0,-1912.5Z" style="fill:#fff;"/><rect x="73.958" y="2172.92" width="375" height="14.583" style="fill:#fff;"/><path d="M434.375,2112.5l14.583,0l0,75l-14.583,0l0,-75Z" style="fill:#fff;"/></g><g><path d="M1162.5,269.792l0,-13.542l-20.833,20.833l20.833,20.834l0,-13.542l430.208,0l0,-14.583l-430.208,0Z" style="fill:#fff;"/><path d="M1592.71,270.833l-14.583,0l0,1912.5l14.583,0l0,-1912.5Z" style="fill:#fff;"/><rect x="1217.71" y="2168.75" width="375" height="14.583" style="fill:#fff;"/><path d="M1232.29,2108.33l-14.584,0l0,75l14.584,0l0,-75Z" style="fill:#fff;"/></g></svg>
+                        <div style="height: 36px;">
+                            <button class="tabs active-tab" style="width: 68px" @click="toggleAutoPlay()">
+                        <span v-if="!autoPlay">
+                            <i class="material-icons"
+                               style="font-size: 10px; position: relative; top: 1px;">play_arrow</i>
+                            Start</span>
+                                <span v-if="autoPlay">
+                            <i class="material-icons"
+                               style="font-size: 10px; position: relative; top: 1px;">stop</i>
+                            Stop</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="tab" v-if="manualMode">
+                        <table class="control-table">
+                            <thead>
+                            <tr>
+                                <td><strong>Joint</strong></td>
+                                <td><strong>Current</strong></td>
+                                <td><strong>Target</strong></td>
+                            </tr>
+                            </thead>
+                            <tr>
+                                <td>Base</td>
+                                <td>{{basePosition}}</td>
+                                <td>
+                                    <input v-model="baseTargetPosition" type="number" step="0.01"/>
+                                    <button @click="baseGoto()">Set</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Main Arm</td>
+                                <td>{{mainArmPosition}}</td>
+                                <td>
+                                    <input v-model="mainArmTargetPosition" type="number" step="0.01"/>
+                                    <button @click="mainArmGoto()">Set</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Forearm</td>
+                                <td>{{secondArmPosition}}</td>
+                                <td>
+                                    <input v-model="secondArmTargetPosition" type="number" step="0.01"/>
+                                    <button @click="secondArmGoto()">Set</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Wrist</td>
+                                <td>{{wristPosition}}</td>
+                                <td>
+                                    <input v-model="wristTargetPosition" type="number" step="0.01"/>
+                                    <button @click="wristGoto()">Set</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Gripper</td>
+                                <td>{{gripperPosition}}</td>
+                                <td>
+                                    <input v-model="gripperTargetPosition" type="number" step="0.01"/>
+                                    <button @click="gripperGoto()">Set</button>
+                                    <small v-if="gripperHasContact">has-contact</small>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Slider</td>
+                                <td>{{sliderPosition}}</td>
+                                <td>
+                                    <button>Push</button>
+                                    <button>Pull</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Adjuster</td>
+                                <td>{{adjusterPosition}}</td>
+                                <td>
+                                    <button>Push</button>
+                                    <button>Pull</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Platform</td>
+                                <td>{{platformPosition}}</td>
+                                <td>
+                                    <button>Tilt</button>
+                                    <button>Level</button>
+                                </td>
+                            </tr>
+                        </table>
+                        <div style="height: 36px"></div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
     <main id="main">
-        <div class="mdl-grid">
-            <div class="mdl-cell mdl-cell--8-col">
+        <div class="mdl-grid" style="width: 90vw;">
+            <div class="mdl-cell mdl-cell--4-col">
                 <h2 style="display: inline-block;">Sensor Monitors</h2>
                 <button @click="toggleRecording()">
                     <i class="material-icons" v-bind:class="{ red: recording }"
@@ -95,123 +182,14 @@
                     <span v-if="!recording" style="font-size: 12px;">Record</span>
                     <span v-if="recording" style="font-size: 12px;">Stop Recording</span>
                 </button>
-            </div>
-            <div class="mdl-cell mdl-cell--4-col">
-                <h2>Camera Signals</h2>
-            </div>
-            <div class="mdl-cell mdl-cell--4-col">
-                Monitor 1: Main Arm
+                <button @click="resetData()">
+                    <span style="font-size: 12px;">Reset</span>
+                </button>
+                <p>Monitor 1: Main Arm</p>
                 <div id="monitor-1" class="time-series"></div>
+                <p class="description">Real-time sensor measurements.</p>
             </div>
-            <div class="mdl-cell mdl-cell--4-col">
-                Monitor 2: Base
-                <div id="monitor-2" class="time-series"></div>
-            </div>
-            <div class="mdl-cell mdl-cell--2-col">
-                <p>Conveyor</p>
-                <div class="pickup-container">
-                    <img id="pickup-camera" style="width: 200px; height: 200px;"
-                         v-bind:src="pickupImageBase64"/>
-                </div>
-            </div>
-            <div class="mdl-cell mdl-cell--2-col">
-                <p>Testing Rig</p>
-                <div class="detection-container">
-                    <img id="detection-camera" style="width: 200px; height: 200px;"
-                         v-bind:src="detectionImageBase64"/>
-                </div>
-            </div>
-            <span>Classification: {{ objectClass }}</span>
-            <div class="mdl-cell mdl-cell--4-col">
-                <h2>Precision Controls</h2>
-                <table>
-                    <thead>
-                    <tr>
-                        <td width="100"><strong>Joint</strong></td>
-                        <td width="100"><strong>Current</strong></td>
-                        <td><strong>Target</strong></td>
-                    </tr>
-                    </thead>
-                    <tr>
-                        <td>Base</td>
-                        <td>{{basePosition}}</td>
-                        <td>
-                            <input v-model="baseTargetPosition" type="number" step="0.01"/>
-                            <input v-model="baseTargetSpeed" type="number" step="0.1"/>
-                            <button @click="baseGoto()">Set</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Main Arm</td>
-                        <td>{{mainArmPosition}}</td>
-                        <td>
-                            <input v-model="mainArmTargetPosition" type="number" step="0.01"/>
-                            <input v-model="mainArmTargetSpeed" type="number" step="0.1"/>
-                            <button @click="mainArmGoto()">Set</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Forearm</td>
-                        <td>{{secondArmPosition}}</td>
-                        <td>
-                            <input v-model="secondArmTargetPosition" type="number" step="0.01"/>
-                            <input v-model="secondArmTargetSpeed" type="number" step="0.1"/>
-                            <button @click="secondArmGoto()">Set</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Wrist</td>
-                        <td>{{wristPosition}}</td>
-                        <td>
-                            <input v-model="wristTargetPosition" type="number" step="0.01"/>
-                            <button @click="wristGoto()">Set</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Gripper</td>
-                        <td>{{gripperPosition}}</td>
-                        <td>
-                            <input v-model="gripperTargetPosition" type="number" step="0.01"/>
-                            <button @click="gripperGoto()">Set</button>
-                            <small v-if="gripperHasContact">has-contact</small>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Hand</td>
-                        <td>x: {{handPosition.x}}<br/>
-                            y: {{handPosition.y}}<br/>
-                            z: {{handPosition.z}}
-                        </td>
-                        <td>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Slider</td>
-                        <td>{{sliderPosition}}</td>
-                        <td>
-                            <button>Push</button>
-                            <button>Back up</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Adjuster</td>
-                        <td>{{adjusterPosition}}</td>
-                        <td>
-                            <button>Push</button>
-                            <button>Back up</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Platform</td>
-                        <td>{{platformPosition}}</td>
-                        <td>
-                            <button>Tilt</button>
-                            <button>Level</button>
-                        </td>
-                    </tr>
-                </table>
-            </div>
-            <div class="mdl-cell mdl-cell--4-col">
+            <div class="mdl-cell mdl-cell--3-col">
                 <h2>Work Item Information</h2>
                 <div style="display: inline-block;">
                     <table>
@@ -229,17 +207,45 @@
                         </tr>
                         <tr>
                             <td><strong>URL</strong></td>
-                            <td><span v-if="qrCode.id === '-'">{{qrCode.id}}</span><a v-if="qrCode.id !== '-'" href="#">http://cdl.io/{{qrCode.id}}</a></td>
+                            <td><span v-if="qrCode.id === '-'">{{qrCode.id}}</span><a v-if="qrCode.id !== '-'" href="#">http://cdl.io/{{qrCode.id}}</a>
+                            </td>
                         </tr>
                     </table>
                 </div>
                 <div style="display: inline-block; float: right;">
                     <img v-if="qrCode.base64" style="width: 75px; height: 75px; margin: 0;" v-bind:src="qrCode.base64"/>
                 </div>
+                <p class="description">Read current item info contained in the QR code, currently scanned by the testing
+                    rig.</p>
+            </div>
+            <div class="mdl-cell mdl-cell--4-col mdl-cell--1-offset">
+                <h2>Camera Signals</h2>
+                <div style="display: inline-block; margin-right: 15px;">
+                    <p>Detection Camera</p>
+                    <div class="detection-container">
+                        <img id="detection-camera" style="width: 200px; height: 200px;"
+                             v-bind:src="detectionImageBase64"/>
+                    </div>
+                </div>
+                <div style="display: inline-block;">
+                    <p>Pickup Camera</p>
+                    <div class="pickup-container">
+                        <img id="pickup-camera" style="width: 200px; height: 200px;"
+                             v-bind:src="pickupImageBase64"/>
+                    </div>
+                </div>
+                <p class="description">The camera images of the two cameras mounted on the unit.</p>
             </div>
         </div>
-
     </main>
+    <hr/>
+    <article>
+        <h1>Project description</h1>
+        <p>This <a href="https://cdl-mint.big.tuwien.ac.at/" target="_blank">CDL-MINT</a> project explores technologies
+            for the model-integrated development and monitoring of production systems. This includes the simulation of
+            a 3D robotic arm model in Blender GE, a MQTT message pipeline, a controller that runs on a server and the
+            dashboard that can be seen above. A detailed description of the setup can be found on <a href="https://github.com/rafaelkonlechner/cdl-digital-twin">GitHub</a>.
+    </article>
     <footer>
         <h5><strong>Christian Doppler Laboratory</strong><br/>
             <small>on Model-Integrated Smart Production</small>

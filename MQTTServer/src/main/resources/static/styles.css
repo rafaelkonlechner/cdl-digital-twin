@@ -3,6 +3,18 @@ header {
     padding: 2vh;
 }
 
+article {
+    width: 40vw;
+    margin: 0 auto 5vh;
+    text-align: justify;
+}
+
+.description {
+    margin-top: 10px;
+    color: #757575;
+    font-size: 0.9em;
+}
+
 header h1 {
     line-height: 1em;
 }
@@ -28,15 +40,6 @@ footer h5 small {
     font-size: .7em;
 }
 
-main {
-    width: 80vw;
-    margin: 0 auto 10vh auto;
-}
-
-input {
-    width: 40px;
-}
-
 h1 {
     font-size: 2.8em;
 }
@@ -59,10 +62,20 @@ img {
 .blueprint {
     position: relative;
     text-align: center;
+    color: white;
     width: 100vw;
     padding: 10px;
     background-color: #1E88E5;
     box-shadow: inset 0 0 5px #000000;
+}
+
+.blueprint-main {
+    width: 85vw;
+    margin: 0 auto;
+}
+
+.blueprint input {
+    width: 20px;
 }
 
 .blueprint-img {
@@ -77,6 +90,14 @@ img {
     font-family: 'Roboto Mono', monospace;
     margin: 0;
     line-height: 1;
+}
+
+.control-table {
+    text-align: left;
+    margin: 10% 5px;
+    width: 100%;
+    height: 100%;
+    font-size: 11px;
 }
 
 .time-series {
@@ -155,7 +176,7 @@ img {
 
 .active-path {
     stroke: #0d47a1;
-    stroke-width: 12.5px;
+    stroke-width: 13px;
 }
 
 .tabs {
@@ -170,7 +191,7 @@ img {
     background-color: #1E88E5;
 }
 
-.tabs.active-tab {
+.active-tab {
     color: #1E88E5;
     background-color: white;
 }
