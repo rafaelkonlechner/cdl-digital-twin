@@ -8,12 +8,12 @@ Code repository: [https://github.com/rafaelkonlechner/cdl-pick-and-place](https:
 
 Das Szenario und die Simulation beschreiben eine Pick-and-Place-Einheit einer Fertigungsstraße. Diese Einheit besteht wiederum aus drei Komponenten: Roboterarm (6 Freiheitsgrade), Förderband und Prüfstand.
 
-/Simulation.png "Simulierte Szene: Pick and Place Unit"
+![](Simulation.png) *Simulierte Szene: Pick and Place Unit*
 
 Die einzelnen Einheiten kommunizieren über MQTT mit dem Server. Der Server speichert die zentrale Abfolgelogik der Anlage und steuert diese mit Befehlen über MQTT. Die Simulation wird von einer Logik kontrolliert, die einen Hardwarecontroller simuliert.
 
 ### Architekturübersicht
-/Architektur.png "Architektur des vorgestellten Systems"
+![](Architektur.png) *Architektur des vorgestellten Systems*
 
 ### Sensordaten der Pick-and-Place Unit
 Folgende Sensoren werden im Szenario berücksichtigt und können über das MQTT-Topic `Sensor` ausgelesen werden:
@@ -44,7 +44,7 @@ Zur Feststellung des aktuellen Systemzustandes können folgende Topics für eing
 
 * `Sensor`: Abonniert man dieses Topic, erhält man im Abstand von wenigen Millisekunden die Daten aller oben beschriebenen Sensoren, exklusive der Kameras. Aufgrund der größeren Datenmenge werden Kameras einzeln abonniert.
 * `PickupCamera`: Enthält das Kamerabild auf das Förderband, zur Aufnahmeunterstützung des Roboters. Die Nachrichten von Camera-Topics enthalten als Payload unmittelbar die Base64-codierte Bilddatei.
-* `DetectionCamera`: Enthält das Kamerabild auf die Prüfstation, auch als Base64-codierte Bilddatei. 
+* `DetectionCamera`: Enthält das Kamerabild auf die Prüfstation, auch als Base64-codierte Bilddatei.
 
 #### Nachrichtenformat für Sensor-Topic
 Nachrichten des Sensor-Topics entsprechen dem JSON-Dateiformat und spezifizieren die sendende Einheit, sowie die gemessenen Daten. Die folgenden Beispiele zeigen je eine Nachricht pro Einheit (*entity*):
@@ -83,7 +83,7 @@ Folgende Topics sind von der Pick-and-Place-Unit abonniert und können für die 
 
 #### Nachrichtenformat für Actuator-Topic
 Das Nachrichtenformat entspricht einem einfachen Wertepaar *[name]-goto value (speed)*, bei dem zuerst der Aktuator (*name*) und danach der Zielwert (*value*) angegeben wird. An die Komponente wird "-goto" als Suffix angefügt. Die Rotationsmotoren des Roboterarms unterstützen außerdem noch die Angabe der Rotationsgeschwindigkeit (*speed*). Beispiele:
- 
+
 * `"base-goto 0.0 1.0"`: Lokale Rotation der Basis (Intervall [-Pi, Pi], Maximale Drehgeschwindigkeit der Bewegung)
 * `"main_arm-goto 0.0"`: Analog für den Hauptarm
 * `"second_arm-goto 0.0 "`: Analog für den Vorderarm
@@ -132,7 +132,7 @@ RoboticArm {
 }
 ```
 
-ist hingegen unbekannt. Unbekannte Zustände treten beim Übergang zwischen zwei bekannten Zuständen auf. Wurde ein bekannter Zustand erkannt, wird überprüft, ob es für die konsolidierten Zustände (Roboterarm, Schieber, Förderband) einen definierten Folgezustand gibt. Beispiel: Der folgende Zustand beschreibt den Grundzustand, bei dem kein Werkstück auf dem Förderband ist: 
+ist hingegen unbekannt. Unbekannte Zustände treten beim Übergang zwischen zwei bekannten Zuständen auf. Wurde ein bekannter Zustand erkannt, wird überprüft, ob es für die konsolidierten Zustände (Roboterarm, Schieber, Förderband) einen definierten Folgezustand gibt. Beispiel: Der folgende Zustand beschreibt den Grundzustand, bei dem kein Werkstück auf dem Förderband ist:
 
 ```
 RoboticArm: IDLE, Slider: HOME, Conveyor: EMPTY
@@ -160,10 +160,10 @@ Der gesamte Nachrichtenverkehr des Servers (MQTT, Websockets) ist derzeit in der
 
 ## QR-Codes
 
-/code-1.png
+![](code-1.png)
 
 Jedes Werkstück ist mit einem QR-Code versehen. Die verwendeten QR-Codes (100 Stück) wurden vorab generiert und werden beim Start der Simulation in geordneter Reihenfolge an die vorhandenen Werkstücke als Textur aufgetragen. Wenn ein Werkstück nach einem erfolgreichen Durchlauf auf die Rampe abgeladen wurde und die Lichtschranke passiert, wird durch die beiden Python-Controller [greengate.py](https://github.com/rafaelkonlechner/cdl-digital-twin/blob/master/blender-scripts/modules/robot/greengate.py) und [redgate.py](https://github.com/rafaelkonlechner/cdl-digital-twin/blob/master/blender-scripts/modules/robot/redgate.py)  ein neues Werkstück erzeugt und in den Puffer legt. Dem Werkstück wird ein neuer QR-Code als Textur zugewiesen.
- 
+
 Generierte QR-Codes: [https://github.com/rafaelkonlechner/cdl-digital-twin/tree/master/qr-codes](https://github.com/rafaelkonlechner/cdl-digital-twin/tree/master/qr-codes)
 
 Das Lesen der QR-Codes erfolgt am Server in der Klasse [https://github.com/rafaelkonlechner/cdl-digital-twin/blob/master/MQTTServer/src/main/kotlin/at/ac/tuwien/big/QRCodeReader.kt](https://github.com/rafaelkonlechner/cdl-digital-twin/blob/master/MQTTServer/src/main/kotlin/at/ac/tuwien/big/QRCodeReader.kt)
