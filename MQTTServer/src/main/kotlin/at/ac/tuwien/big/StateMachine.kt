@@ -5,7 +5,7 @@ import at.ac.tuwien.big.entity.state.*
 /**
  * Holds all defined states of the environment
  */
-object States {
+object StateMachine {
     /*
      * Robotic arm states
      */
