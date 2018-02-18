@@ -6,7 +6,7 @@ import org.springframework.scheduling.annotation.EnableScheduling
 
 @SpringBootApplication
 @EnableScheduling
-class MqttServerApplication
+open class MqttServerApplication
 
 fun main(args: Array<String>) {
     SpringApplication.run(MqttServerApplication::class.java, *args)
