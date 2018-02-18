@@ -1,6 +1,6 @@
 package at.ac.tuwien.big
 
-import at.ac.tuwien.big.States as s
+import at.ac.tuwien.big.StateMachine as s
 import at.ac.tuwien.big.entity.state.Context
 import at.ac.tuwien.big.entity.state.Transition
 
