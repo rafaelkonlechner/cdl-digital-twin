@@ -26,7 +26,7 @@ class SimulationController(val messageController: MessageController) {
     /**
      * Start and stop automatic mode
      */
-    @RequestMapping(value = "/autoPlay", method = arrayOf(RequestMethod.PUT))
+    @RequestMapping(value = ["/autoPlay"], method = arrayOf(RequestMethod.PUT))
     fun setAutoPlay(@RequestBody autoPlay: Boolean) {
         messageController.autoPlay = autoPlay
     }
@@ -34,7 +34,7 @@ class SimulationController(val messageController: MessageController) {
     /**
      * Start and stop recording sensor signals to the time series database
      */
-    @RequestMapping(value = "/recording", method = arrayOf(RequestMethod.PUT))
+    @RequestMapping(value = ["/recording"], method = arrayOf(RequestMethod.PUT))
     fun setRecording(@RequestBody recording: Boolean) {
         messageController.recording = recording
     }
@@ -42,7 +42,7 @@ class SimulationController(val messageController: MessageController) {
     /**
      * Reset the time series database
      */
-    @RequestMapping(value = "/resetData", method = arrayOf(RequestMethod.PUT))
+    @RequestMapping(value = ["/resetData"], method = arrayOf(RequestMethod.PUT))
     fun resetData() {
         TimeSeriesCollectionService.resetDatabase()
     }
