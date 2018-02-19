@@ -34,94 +34,94 @@ object RobotController {
      */
     fun next(c: Context): Pair<Transition, Int>? {
         return when (c) {
-            Context(s.idle, s.sliderHomePosition, s.conveyorEmpty, s.none) -> {
-                Pair(s.slider_pushed, 8000)
+            Context(s.States.idle, s.States.sliderHomePosition, s.States.conveyorEmpty, s.States.none) -> {
+                Pair(s.Transitions.slider_pushed, 8000)
             }
-            Context(s.idle, s.sliderPushedPosition, s.conveyorEmpty, s.none),
-            Context(s.idle, s.sliderPushedPosition, s.conveyorObjectDetected, s.none),
-            Context(s.idle, s.sliderPushedPosition, s.conveyorObjectInWindow, s.none) -> {
-                Pair(s.slider_home, 0)
+            Context(s.States.idle, s.States.sliderPushedPosition, s.States.conveyorEmpty, s.States.none),
+            Context(s.States.idle, s.States.sliderPushedPosition, s.States.conveyorObjectDetected, s.States.none),
+            Context(s.States.idle, s.States.sliderPushedPosition, s.States.conveyorObjectInWindow, s.States.none) -> {
+                Pair(s.Transitions.slider_home, 0)
             }
-            Context(s.idle, s.sliderHomePosition, s.conveyorObjectDetected, s.none) -> {
-                Pair(s.adjuster_detected_pushed, 0)
+            Context(s.States.idle, s.States.sliderHomePosition, s.States.conveyorObjectDetected, s.States.none) -> {
+                Pair(s.Transitions.adjuster_detected_pushed, 0)
             }
-            Context(s.idle, s.sliderHomePosition, s.conveyorAdjusterPushed, s.none),
-            Context(s.approach, s.sliderHomePosition, s.conveyorAdjusterPushed, s.none) -> {
-                Pair(s.adjuster_pushed_pickup, 0)
+            Context(s.States.idle, s.States.sliderHomePosition, s.States.conveyorAdjusterPushed, s.States.none),
+            Context(s.States.approach, s.States.sliderHomePosition, s.States.conveyorAdjusterPushed, s.States.none) -> {
+                Pair(s.Transitions.adjuster_pushed_pickup, 0)
             }
-            Context(s.idle, s.sliderHomePosition, s.conveyorObjectInWindow, s.none) -> {
-                Pair(s.idle_approach, 0)
+            Context(s.States.idle, s.States.sliderHomePosition, s.States.conveyorObjectInWindow, s.States.none) -> {
+                Pair(s.Transitions.idle_approach, 0)
             }
-            Context(s.approach, s.sliderHomePosition, s.conveyorObjectInWindow, s.none) -> {
-                Pair(s.approach_pickup, 0)
+            Context(s.States.approach, s.States.sliderHomePosition, s.States.conveyorObjectInWindow, s.States.none) -> {
+                Pair(s.Transitions.approach_pickup, 0)
             }
-            Context(s.pickup, s.sliderHomePosition, s.conveyorObjectInWindow, s.none),
-            Context(s.pickup, s.sliderHomePosition, s.conveyorObjectDetected, s.none) -> {
-                Pair(s.pickup_lift, 0)
+            Context(s.States.pickup, s.States.sliderHomePosition, s.States.conveyorObjectInWindow, s.States.none),
+            Context(s.States.pickup, s.States.sliderHomePosition, s.States.conveyorObjectDetected, s.States.none) -> {
+                Pair(s.Transitions.pickup_lift, 0)
             }
-            Context(s.lift, s.sliderHomePosition, s.conveyorObjectInWindow, s.none) -> {
-                Pair(s.lift_park, 0)
+            Context(s.States.lift, s.States.sliderHomePosition, s.States.conveyorObjectInWindow, s.States.none) -> {
+                Pair(s.Transitions.lift_park, 0)
             }
-            Context(s.park, s.sliderHomePosition, s.conveyorEmpty, s.none),
-            Context(s.park, s.sliderHomePosition, s.conveyorEmpty, s.red),
-            Context(s.park, s.sliderHomePosition, s.conveyorEmpty, s.green)
+            Context(s.States.park, s.States.sliderHomePosition, s.States.conveyorEmpty, s.States.none),
+            Context(s.States.park, s.States.sliderHomePosition, s.States.conveyorEmpty, s.States.red),
+            Context(s.States.park, s.States.sliderHomePosition, s.States.conveyorEmpty, s.States.green)
             -> {
-                Pair(s.park_halfrelease, 0)
+                Pair(s.Transitions.park_halfrelease, 0)
             }
-            Context(s.halfRelease, s.sliderHomePosition, s.conveyorEmpty, s.none),
-            Context(s.halfRelease, s.sliderHomePosition, s.conveyorEmpty, s.red),
-            Context(s.halfRelease, s.sliderHomePosition, s.conveyorEmpty, s.green)
+            Context(s.States.halfRelease, s.States.sliderHomePosition, s.States.conveyorEmpty, s.States.none),
+            Context(s.States.halfRelease, s.States.sliderHomePosition, s.States.conveyorEmpty, s.States.red),
+            Context(s.States.halfRelease, s.States.sliderHomePosition, s.States.conveyorEmpty, s.States.green)
             -> {
-                Pair(s.halfrelease_fullrelease, 0)
+                Pair(s.Transitions.halfrelease_fullrelease, 0)
             }
-            Context(s.idle, s.sliderHomePosition, s.conveyorEmpty, s.red),
-            Context(s.idle, s.sliderHomePosition, s.conveyorEmpty, s.green),
-            Context(s.fullRelease, s.sliderHomePosition, s.conveyorEmpty, s.none),
-            Context(s.fullRelease, s.sliderHomePosition, s.conveyorEmpty, s.red),
-            Context(s.fullRelease, s.sliderHomePosition, s.conveyorEmpty, s.green)
+            Context(s.States.idle, s.States.sliderHomePosition, s.States.conveyorEmpty, s.States.red),
+            Context(s.States.idle, s.States.sliderHomePosition, s.States.conveyorEmpty, s.States.green),
+            Context(s.States.fullRelease, s.States.sliderHomePosition, s.States.conveyorEmpty, s.States.none),
+            Context(s.States.fullRelease, s.States.sliderHomePosition, s.States.conveyorEmpty, s.States.red),
+            Context(s.States.fullRelease, s.States.sliderHomePosition, s.States.conveyorEmpty, s.States.green)
             -> {
-                Pair(s.fullrelease_wait, 0)
+                Pair(s.Transitions.fullrelease_wait, 0)
             }
-            Context(s.wait, s.sliderHomePosition, s.conveyorEmpty, s.red),
-            Context(s.wait, s.sliderHomePosition, s.conveyorEmpty, s.green)
+            Context(s.States.wait, s.States.sliderHomePosition, s.States.conveyorEmpty, s.States.red),
+            Context(s.States.wait, s.States.sliderHomePosition, s.States.conveyorEmpty, s.States.green)
             -> {
-                Pair(s.wait_retrieve, 0)
+                Pair(s.Transitions.wait_retrieve, 0)
             }
-            Context(s.retrieve, s.sliderHomePosition, s.conveyorEmpty, s.red),
-            Context(s.retrieve, s.sliderHomePosition, s.conveyorEmpty, s.green)
+            Context(s.States.retrieve, s.States.sliderHomePosition, s.States.conveyorEmpty, s.States.red),
+            Context(s.States.retrieve, s.States.sliderHomePosition, s.States.conveyorEmpty, s.States.green)
             -> {
-                Pair(s.retrieve_retrievegrip, 0)
+                Pair(s.Transitions.retrieve_retrievegrip, 0)
             }
-            Context(s.retrieveGrip, s.sliderHomePosition, s.conveyorEmpty, s.red) -> {
-                Pair(s.retrievegrip_depositred, 0)
+            Context(s.States.retrieveGrip, s.States.sliderHomePosition, s.States.conveyorEmpty, s.States.red) -> {
+                Pair(s.Transitions.retrievegrip_depositred, 0)
             }
-            Context(s.retrieveGrip, s.sliderHomePosition, s.conveyorEmpty, s.green) -> {
-                Pair(s.retrievegrip_depositgreen, 0)
+            Context(s.States.retrieveGrip, s.States.sliderHomePosition, s.States.conveyorEmpty, s.States.green) -> {
+                Pair(s.Transitions.retrievegrip_depositgreen, 0)
             }
-            Context(s.depositRed, s.sliderHomePosition, s.conveyorEmpty, s.red) -> {
-                Pair(s.red_tilt, 0)
+            Context(s.States.depositRed, s.States.sliderHomePosition, s.States.conveyorEmpty, s.States.red) -> {
+                Pair(s.Transitions.red_tilt, 0)
             }
-            Context(s.depositGreen, s.sliderHomePosition, s.conveyorEmpty, s.green) -> {
-                Pair(s.green_tilt, 0)
+            Context(s.States.depositGreen, s.States.sliderHomePosition, s.States.conveyorEmpty, s.States.green) -> {
+                Pair(s.Transitions.green_tilt, 0)
             }
-            Context(s.depositRed, s.sliderHomePosition, s.conveyorEmpty, s.tilted),
-            Context(s.depositGreen, s.sliderHomePosition, s.conveyorEmpty, s.tilted) -> {
-                Pair(s.tilted_none, 0)
+            Context(s.States.depositRed, s.States.sliderHomePosition, s.States.conveyorEmpty, s.States.tilted),
+            Context(s.States.depositGreen, s.States.sliderHomePosition, s.States.conveyorEmpty, s.States.tilted) -> {
+                Pair(s.Transitions.tilted_none, 0)
             }
-            Context(s.idle, s.sliderHomePosition, s.conveyorEmpty, s.tilted) -> {
-                Pair(s.tilted_none, 0)
+            Context(s.States.idle, s.States.sliderHomePosition, s.States.conveyorEmpty, s.States.tilted) -> {
+                Pair(s.Transitions.tilted_none, 0)
             }
-            Context(s.depositRed, s.sliderHomePosition, s.conveyorEmpty, s.none) -> {
-                Pair(s.depositred_releasered, 0)
+            Context(s.States.depositRed, s.States.sliderHomePosition, s.States.conveyorEmpty, s.States.none) -> {
+                Pair(s.Transitions.depositred_releasered, 0)
             }
-            Context(s.releaseRed, s.sliderHomePosition, s.conveyorEmpty, s.none) -> {
-                Pair(s.releasered_idle, 0)
+            Context(s.States.releaseRed, s.States.sliderHomePosition, s.States.conveyorEmpty, s.States.none) -> {
+                Pair(s.Transitions.releasered_idle, 0)
             }
-            Context(s.depositGreen, s.sliderHomePosition, s.conveyorEmpty, s.none) -> {
-                Pair(s.depositgreen_releasegreen, 0)
+            Context(s.States.depositGreen, s.States.sliderHomePosition, s.States.conveyorEmpty, s.States.none) -> {
+                Pair(s.Transitions.depositgreen_releasegreen, 0)
             }
-            Context(s.releaseGreen, s.sliderHomePosition, s.conveyorEmpty, s.none) -> {
-                Pair(s.releasegreen_idle, 0)
+            Context(s.States.releaseGreen, s.States.sliderHomePosition, s.States.conveyorEmpty, s.States.none) -> {
+                Pair(s.Transitions.releasegreen_idle, 0)
             }
             else -> null
         }
