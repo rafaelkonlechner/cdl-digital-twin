@@ -1,6 +1,7 @@
 package at.ac.tuwien.big
 
 import at.ac.tuwien.big.entity.state.*
+import javax.swing.plaf.nimbus.State
 
 /**
  * Holds all defined states and transitions of the environment
@@ -192,40 +193,27 @@ object StateMachine {
     /*
      * Maps of state names to states, per entity
      */
-    val roboticArm = mapOf(
-            Pair(States.idle.name, States.idle),
-            Pair(States.approach.name, States.approach),
-            Pair(States.pickup.name, States.pickup),
-            Pair(States.lift.name, States.lift),
-            Pair(States.park.name, States.park),
-            Pair(States.halfRelease.name, States.halfRelease),
-            Pair(States.fullRelease.name, States.fullRelease),
-            Pair(States.wait.name, States.wait),
-            Pair(States.retrieve.name, States.retrieve),
-            Pair(States.retrieveGrip.name, States.retrieveGrip),
-            Pair(States.depositGreen.name, States.depositGreen),
-            Pair(States.releaseGreen.name, States.releaseGreen),
-            Pair(States.depositRed.name, States.depositRed),
-            Pair(States.releaseRed.name, States.releaseRed)
+    val roboticArm = createMap(States.idle,
+            States.approach,
+            States.pickup,
+            States.lift,
+            States.park,
+            States.halfRelease,
+            States.fullRelease,
+            States.wait,
+            States.retrieve,
+            States.retrieveGrip,
+            States.depositGreen,
+            States.releaseGreen,
+            States.depositRed,
+            States.releaseRed
     )
 
-    val slider = mapOf(
-            Pair(States.sliderHomePosition.name, States.sliderHomePosition),
-            Pair(States.sliderPushedPosition.name, States.sliderPushedPosition)
-    )
-    val conveyor = mapOf(
-            Pair(States.conveyorEmpty.name, States.conveyorEmpty),
-            Pair(States.conveyorObjectDetected.name, States.conveyorObjectDetected),
-            Pair(States.conveyorObjectInWindow.name, States.conveyorObjectInWindow),
-            Pair(States.conveyorAdjusterPushed.name, States.conveyorAdjusterPushed)
-    )
+    val slider = createMap(States.sliderHomePosition, States.sliderPushedPosition)
 
-    val testingRig = mapOf(
-            Pair(States.none.name, States.none),
-            Pair(States.green.name, States.green),
-            Pair(States.red.name, States.red),
-            Pair(States.tilted.name, States.tilted)
-    )
+    val conveyor = createMap(States.conveyorEmpty, States.conveyorObjectDetected, States.conveyorObjectInWindow, States.conveyorAdjusterPushed)
+
+    val testingRig = createMap(States.none, States.green, States.red, States.tilted)
 
     val all = roboticArm.values union slider.values union conveyor.values union testingRig.values
 
@@ -259,6 +247,16 @@ object StateMachine {
      */
     fun matchState(testingRigState: TestingRigState): TestingRigState? {
         return testingRig.values.filter { match(it, testingRigState) }.firstOrNull()
+    }
+
+    private fun<T: StateEvent> createMap(vararg states: T) : Map<String,T> {
+        var  map = HashMap<String, T>()
+
+        for (state in states) {
+            map.put(state.name, state)
+        }
+
+        return map
     }
 
     /**

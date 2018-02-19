@@ -1,8 +1,34 @@
 package at.ac.tuwien.big
 
+import at.ac.tuwien.big.entity.state.BasicStateEvent
 import org.junit.Test
+import kotlin.reflect.KProperty1
+import kotlin.reflect.KType
+import kotlin.reflect.full.createType
+import kotlin.reflect.full.declaredMemberProperties
+import kotlin.reflect.full.isSubtypeOf
+import at.ac.tuwien.big.entity.state.StateEvent
 
 class StateMachineTest {
+
+    @Test
+    fun statesComplete() {
+        val basicStateEventType: KType = StateEvent::class.createType()
+        var builder = StringBuilder()
+
+        StateMachine.States::class.declaredMemberProperties.forEach { it: KProperty1<StateMachine.States, *> ->
+            if (it.returnType.isSubtypeOf(basicStateEventType)) {
+                var value: StateEvent? = it.get(StateMachine.States) as StateEvent
+                if (value != null && !StateMachine.all.contains( value)) {
+                    builder.appendln("Missing state $value")
+                }
+            }
+        }
+
+        assert(builder.isEmpty()) {
+            builder.toString()
+        }
+    }
 
     @Test
     fun similar() {
