@@ -290,8 +290,8 @@ object StateMachine {
      * Equality check with an epsilon of 0.02
      * @return true, if the distance between the two real numbers is < 0.02 and false otherwise
      */
-    private fun similar(a: Double, b: Double): Boolean {
-        return Math.abs(a - b) <= 0.02
+    internal fun similar(a: Double, b: Double): Boolean {
+        return if (a == b) true else Math.abs(a - b) < 0.02
     }
 
     /**
