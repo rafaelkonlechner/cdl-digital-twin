@@ -1,7 +1,7 @@
 package at.ac.tuwien.big.rest
 
 import at.ac.tuwien.big.MessageController
-import at.ac.tuwien.big.States
+import at.ac.tuwien.big.StateMachine
 import at.ac.tuwien.big.entity.state.*
 import org.springframework.web.bind.annotation.*
 
@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*
 class StateController(val messageController: MessageController) {
 
     @GetMapping("/all")
-    fun findAll() = States.all
+    fun findAll() = StateMachine.all
 
     /**
      * @return the current state of the robotic arm
@@ -42,9 +42,9 @@ class StateController(val messageController: MessageController) {
     /**
      * Set a new state for the robotic arm. The environment will adapt to it.
      */
-    @RequestMapping(value = "/roboticArmState", method = arrayOf(RequestMethod.PUT))
+    @RequestMapping(value = ["/roboticArmState"], method = arrayOf(RequestMethod.PUT))
     fun setRoboticArmState(@RequestBody state: String) {
-        val match = States.roboticArm[state]
+        val match = StateMachine.roboticArm[state]
         if (match != null) {
             messageController.sendMQTTTransitionCommand(RoboticArmTransition(RoboticArmState(), match))
         }
@@ -53,9 +53,9 @@ class StateController(val messageController: MessageController) {
     /**
      * Set a new state for the slider. The environment will adapt to it.
      */
-    @RequestMapping(value = "/sliderState", method = arrayOf(RequestMethod.PUT))
+    @RequestMapping(value = ["/sliderState"], method = arrayOf(RequestMethod.PUT))
     fun setSliderState(@RequestBody state: String) {
-        val match = States.slider[state]
+        val match = StateMachine.slider[state]
         if (match != null) {
             messageController.sendMQTTTransitionCommand(SliderTransition(SliderState(), match))
         }
@@ -64,9 +64,9 @@ class StateController(val messageController: MessageController) {
     /**
      * Set a new state for the conveyor. The environment will adapt to it.
      */
-    @RequestMapping(value = "/conveyorState", method = arrayOf(RequestMethod.PUT))
+    @RequestMapping(value = ["/conveyorState"], method = arrayOf(RequestMethod.PUT))
     fun setConveyorState(@RequestBody state: String) {
-        val match = States.conveyor[state]
+        val match = StateMachine.conveyor[state]
         if (match != null) {
             messageController.sendMQTTTransitionCommand(ConveyorTransition(ConveyorState(), match))
         }
@@ -75,9 +75,9 @@ class StateController(val messageController: MessageController) {
     /**
      * Set a new state for the testing rig. The environment will adapt to it.
      */
-    @RequestMapping(value = "/testingRigState", method = arrayOf(RequestMethod.PUT))
+    @RequestMapping(value = ["/testingRigState"], method = arrayOf(RequestMethod.PUT))
     fun setTestingRigState(@RequestBody state: String) {
-        val match = States.testingRig[state]
+        val match = StateMachine.testingRig[state]
         if (match != null) {
             messageController.sendMQTTTransitionCommand(TestingRigTransition(TestingRigState(), match))
         }

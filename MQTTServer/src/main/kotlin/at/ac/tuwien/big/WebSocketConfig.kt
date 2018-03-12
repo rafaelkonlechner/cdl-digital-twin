@@ -11,7 +11,7 @@ import org.springframework.web.socket.config.annotation.StompEndpointRegistry
  */
 @Configuration
 @EnableWebSocketMessageBroker
-class WebSocketConfig : AbstractWebSocketMessageBrokerConfigurer() {
+open class WebSocketConfig : AbstractWebSocketMessageBrokerConfigurer() {
 
     override fun configureMessageBroker(config: MessageBrokerRegistry) {
         config.enableSimpleBroker("/topic")
