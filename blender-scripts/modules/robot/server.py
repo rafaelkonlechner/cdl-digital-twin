@@ -5,7 +5,7 @@ import bpy
 
 def on_connect(client, userdata, flags, rc):
     print("Connected with result code "+str(rc))
-    client.subscribe("Actuator")
+    client.subscribe("Actuator-Simulation")
 
 def on_message(client, userdata, msg):
 
@@ -49,6 +49,8 @@ def on_goto_message(message):
     print(message)
     msg_type, position = message.split(' ')
     position = float(position[:len(position) - 1])
+    if msg_type == "b'message-rate":
+        GameLogic.messageRate = int(position)
     if msg_type == "b'wrist-goto":
         GameLogic.wrist_target_position = position
         print("New wrist target position: " + str(GameLogic.wrist_target_position))
@@ -142,6 +144,8 @@ def main():
     GameLogic.greenCounter = 0
     GameLogic.redCounter = 0
     GameLogic.handContact = 0
+    GameLogic.messageRate = 2 
+    GameLogic.messageRateCounter = 0
 
     # Paint QR-Code textures
     for i in range(1, 9):

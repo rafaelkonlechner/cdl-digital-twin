@@ -7,7 +7,7 @@ def main():
 
     GameLogic.redCounter += 1
     if (GameLogic.redCounter % 2 == 1):
-        GameLogic.server.client.publish("Sensor", payload="{\"entity\": \"Gate\", \"event\": \"object-detected\", \"channel\": \"red\"}", qos=0, retain=False)
+        GameLogic.server.client.publish("Sensor-Simulation", payload="{\"entity\": \"Gate\", \"event\": \"object-detected\", \"channel\": \"red\"}", qos=0, retain=False)
         controller = bge.logic.getCurrentController()
         owner = controller.owner
         scene = bge.logic.getCurrentScene()

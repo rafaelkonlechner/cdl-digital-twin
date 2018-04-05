@@ -18,8 +18,8 @@ import javax.annotation.PreDestroy
 final class MessageController(val webSocket: SimpMessagingTemplate) : MqttCallback {
 
     final val qos = 0
-    final val sensorTopic = "Sensor"
-    final val actuatorTopic = "Actuator"
+    final val sensorTopic = "Sensor-Simulation"
+    final val actuatorTopic = "Actuator-Simulation"
     final val detectionCameraTopic = "DetectionCamera"
     final val pickupCameraTopic = "PickupCamera"
     final val client: MqttClient
@@ -175,7 +175,9 @@ final class MessageController(val webSocket: SimpMessagingTemplate) : MqttCallba
         tmp.qos = qos
         println("Sending via MQTT: $message")
         synchronized(lock) {
-            client.publish(actuatorTopic, tmp)
+            if (client.isConnected) {
+                client.publish(actuatorTopic, tmp)
+            }
         }
     }
 
@@ -184,7 +186,7 @@ final class MessageController(val webSocket: SimpMessagingTemplate) : MqttCallba
         println("Actuator command: " + command)
         if (command.startsWith("goto:")) {
             val stateName = command.split(": ")[1]
-            val state = States.all.filter { it.name == stateName }.first()
+            val state = States.all.first { it.name == stateName }
             val transition: Transition = when (state) {
                 is RoboticArmState -> RoboticArmTransition(state, state)
                 is SliderState -> SliderTransition(state, state)
