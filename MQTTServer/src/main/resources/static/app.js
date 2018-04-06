@@ -101,6 +101,7 @@ var vue = new Vue({
         gripperHasContact: false,
         pickupImageBase64: "images/canvas.png",
         detectionImageBase64: "images/canvas.png",
+        sceneImageBase64: "images/canvas.png",
         upKey: false,
         downKey: false,
         leftKey: false,
@@ -176,20 +177,23 @@ var vue = new Vue({
     },
     mounted: function () {
         var time = new Date();
-        var data1 = [
-            {
-                x: [time],
-                y: [0.0],
-                mode: 'lines',
-                name: "Main Arm",
-                line: {color: '#2196F3'}
-            }];
+        var data1 = [{
+            x: [time],
+            y: [0.0],
+            mode: 'lines',
+            name: "Main Arm",
+            line: {
+                color: '#2196F3'
+            }
+        }];
         var data2 = [{
             x: [time],
             y: [0.0],
             mode: 'lines',
             name: "Second Arm",
-            line: {color: '#4CAF50'}
+            line: {
+                color: '#4CAF50'
+            }
         }];
         var layout = {
             yaxis: {
@@ -210,48 +214,6 @@ var vue = new Vue({
     watch: {
         platformTargetPosition: function (newTargetPosition) {
             this.platformGoto();
-        },
-        upKey: function (newUpKey) {
-            if (newUpKey === true) {
-                this.sendSocketMessage("lower-main-arm")
-            } else {
-                this.sendSocketMessage("stop-lower-main-arm")
-            }
-        },
-        downKey: function (newDownKey) {
-            if (newDownKey === true) {
-                this.sendSocketMessage("lift-main-arm")
-            } else {
-                this.sendSocketMessage("stop-lift-main-arm")
-            }
-        },
-        leftKey: function (newLeftKey) {
-            if (newLeftKey === true) {
-                this.sendSocketMessage("left-rotate-base")
-            } else {
-                this.sendSocketMessage("stop-left-rotate-base")
-            }
-        },
-        rightKey: function (newRightKey) {
-            if (newRightKey === true) {
-                this.sendSocketMessage("right-rotate-base")
-            } else {
-                this.sendSocketMessage("stop-right-rotate-base")
-            }
-        },
-        wKey: function (newWKey) {
-            if (newWKey === true) {
-                this.sendSocketMessage("lift-second-arm")
-            } else {
-                this.sendSocketMessage("stop-lift-second-arm")
-            }
-        },
-        sKey: function (newSKey) {
-            if (newSKey === true) {
-                this.sendSocketMessage("lower-second-arm")
-            } else {
-                this.sendSocketMessage("stop-lower-second-arm")
-            }
         }
     },
     methods: {
@@ -387,8 +349,12 @@ var vue = new Vue({
             }
             var time = new Date();
             var updateMainArm = {
-                x: [[time]],
-                y: [[this.mainArmPosition]]
+                x: [
+                    [time]
+                ],
+                y: [
+                    [this.mainArmPosition]
+                ]
             };
             var olderTime = time.setMinutes(time.getMinutes() - 1);
             var futureTime = time.setMinutes(time.getMinutes() + 1);

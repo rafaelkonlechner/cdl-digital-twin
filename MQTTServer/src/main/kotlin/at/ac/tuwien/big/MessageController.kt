@@ -20,6 +20,10 @@ final class MessageController(val webSocket: SimpMessagingTemplate) : MqttCallba
     final val qos = 0
     final val sensorTopic = "Sensor-Simulation"
     final val actuatorTopic = "Actuator-Simulation"
+
+    final val sensorTopicHedgehog = "Sensor"
+    final val actuatorTopicHedgehog = "Actuator"
+
     final val detectionCameraTopic = "DetectionCamera"
     final val pickupCameraTopic = "PickupCamera"
     final val client: MqttClient
@@ -99,14 +103,14 @@ final class MessageController(val webSocket: SimpMessagingTemplate) : MqttCallba
             is RoboticArmState -> {
                 val match = States.matchState(state)
                 if (match != null && state != match) {
-                    if (roboticArmState != null) {
-                        TimeSeriesCollectionService.savePoint(RoboticArmTransition(startState = roboticArmState!!, targetState = match))
+                    if (recording && roboticArmState != null) {
+                        //TimeSeriesCollectionService.savePoint(RoboticArmTransition(startState = roboticArmState!!, targetState = match))
                         EventProcessing.submitEvent(match)
                     }
                     roboticArmState = match
                 }
                 if (recording) {
-                    TimeSeriesCollectionService.savePoint(state)
+                    //TimeSeriesCollectionService.savePoint(state)
                 }
             }
             is SliderState -> {
@@ -141,7 +145,7 @@ final class MessageController(val webSocket: SimpMessagingTemplate) : MqttCallba
         }
     }
 
-    @Scheduled(fixedDelay = 200)
+    @Scheduled(fixedDelay = 500)
     fun issueCommands() {
         val context = Context(roboticArmState?.copy(), sliderState?.copy(), conveyorState?.copy(), testingRigState?.copy())
         if (autoPlay) {
@@ -177,6 +181,7 @@ final class MessageController(val webSocket: SimpMessagingTemplate) : MqttCallba
         synchronized(lock) {
             if (client.isConnected) {
                 client.publish(actuatorTopic, tmp)
+                client.publish(actuatorTopicHedgehog, tmp)
             }
         }
     }

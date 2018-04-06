@@ -35,7 +35,7 @@ object States {
     )
     val park = RoboticArmState(
             name = "Park",
-            basePosition = 3.142,
+            basePosition = -3.14,
             mainArmPosition = 1.40,
             secondArmPosition = -1.55,
             wristPosition = -1.5,
@@ -43,7 +43,7 @@ object States {
     )
     val halfRelease = RoboticArmState(
             name = "Half Release",
-            basePosition = 3.142,
+            basePosition = -3.14,
             mainArmPosition = 1.36,
             secondArmPosition = -1.34,
             wristPosition = -1.5,
@@ -51,7 +51,7 @@ object States {
     )
     val fullRelease = RoboticArmState(
             name = "Full Release",
-            basePosition = 3.142,
+            basePosition = -3.14,
             mainArmPosition = 1.36,
             secondArmPosition = -1.334,
             wristPosition = -1.5,
@@ -59,7 +59,7 @@ object States {
     )
     val wait = RoboticArmState(
             name = "Wait",
-            basePosition = 3.142,
+            basePosition = -3.14,
             mainArmPosition = 0.0,
             secondArmPosition = 0.0,
             wristPosition = -1.5,
@@ -67,7 +67,7 @@ object States {
     )
     val retrieve = RoboticArmState(
             name = "Retrieve",
-            basePosition = 3.142,
+            basePosition = -3.14,
             mainArmPosition = 1.30,
             secondArmPosition = -1.30,
             wristPosition = -1.5,
@@ -75,7 +75,7 @@ object States {
     )
     val retrieveGrip = RoboticArmState(
             name = "Retrieve Grip",
-            basePosition = 3.142,
+            basePosition = -3.14,
             mainArmPosition = 1.30,
             secondArmPosition = -1.30,
             wristPosition = -1.5,
