@@ -13,15 +13,15 @@ class EventProcessingTest {
     @Test
     fun basicCEPTest() {
         val cep = EventProcessing.runtime
-        cep.sendEvent(States.idle)
-        cep.sendEvent(States.approach)
-        cep.sendEvent(States.pickup)
-        cep.sendEvent(States.lift)
-        cep.sendEvent(States.park)
-        cep.sendEvent(States.halfRelease)
-        cep.sendEvent(States.fullRelease)
-        cep.sendEvent(States.depositGreen)
-        cep.sendEvent(States.releaseGreen)
+        cep.sendEvent(StateMachine.States.idle)
+        cep.sendEvent(StateMachine.States.approach)
+        cep.sendEvent(StateMachine.States.pickup)
+        cep.sendEvent(StateMachine.States.lift)
+        cep.sendEvent(StateMachine.States.park)
+        cep.sendEvent(StateMachine.States.halfRelease)
+        cep.sendEvent(StateMachine.States.fullRelease)
+        cep.sendEvent(StateMachine.States.depositGreen)
+        cep.sendEvent(StateMachine.States.releaseGreen)
 
         println(TimeSeriesCollectionService.getSuccessfulProductions(Duration.ofHours(1), Duration.ofHours(1)))
     }

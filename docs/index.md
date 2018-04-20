@@ -1,6 +1,6 @@
 # MDE for IoT - Digital Twin
 
-*"MDE for IoT - Digital Twin"* ist ein zweimonatiges Projekt, das Technologien für die modellgetriebene Entwicklung von Produktionssystemen und digitale Zwillinge erprobt. Technologien beinhalten die Simulation von physischen Maschinen, die Verarbeitung von Sensordaten mit CEP und Monitoring und Steuerung mit Webtechnologien.
+*"MDE for IoT - Digital Twin"* ist ein zweimonatiges Projekt des *[Christian Doppler Labors for modell-integrierte, smarte Produktion](https://cdl-mint.big.tuwien.ac.at/)*, das Technologien für die modellgetriebene Entwicklung von Produktionssystemen und digitale Zwillinge erprobt. Technologien beinhalten die Simulation von physischen Maschinen, die Verarbeitung von Sensordaten mit CEP und Monitoring und Steuerung mit Webtechnologien.
 
 Code repository: [https://github.com/rafaelkonlechner/cdl-pick-and-place](https://github.com/rafaelkonlechner/cdl-pick-and-place)
 
@@ -235,12 +235,12 @@ Für das erstellen von hierachischen Sichten auf Events, Zustandsänderungen und
 Konzept:
 
 ```
-ProductionStream:  - - - - - - - - - - - - - - - - - - - * - >
-													   /			
-													  / Production
-StateStream:        - - - - * - - - * - - - - * - - * - - - - >
-						  /        /       /      /
-						 / Idle   / Grip  / Park / Deposit
+ProductionStream:  - - - - - - - - - - - - - - - - * - - - - >
+						 /			
+	   					/ Production
+StateStream:  - - - - * - - - * - - - - * - - * - - - - >
+		     /        /       /      /
+	            / Idle   / Grip  / Park / Deposit
 SensorStream:      * - * - * - * - * - * - * - * - * - * - * >
 ```
 

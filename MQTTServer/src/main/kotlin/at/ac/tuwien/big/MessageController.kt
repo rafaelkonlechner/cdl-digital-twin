@@ -69,7 +69,7 @@ final class MessageController(val webSocket: SimpMessagingTemplate) : MqttCallba
                     sendWebSocketMessageQRCodeScanner(gson.toJson(code).toString())
                 }
                 val color = if (code == null) ObjectCategory.NONE else if (code.color == "red") ObjectCategory.RED else ObjectCategory.GREEN
-                val match = States.matchState(TestingRigState(objectCategory = color))
+                val match = StateMachine.matchState(TestingRigState(objectCategory = color))
                 if (match != testingRigState) {
                     testingRigState = match
                 }
@@ -92,7 +92,7 @@ final class MessageController(val webSocket: SimpMessagingTemplate) : MqttCallba
                 "Gate" -> gson.fromJson(payload, GatePassed::class.java)
                 else -> BasicStateEvent()
             }
-        } catch(e: Exception) {
+        } catch (e: Exception) {
             println(e.message)
         }
         return BasicStateEvent()
@@ -101,7 +101,7 @@ final class MessageController(val webSocket: SimpMessagingTemplate) : MqttCallba
     fun handle(state: StateEvent) {
         when (state) {
             is RoboticArmState -> {
-                val match = States.matchState(state)
+                val match = StateMachine.matchState(state)
                 if (match != null && state != match) {
                     if (recording && roboticArmState != null) {
                         //TimeSeriesCollectionService.savePoint(RoboticArmTransition(startState = roboticArmState!!, targetState = match))
@@ -114,13 +114,14 @@ final class MessageController(val webSocket: SimpMessagingTemplate) : MqttCallba
                 }
             }
             is SliderState -> {
-                val match = States.matchState(state)
+                val match = StateMachine.matchState(state)
                 if (match != null && state != match) {
                     sliderState = match
                 }
             }
             is ConveyorState -> {
-                val match = States.matchState(conveyorState?.copy(adjusterPosition = state.adjusterPosition) ?: state)
+                val match = StateMachine.matchState(conveyorState?.copy(adjusterPosition = state.adjusterPosition)
+                        ?: state)
                 if (match != null && state.adjusterPosition != match.adjusterPosition) {
                     conveyorState = match
                 }
@@ -129,7 +130,8 @@ final class MessageController(val webSocket: SimpMessagingTemplate) : MqttCallba
                 }
             }
             is TestingRigState -> {
-                val match = States.matchState(testingRigState?.copy(platformPosition = state.platformPosition) ?: state)
+                val match = StateMachine.matchState(testingRigState?.copy(platformPosition = state.platformPosition)
+                        ?: state)
                 if (match != null && state.platformPosition != match.platformPosition) {
                     testingRigState = match
                 }
@@ -167,7 +169,7 @@ final class MessageController(val webSocket: SimpMessagingTemplate) : MqttCallba
 
     fun sendMQTTTransitionCommand(transition: Transition?) {
         if (transition != null) {
-            val commands = States.transform(transition)
+            val commands = StateMachine.transform(transition)
             for (c in commands) {
                 sendMQTTDirectCommand(c)
             }
@@ -191,7 +193,7 @@ final class MessageController(val webSocket: SimpMessagingTemplate) : MqttCallba
         println("Actuator command: " + command)
         if (command.startsWith("goto:")) {
             val stateName = command.split(": ")[1]
-            val state = States.all.first { it.name == stateName }
+            val state = StateMachine.all.filter { it.name == stateName }.first()
             val transition: Transition = when (state) {
                 is RoboticArmState -> RoboticArmTransition(state, state)
                 is SliderState -> SliderTransition(state, state)
@@ -209,7 +211,8 @@ final class MessageController(val webSocket: SimpMessagingTemplate) : MqttCallba
         val tracking = gson.fromJson(message, ItemPosition::class.java)
         val detected = !(tracking.x == 0.0 && tracking.y == 0.0)
         val inPickupWindow = 36 < tracking.x && tracking.x < 125 && 60 < tracking.y && tracking.y < 105
-        val match = States.matchState(conveyorState?.copy(detected = detected, inPickupWindow = inPickupWindow) ?: ConveyorState(detected = detected, inPickupWindow = inPickupWindow))
+        val match = StateMachine.matchState(conveyorState?.copy(detected = detected, inPickupWindow = inPickupWindow)
+                ?: ConveyorState(detected = detected, inPickupWindow = inPickupWindow))
         if (match != conveyorState) {
             conveyorState = match
         }
