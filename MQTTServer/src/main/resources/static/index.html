@@ -44,7 +44,7 @@
                         <div class="blueprint-img">
                             <h2 class="blueprint-text">Testing Rig
                                 <br/>
-                                <small v-if="context">&mdash; {{context.testingRigState.name}}</small>
+                                <small v-if="context && context.testingRigState">&mdash; {{context.testingRigState.name}}</small>
                             </h2>
                             <svg width="80%" height="100%" viewBox="0 0 1667 1667" version="1.1" xmlns="http://www.w3.org/2000/svg" xml:space="preserve"
                                 style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.5;">
@@ -95,7 +95,7 @@
                         <div class="blueprint-img">
                             <h2 class="blueprint-text">KR5-R850
                                 <br/>
-                                <small v-if="context">&mdash; {{context.roboticArmState.name}}</small>
+                                <small v-if="context && context.roboticArmState">&mdash; {{context.roboticArmState.name}}</small>
                             </h2>
                             <svg width="80%" height="100%" viewBox="0 0 1667 1667" version="1.1" xmlns="http://www.w3.org/2000/svg" xml:space="preserve"
                                 style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.5;">
@@ -164,7 +164,7 @@
                         <div class="blueprint-img">
                             <h2 class="blueprint-text">Conveyor
                                 <br/>
-                                <small v-if="context">&mdash; {{context.conveyorState.name}}</small>
+                                <small v-if="context && context.conveyorState">&mdash; {{context.conveyorState.name}}</small>
                             </h2>
                             <svg width="80%" height="100%" viewBox="0 0 1667 1667" version="1.1" xmlns="http://www.w3.org/2000/svg" xml:space="preserve"
                                 style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.5;">
