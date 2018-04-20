@@ -1,7 +1,6 @@
 package at.ac.tuwien.big
 
 import at.ac.tuwien.big.entity.state.*
-import javax.swing.plaf.nimbus.State
 
 /**
  * Holds all defined states and transitions of the environment
@@ -249,15 +248,7 @@ object StateMachine {
         return testingRig.values.filter { match(it, testingRigState) }.firstOrNull()
     }
 
-    private fun<T: StateEvent> createMap(vararg states: T) : Map<String,T> {
-        var  map = HashMap<String, T>()
-
-        for (state in states) {
-            map.put(state.name, state)
-        }
-
-        return map
-    }
+    private fun <T : StateEvent> createMap(vararg states: T) = states.map { Pair(it.name, it) }.toMap()
 
     /**
      * Matches two given states
@@ -265,15 +256,15 @@ object StateMachine {
      */
     private fun match(a: StateEvent, b: StateEvent): Boolean {
         return if (a is RoboticArmState && b is RoboticArmState) {
-            similar(a.basePosition, b.basePosition)
-                    && similar(a.mainArmPosition, b.mainArmPosition)
-                    && similar(a.secondArmPosition, b.secondArmPosition)
-                    && similar(a.wristPosition, b.wristPosition)
-                    && similar(a.gripperPosition, b.gripperPosition)
+            similar(a.basePosition, b.basePosition, 0.02)
+                    && similar(a.mainArmPosition, b.mainArmPosition, 0.02)
+                    && similar(a.secondArmPosition, b.secondArmPosition, 0.02)
+                    && similar(a.wristPosition, b.wristPosition, 0.02)
+                    && similar(a.gripperPosition, b.gripperPosition, 0.02)
         } else if (a is SliderState && b is SliderState) {
-            similar(a.sliderPosition, b.sliderPosition)
+            similar(a.sliderPosition, b.sliderPosition, 0.02)
         } else if (a is ConveyorState && b is ConveyorState) {
-            similar(a.adjusterPosition, b.adjusterPosition)
+            similar(a.adjusterPosition, b.adjusterPosition, 0.02)
                     && a.detected == b.detected
                     && a.inPickupWindow == b.inPickupWindow
         } else if (a is TestingRigState && b is TestingRigState) {
@@ -288,9 +279,7 @@ object StateMachine {
      * Equality check with an epsilon of 0.02
      * @return true, if the distance between the two real numbers is < 0.02 and false otherwise
      */
-    internal fun similar(a: Double, b: Double): Boolean {
-        return if (a == b) true else Math.abs(a - b) < 0.02
-    }
+    private fun similar(a: Double, b: Double, accuracy: Double) = Math.abs(a - b) <= accuracy
 
     /**
      * Transform transitions into 'goto' commands for the MQTT API
