@@ -145,11 +145,16 @@ object StateMachine {
         /*
          * Testing rig states
          */
-        val none = TestingRigState("None", objectCategory = ObjectCategory.NONE)
-        val green = TestingRigState("Green", objectCategory = ObjectCategory.GREEN)
-        val red = TestingRigState("Red", objectCategory = ObjectCategory.RED)
-        val tilted = TestingRigState("Tilted", platformPosition = -1.0)
-
+        val none = TestingRigState("None", objectCategory = ObjectCategory.NONE, criterion = { _ -> true })
+        val green = TestingRigState("Green", objectCategory = ObjectCategory.GREEN, criterion = { x ->
+            x.heatplateTemperature != null && !similar(x.heatplateTemperature, 130.0, 0.1)
+        })
+        val red = TestingRigState("Red", objectCategory = ObjectCategory.RED, criterion = { x ->
+            x.heatplateTemperature != null && !similar(x.heatplateTemperature, 150.0, 0.1)
+        })
+        val green_heated = TestingRigState("Green Heated", objectCategory = ObjectCategory.GREEN, heatplateTemperature = 130.0, criterion = { x -> x.heatplateTemperature != null })
+        val red_heated = TestingRigState("Red Heated", objectCategory = ObjectCategory.RED, heatplateTemperature = 150.0, criterion = { x -> x.heatplateTemperature != null })
+        val tilted = TestingRigState("Tilted", platformPosition = -1.0, criterion = { _ -> true })
     }
 
     object Transitions {
@@ -168,6 +173,8 @@ object StateMachine {
         val none_green = TestingRigTransition(States.none, States.green)
         val none_red = TestingRigTransition(States.none, States.red)
         val to_none = TestingRigTransition(States.none, States.none)
+        val green_heatup = TestingRigTransition(States.green, States.green_heated)
+        val red_heatup = TestingRigTransition(States.red, States.red_heated)
         val red_tilt = TestingRigTransition(States.red, States.tilted)
         val green_tilt = TestingRigTransition(States.green, States.tilted)
         val tilted_none = TestingRigTransition(States.tilted, States.none)
@@ -212,7 +219,7 @@ object StateMachine {
 
     val conveyor = createMap(States.conveyorEmpty, States.conveyorObjectDetected, States.conveyorObjectInWindow, States.conveyorAdjusterPushed)
 
-    val testingRig = createMap(States.none, States.green, States.red, States.tilted)
+    val testingRig = createMap(States.none, States.green, States.red, States.green_heated, States.red_heated, States.tilted)
 
     val all = roboticArm.values union slider.values union conveyor.values union testingRig.values
 
@@ -221,7 +228,7 @@ object StateMachine {
      * @return the matching state or null, if no match was found
      */
     fun matchState(roboticArmState: RoboticArmState): RoboticArmState? {
-        return roboticArm.values.filter { match(it, roboticArmState) }.firstOrNull()
+        return roboticArm.values.firstOrNull { match(roboticArmState, it) }
     }
 
     /**
@@ -229,7 +236,7 @@ object StateMachine {
      * @return the matching state or null, if no match was found
      */
     fun matchState(sliderState: SliderState): SliderState? {
-        return slider.values.filter { match(it, sliderState) }.firstOrNull()
+        return slider.values.firstOrNull { match(sliderState, it) }
     }
 
     /**
@@ -237,7 +244,7 @@ object StateMachine {
      * @return the matching state or null, if no match was found
      */
     fun matchState(conveyorState: ConveyorState): ConveyorState? {
-        return conveyor.values.filter { match(it, conveyorState) }.firstOrNull()
+        return conveyor.values.firstOrNull { match(conveyorState, it) }
     }
 
     /**
@@ -245,7 +252,9 @@ object StateMachine {
      * @return the matching state or null, if no match was found
      */
     fun matchState(testingRigState: TestingRigState): TestingRigState? {
-        return testingRig.values.filter { match(it, testingRigState) }.firstOrNull()
+        return testingRig.values
+                .filter { match(testingRigState, it) }
+                .find { it.criterion(testingRigState) }
     }
 
     private fun <T : StateEvent> createMap(vararg states: T) = states.map { Pair(it.name, it) }.toMap()
@@ -269,7 +278,16 @@ object StateMachine {
                     && a.inPickupWindow == b.inPickupWindow
         } else if (a is TestingRigState && b is TestingRigState) {
             a.objectCategory == b.objectCategory
-                    && similar(a.platformPosition, b.platformPosition)
+                    && if (b.platformPosition != null) {
+                similar(a.platformPosition ?: 0.0, b.platformPosition, 0.02)
+            } else {
+                true
+            }
+                    && if (b.heatplateTemperature != null) {
+                similar(a.heatplateTemperature ?: 0.0, b.heatplateTemperature, 0.1)
+            } else {
+                true
+            }
         } else {
             false
         }
@@ -303,7 +321,19 @@ object StateMachine {
                 listOf("adjuster-goto ${transition.targetState.adjusterPosition}")
             }
             is TestingRigTransition -> {
-                listOf("platform-goto ${transition.targetState.platformPosition}")
+                val t = transition.targetState
+                listOf(
+                        if (t.platformPosition != null) {
+                            "platform-goto ${t.platformPosition}"
+                        } else {
+                            ""
+                        },
+                        if (t.heatplateTemperature != null) {
+                            "platform-heatup ${t.heatplateTemperature}"
+                        } else {
+                            ""
+                        }
+                ).filter { !it.isEmpty() }
             }
             else -> emptyList()
         }

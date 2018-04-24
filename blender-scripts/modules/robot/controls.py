@@ -2,6 +2,7 @@ import bge
 import math
 from math import pi
 from robot.util import rad
+import random
 import GameLogic
 
 def rot_direction(position, target):
@@ -70,7 +71,7 @@ def main():
     second_arm_target_speed = GameLogic.second_arm_target_speed
 
     acceleration = 0.000873 # 0.05° per frame (30 frames or 0.5 sec to top speed)
-    deceleration = acceleration # 0.1° per frame (15 frames or 0.25 sec from top speed to zero)
+    deceleration = acceleration # 0.05° per frame (15 frames or 0.25 sec from top speed to zero)
 
     base_speed = calc_speed(base_position, GameLogic.base_target_position, base_speed, rad(base_target_speed), acceleration, deceleration)
     if base_speed == 0:
@@ -126,3 +127,10 @@ def main():
         GameLogic.sendMessage("tilt-platform")
     if GameLogic.platform_target and platform_position < GameLogic.platform_target_position:
         GameLogic.sendMessage("untilt-platform")
+
+    if not math.isclose(GameLogic.heatplateTemperature, GameLogic.heatplateTargetTemperature, rel_tol=0.0001, abs_tol=0.05):
+        if GameLogic.heatplateTemperature < GameLogic.heatplateTargetTemperature:
+            GameLogic.heatplateTemperature += random.uniform(0, 0.1)
+        else:
+            GameLogic.heatplateTemperature -= random.uniform(0, 0.1)
+        print(str(GameLogic.heatplateTemperature))

@@ -51,7 +51,7 @@ def on_goto_message(message):
     position = float(position[:len(position) - 1])
     if msg_type == "b'message-rate":
         GameLogic.messageRate = int(position)
-    if msg_type == "b'wrist-goto":
+    elif msg_type == "b'wrist-goto":
         GameLogic.wrist_target_position = position
         print("New wrist target position: " + str(GameLogic.wrist_target_position))
         GameLogic.wrist_target = True
@@ -71,6 +71,8 @@ def on_goto_message(message):
         GameLogic.platform_target_position = position
         print("New platform target position: " + str(GameLogic.platform_target_position))
         GameLogic.platform_target = True
+    elif msg_type == "b'platform-heatup":
+        GameLogic.heatplateTargetTemperature = int(position)
 
 def on_goto_speed_control_message(message):
     print(message)
@@ -146,6 +148,8 @@ def main():
     GameLogic.handContact = 0
     GameLogic.messageRate = 1
     GameLogic.messageRateCounter = 0
+    GameLogic.heatplateTemperature = 120 # degree Celsius
+    GameLogic.heatplateTargetTemperature = 120 # degree Celsius
 
     # Paint QR-Code textures
     for i in range(1, 9):

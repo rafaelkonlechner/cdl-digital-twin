@@ -1,6 +1,7 @@
 import GameLogic
 
 def main():
+
     if (GameLogic.messageRate > 0 and GameLogic.messageRateCounter > 30 / GameLogic.messageRate):
         base_joint = GameLogic.getCurrentScene().objects["base_joint"]
         main_arm = GameLogic.getCurrentScene().objects["main_arm"]
@@ -21,6 +22,8 @@ def main():
         slider_position = slider.worldPosition.x
         adjuster_position = adjuster.worldPosition.x
         platform_position = platform.localOrientation.to_euler().y
+
+        heatplate_temperature = GameLogic.heatplateTemperature
 
         if (GameLogic.handContact % 2 == 1):
             hand_contact = True
@@ -50,7 +53,7 @@ def main():
 
         message_slider = "{ \"entity\": \"Slider\", \"sliderPosition\": %s }" % (str(slider_position))
         message_adjuster = "{ \"entity\": \"Conveyor\", \"adjusterPosition\": %s }" % (str(adjuster_position))
-        message_platform = "{ \"entity\": \"TestingRig\", \"platformPosition\": %s }" % (str(platform_position))
+        message_platform = "{ \"entity\": \"TestingRig\", \"platformPosition\": %s, \"heatplateTemperature\": %s}" % (str(platform_position), str(heatplate_temperature))
 
         GameLogic.server.client.publish("Sensor-Simulation", payload=message_roboticarm, qos=0, retain=False)
         GameLogic.server.client.publish("Sensor-Simulation", payload=message_slider, qos=0, retain=False)

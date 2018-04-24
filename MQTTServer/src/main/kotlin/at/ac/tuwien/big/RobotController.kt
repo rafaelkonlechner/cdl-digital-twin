@@ -11,13 +11,6 @@ import at.ac.tuwien.big.StateMachine.Transitions as t
  */
 object RobotController {
 
-    infix fun Context.matches(next: Context): Boolean {
-        return (next.roboticArmState == null || this.roboticArmState == next.roboticArmState)
-                && (next.conveyorState == null || this.conveyorState == next.conveyorState)
-                && (next.testingRigState == null || this.testingRigState == next.testingRigState)
-                && (next.sliderState == null || this.sliderState == next.sliderState)
-    }
-
     fun next(c: Context): Pair<Transition, Int>? {
         return when {
             c matches Context(s.idle, conveyorState = s.conveyorEmpty, testingRigState = s.red) -> Pair(t.fullrelease_wait, 0)
@@ -34,15 +27,26 @@ object RobotController {
             c matches Context(s.halfRelease) -> Pair(t.halfrelease_fullrelease, 0)
             c matches Context(s.idle) -> Pair(t.fullrelease_wait, 0)
             c matches Context(s.fullRelease) -> Pair(t.fullrelease_wait, 0)
-            c matches Context(s.wait) -> Pair(t.wait_retrieve, 0)
+            c matches Context(s.wait, testingRigState = s.red_heated) -> Pair(t.wait_retrieve, 0)
+            c matches Context(s.wait, testingRigState = s.green_heated) -> Pair(t.wait_retrieve, 0)
+            c matches Context(testingRigState = s.green) -> Pair(t.green_heatup, 2000)
+            c matches Context(testingRigState = s.red) -> Pair(t.red_heatup, 2000)
             c matches Context(s.retrieve) -> Pair(t.retrieve_retrievegrip, 0)
-            c matches Context(s.retrieveGrip, testingRigState = s.red) -> Pair(t.retrievegrip_depositred, 0)
-            c matches Context(s.retrieveGrip, testingRigState = s.green) -> Pair(t.retrievegrip_depositgreen, 0)
+            c matches Context(s.retrieveGrip, testingRigState = s.red_heated) -> Pair(t.retrievegrip_depositred, 0)
+            c matches Context(s.retrieveGrip, testingRigState = s.green_heated) -> Pair(t.retrievegrip_depositgreen, 0)
             c matches Context(s.depositRed) -> Pair(t.depositred_releasered, 0)
             c matches Context(s.releaseRed) -> Pair(t.releasered_idle, 0)
             c matches Context(s.depositGreen) -> Pair(t.depositgreen_releasegreen, 0)
             c matches Context(s.releaseGreen) -> Pair(t.releasegreen_idle, 0)
             else -> null
         }
+    }
+
+
+    infix fun Context.matches(next: Context): Boolean {
+        return (next.roboticArmState == null || this.roboticArmState == next.roboticArmState)
+                && (next.conveyorState == null || this.conveyorState == next.conveyorState)
+                && (next.testingRigState == null || this.testingRigState == next.testingRigState)
+                && (next.sliderState == null || this.sliderState == next.sliderState)
     }
 }

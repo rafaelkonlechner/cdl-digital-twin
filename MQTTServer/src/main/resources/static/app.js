@@ -87,6 +87,7 @@ var vue = new Vue({
         sliderPosition: 0.0,
         adjusterPosition: 0.0,
         platformPosition: 0.0,
+        platformTemperature: 0.0,
         baseTargetPosition: 0.0,
         baseTargetSpeed: 1.0,
         mainArmTargetSpeed: 1.0,
@@ -334,6 +335,7 @@ var vue = new Vue({
                     break;
                 case 'TestingRig':
                     this.platformPosition = truncate(json.platformPosition);
+                    this.platformTemperature = truncate(json.heatplateTemperature);
                     break;
                 case 'GreenGate':
                     this.greenCount++;
