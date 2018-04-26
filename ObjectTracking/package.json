@@ -1,7 +1,7 @@
 {
-  "name": "object-tracking",
+  "name": "object-tracker",
   "version": "1.0.0",
-  "description": "Object tracker for identifying and localizing manufactured items in a production unit.",
+  "description": "Web service to identify and localize colored items in an image",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
@@ -12,6 +12,9 @@
   "dependencies": {
     "express": "^4.15.3",
     "express-fileupload": "^0.1.4",
+    "image-size": "^0.6.2",
+    "nodeunit": "^0.11.2",
+    "png-js": "^0.1.1",
     "tracking": "^1.1.3"
   }
 }
