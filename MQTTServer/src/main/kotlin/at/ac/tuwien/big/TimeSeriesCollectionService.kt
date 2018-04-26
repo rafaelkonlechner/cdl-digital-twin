@@ -1,6 +1,13 @@
 package at.ac.tuwien.big
 
-import at.ac.tuwien.big.entity.state.*
+import at.ac.tuwien.big.entity.state.ConveyorState
+import at.ac.tuwien.big.entity.state.GatePassed
+import at.ac.tuwien.big.entity.state.RoboticArmState
+import at.ac.tuwien.big.entity.state.TestingRigState
+import at.ac.tuwien.big.entity.transition.ConveyorTransition
+import at.ac.tuwien.big.entity.transition.RoboticArmTransition
+import at.ac.tuwien.big.entity.transition.TestingRigTransition
+import at.ac.tuwien.big.entity.transition.Transition
 import org.influxdb.InfluxDB
 import org.influxdb.InfluxDB.ConsistencyLevel
 import org.influxdb.InfluxDBFactory
@@ -59,8 +66,8 @@ object TimeSeriesCollectionService {
         val point = Point.measurement("conveyor")
                 .time(System.currentTimeMillis(), TimeUnit.MILLISECONDS)
                 .addField("adjuster", state.adjusterPosition)
-                .addField("detected", state.detected)
-                .addField("in_pickup_window", state.inPickupWindow)
+                .addField("detected", state.detected ?: false)
+                .addField("in_pickup_window", state.inPickupWindow ?: false)
                 .build()
         batchPoints.point(point)
         influxDB.write(batchPoints)
@@ -77,7 +84,7 @@ object TimeSeriesCollectionService {
         val point = Point.measurement("testing_rig")
                 .time(System.currentTimeMillis(), TimeUnit.MILLISECONDS)
                 .addField("platform", state.platformPosition)
-                .addField("category", state.objectCategory.name)
+                .addField("category", state.objectCategory?.name)
                 .build()
         batchPoints.point(point)
         influxDB.write(batchPoints)

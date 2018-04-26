@@ -1,8 +1,16 @@
 package at.ac.tuwien.big.rest
 
 import at.ac.tuwien.big.MessageController
+import at.ac.tuwien.big.PickAndPlaceController
 import at.ac.tuwien.big.StateMachine
-import at.ac.tuwien.big.entity.state.*
+import at.ac.tuwien.big.entity.state.ConveyorState
+import at.ac.tuwien.big.entity.state.RoboticArmState
+import at.ac.tuwien.big.entity.state.SliderState
+import at.ac.tuwien.big.entity.state.TestingRigState
+import at.ac.tuwien.big.entity.transition.ConveyorTransition
+import at.ac.tuwien.big.entity.transition.RoboticArmTransition
+import at.ac.tuwien.big.entity.transition.SliderTransition
+import at.ac.tuwien.big.entity.transition.TestingRigTransition
 import org.springframework.web.bind.annotation.*
 
 /**
@@ -19,25 +27,25 @@ class StateController(val messageController: MessageController) {
      * @return the current state of the robotic arm
      */
     @GetMapping("/roboticArmState")
-    fun getRoboticArmState() = messageController.roboticArmState
+    fun getRoboticArmState() = PickAndPlaceController.roboticArmSnapshot
 
     /**
      * @return the current state of the slider
      */
     @GetMapping("/sliderState")
-    fun getSliderState() = messageController.sliderState
+    fun getSliderState() = PickAndPlaceController.sliderSnapshot
 
     /**
      * @return the current state of the conveyor
      */
     @GetMapping("/conveyorState")
-    fun getConveyorState() = messageController.conveyorState
+    fun getConveyorState() = PickAndPlaceController.conveyorSnapshot
 
     /**
      * @return the current state of the testing rig
      */
     @GetMapping("/testingRigState")
-    fun getTestingRigState() = messageController.testingRigState
+    fun getTestingRigState() = PickAndPlaceController.testingRigSnapshot
 
     /**
      * Set a new state for the robotic arm. The environment will adapt to it.

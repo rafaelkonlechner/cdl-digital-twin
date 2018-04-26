@@ -6,7 +6,7 @@ package at.ac.tuwien.big.entity.state
 data class TestingRigState(
         override var name: String = "Snapshot",
         override var entity: String = "TestingRig",
-        val objectCategory: ObjectCategory = ObjectCategory.NONE,
+        val objectCategory: ObjectCategory? = null,
         val platformPosition: Double? = null,
         val heatplateTemperature: Double? = null,
         val criterion: (TestingRigState) -> Boolean = { _ -> true }

@@ -1,6 +1,7 @@
 package at.ac.tuwien.big
 
 import at.ac.tuwien.big.entity.state.*
+import at.ac.tuwien.big.entity.transition.*
 
 /**
  * Holds all defined states and transitions of the environment
@@ -130,10 +131,10 @@ object StateMachine {
          * Conveyor states
          */
         val conveyorEmpty = ConveyorState(
-                "Conveyor Empty", adjusterPosition = 1.669
+                "Conveyor Empty", adjusterPosition = 1.669, detected = false, inPickupWindow = false
         )
         val conveyorObjectDetected = ConveyorState(
-                "Conveyor Object Detected", adjusterPosition = 1.669, detected = true
+                "Conveyor Object Detected", adjusterPosition = 1.669, detected = true, inPickupWindow = false
         )
         val conveyorObjectInWindow = ConveyorState(
                 "Conveyor Object In Window", adjusterPosition = 1.669, detected = true, inPickupWindow = true
@@ -273,7 +274,11 @@ object StateMachine {
         } else if (a is SliderState && b is SliderState) {
             similar(a.sliderPosition, b.sliderPosition, 0.02)
         } else if (a is ConveyorState && b is ConveyorState) {
-            similar(a.adjusterPosition, b.adjusterPosition, 0.02)
+            if (b.adjusterPosition != null) {
+                similar(a.adjusterPosition ?: 0.0, b.adjusterPosition, 0.02)
+            } else {
+                true
+            }
                     && a.detected == b.detected
                     && a.inPickupWindow == b.inPickupWindow
         } else if (a is TestingRigState && b is TestingRigState) {
@@ -297,7 +302,7 @@ object StateMachine {
      * Equality check with an epsilon of 0.02
      * @return true, if the distance between the two real numbers is < 0.02 and false otherwise
      */
-    private fun similar(a: Double, b: Double, accuracy: Double) = Math.abs(a - b) <= accuracy
+    fun similar(a: Double, b: Double, accuracy: Double) = Math.abs(a - b) <= accuracy
 
     /**
      * Transform transitions into 'goto' commands for the MQTT API

@@ -2,6 +2,7 @@ package at.ac.tuwien.big
 
 import at.ac.tuwien.big.entity.message.ItemPosition
 import at.ac.tuwien.big.entity.state.*
+import at.ac.tuwien.big.entity.transition.*
 import com.google.gson.Gson
 import org.eclipse.paho.client.mqttv3.*
 import org.springframework.messaging.handler.annotation.MessageMapping
@@ -24,14 +25,8 @@ final class MessageController(private val webSocket: SimpMessagingTemplate) : Mq
     private val actuatorTopicHedgehog = "Actuator"
     private val detectionCameraTopic = "DetectionCamera"
     private val pickupCameraTopic = "PickupCamera"
-
     private val gson = Gson()
     private val client: MqttClient
-    var roboticArmState: RoboticArmState = RoboticArmState()
-    var sliderState: SliderState = SliderState()
-    var conveyorState: ConveyorState = ConveyorState()
-    var testingRigState: TestingRigState = TestingRigState()
-    var testingRigSnapshot: TestingRigState = TestingRigState()
     var autoPlay: Boolean = false
     var recording: Boolean = false
     var lock = Any()
@@ -59,8 +54,8 @@ final class MessageController(private val webSocket: SimpMessagingTemplate) : Mq
     override fun messageArrived(topic: String?, message: MqttMessage?) {
         when (topic) {
             sensorTopic -> {
-                sendWebSocketMessageSensor(String(message!!.payload))
-                handle(parse(String(message.payload)))
+                PickAndPlaceController.update(parse(String(message!!.payload)))
+                sendWebSocketMessageSensor(String(message.payload))
             }
             detectionCameraTopic -> {
                 val code = QRCode.read(String(message!!.payload))
@@ -68,11 +63,7 @@ final class MessageController(private val webSocket: SimpMessagingTemplate) : Mq
                     sendWebSocketMessageQRCodeScanner(gson.toJson(code).toString())
                 }
                 val color = if (code == null) ObjectCategory.NONE else if (code.color == "red") ObjectCategory.RED else ObjectCategory.GREEN
-                testingRigSnapshot = testingRigSnapshot.copy(objectCategory = color)
-                val match = StateMachine.matchState(testingRigSnapshot)
-                if (match != null && match != testingRigState) {
-                    testingRigState = match
-                }
+                PickAndPlaceController.update(TestingRigState(objectCategory = color))
                 sendWebSocketMessageDetectionCamera(String(message.payload))
             }
             pickupCameraTopic -> {
@@ -81,81 +72,40 @@ final class MessageController(private val webSocket: SimpMessagingTemplate) : Mq
         }
     }
 
-    fun parse(payload: String): StateEvent {
-        try {
-            val basicState = gson.fromJson(payload, BasicStateEvent::class.java)
-            return when (basicState.entity) {
-                "RoboticArm" -> gson.fromJson(payload, RoboticArmState::class.java)
-                "Slider" -> gson.fromJson(payload, SliderState::class.java)
-                "Conveyor" -> gson.fromJson(payload, ConveyorState::class.java)
-                "TestingRig" -> gson.fromJson(payload, TestingRigState::class.java)
-                "Gate" -> gson.fromJson(payload, GatePassed::class.java)
-                else -> BasicStateEvent()
+    @MessageMapping("/actuator")
+    fun receiveActuatorWebSocketMessage(command: String) {
+        println("Actuator command: " + command)
+        if (command.startsWith("goto:")) {
+            val stateName = command.split(": ")[1]
+            val state = StateMachine.all.filter { it.name == stateName }.first()
+            val transition: Transition = when (state) {
+                is RoboticArmState -> RoboticArmTransition(state, state)
+                is SliderState -> SliderTransition(state, state)
+                is ConveyorState -> ConveyorTransition(state, state)
+                else -> BasicTransition(state, state)
             }
-        } catch (e: Exception) {
-            println(e.message)
-        }
-        return BasicStateEvent()
-    }
-
-    fun handle(state: StateEvent) {
-        when (state) {
-            is RoboticArmState -> {
-                val match = StateMachine.matchState(state)
-                if (match != null && state != match) {
-                    if (recording) {
-                        TimeSeriesCollectionService.savePoint(RoboticArmTransition(startState = roboticArmState, targetState = match))
-                        EventProcessing.submitEvent(match)
-                    }
-                    roboticArmState = match
-                }
-                if (recording) {
-                    TimeSeriesCollectionService.savePoint(state)
-                }
-            }
-            is SliderState -> {
-                val match = StateMachine.matchState(state)
-                if (match != null && state != match) {
-                    sliderState = match
-                }
-            }
-            is ConveyorState -> {
-                val match = StateMachine.matchState(conveyorState.copy(adjusterPosition = state.adjusterPosition))
-                if (match != null && state.adjusterPosition != match.adjusterPosition) {
-                    conveyorState = match
-                }
-                if (recording) {
-                    TimeSeriesCollectionService.savePoint(state)
-                }
-            }
-            is TestingRigState -> {
-                testingRigSnapshot = testingRigSnapshot.copy(platformPosition = state.platformPosition, heatplateTemperature = state.heatplateTemperature)
-                val match = StateMachine.matchState(testingRigSnapshot)
-                if (match != null && state != match) {
-                    testingRigState = match
-                }
-                if (recording) {
-                    TimeSeriesCollectionService.savePoint(state)
-                }
-            }
-            is GatePassed -> {
-                if (recording) {
-                    TimeSeriesCollectionService.savePoint(state)
-                }
-            }
+            sendMQTTTransitionCommand(transition)
+        } else {
+            sendMQTTDirectCommand(command)
         }
     }
 
-    @Scheduled(fixedDelay = 500)
-    fun issueCommands() {
-        val context = Context(roboticArmState.copy(), sliderState.copy(), conveyorState.copy(), testingRigState.copy())
+    @MessageMapping("/tracking")
+    fun receiveTrackingWebSocketMessage(message: String) {
+        val tracking = gson.fromJson(message, ItemPosition::class.java)
+        val detected = !(tracking.x == 0.0 && tracking.y == 0.0)
+        val inPickupWindow = 36 < tracking.x && tracking.x < 125 && 60 < tracking.y && tracking.y < 105
+        PickAndPlaceController.update(ConveyorState(detected = detected, inPickupWindow = inPickupWindow))
+    }
+
+    @Scheduled(fixedDelay = 200)
+    fun issueTransition() {
         if (autoPlay) {
-            val next = RobotController.next(context)
-            println("Next: ${context.roboticArmState?.name}, ${context.sliderState?.name}, ${context.conveyorState?.name}, ${context.testingRigState?.name} -> ${next?.first?.targetState?.name}")
-            sendMQTTTransitionCommand(next?.first)
-            Thread.sleep(next?.second?.toLong() ?: 0)
+            val latest = PickAndPlaceController.latest()
+            val transition = PickAndPlaceController.next()
+            println("Next: ${latest.roboticArmState?.name}, ${latest.sliderState?.name}, ${latest.conveyorState?.name}, ${latest.testingRigState?.name} -> ${transition?.targetState?.name}")
+            sendMQTTTransitionCommand(transition)
         }
-        sendWebSocketMessageContext(gson.toJson(context))
     }
 
     override fun connectionLost(cause: Throwable?) {
@@ -187,33 +137,21 @@ final class MessageController(private val webSocket: SimpMessagingTemplate) : Mq
         }
     }
 
-    @MessageMapping("/actuator")
-    fun receiveActuatorWebSocketMessage(command: String) {
-        println("Actuator command: " + command)
-        if (command.startsWith("goto:")) {
-            val stateName = command.split(": ")[1]
-            val state = StateMachine.all.filter { it.name == stateName }.first()
-            val transition: Transition = when (state) {
-                is RoboticArmState -> RoboticArmTransition(state, state)
-                is SliderState -> SliderTransition(state, state)
-                is ConveyorState -> ConveyorTransition(state, state)
-                else -> BasicTransition(state, state)
+    private fun parse(payload: String): StateEvent {
+        try {
+            val basicState = gson.fromJson(payload, BasicStateEvent::class.java)
+            return when (basicState.entity) {
+                "RoboticArm" -> gson.fromJson(payload, RoboticArmState::class.java)
+                "Slider" -> gson.fromJson(payload, SliderState::class.java)
+                "Conveyor" -> gson.fromJson(payload, ConveyorState::class.java)
+                "TestingRig" -> gson.fromJson(payload, TestingRigState::class.java)
+                "Gate" -> gson.fromJson(payload, GatePassed::class.java)
+                else -> BasicStateEvent()
             }
-            sendMQTTTransitionCommand(transition)
-        } else {
-            sendMQTTDirectCommand(command)
+        } catch (e: Exception) {
+            println(e.message)
         }
-    }
-
-    @MessageMapping("/tracking")
-    fun receiveTrackingWebSocketMessage(message: String) {
-        val tracking = gson.fromJson(message, ItemPosition::class.java)
-        val detected = !(tracking.x == 0.0 && tracking.y == 0.0)
-        val inPickupWindow = 36 < tracking.x && tracking.x < 125 && 60 < tracking.y && tracking.y < 105
-        val match = StateMachine.matchState(conveyorState.copy(detected = detected, inPickupWindow = inPickupWindow))
-        if (match != null && match != conveyorState) {
-            conveyorState = match
-        }
+        return BasicStateEvent()
     }
 
     private fun sendWebSocketMessageSensor(message: String) {

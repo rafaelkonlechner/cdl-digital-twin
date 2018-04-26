@@ -1,4 +1,6 @@
-package at.ac.tuwien.big.entity.state
+package at.ac.tuwien.big.entity.transition
+
+import at.ac.tuwien.big.entity.state.SliderState
 
 /**
  * State change of the slider

@@ -1,6 +1,6 @@
 package at.ac.tuwien.big
 
-import at.ac.tuwien.big.entity.state.*
+import at.ac.tuwien.big.entity.transition.Transition
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
