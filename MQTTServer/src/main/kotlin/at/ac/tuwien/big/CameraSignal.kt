@@ -1,5 +1,8 @@
 package at.ac.tuwien.big
 
+import at.ac.tuwien.big.rest.data.TrackingResult
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import org.springframework.core.io.FileSystemResource
 import org.springframework.http.HttpEntity
 import org.springframework.http.HttpHeaders
@@ -21,6 +24,7 @@ import javax.imageio.ImageIO
  */
 object CameraSignal {
 
+    private val gson = Gson()
     /**
      * Save an encoded image string to a file in the *png* file format.
      */
@@ -36,14 +40,14 @@ object CameraSignal {
      * Encodes a given image in the *png* file format into Base64.
      * @return the encoded image in Base64
      */
-    fun toBase64(img: ByteArray): String {
-        return String(Base64.getEncoder().encode(img))
-    }
+    fun toBase64(img: ByteArray) = String(Base64.getEncoder().encode(img))
+
+    fun fromBase64(img: String) = Base64.getDecoder().decode(img)
 
     /**
      * Sends a camera image to the tracking service. *Note:* This service has not yet been implemented
      */
-    fun analyzeImage(imageFile: File) {
+    fun analyzeImage(imageFile: File): List<TrackingResult> {
 
         val restTemplate = RestTemplate()
         restTemplate.messageConverters.add(ByteArrayHttpMessageConverter())
@@ -54,6 +58,8 @@ object CameraSignal {
         val headers = HttpHeaders()
         headers.contentType = MediaType.MULTIPART_FORM_DATA
         val requestEntity = HttpEntity<MultiValueMap<String, Any>>(params, headers)
-        restTemplate.exchange("http://localhost:3000/analyze", HttpMethod.POST, requestEntity, String::class.java)
+        val response = restTemplate.exchange("http://localhost:3000/analyze", HttpMethod.POST, requestEntity, String::class.java)
+        val turnsType = object : TypeToken<List<TrackingResult>>() {}.type
+        return gson.fromJson(response.body, turnsType)
     }
 }

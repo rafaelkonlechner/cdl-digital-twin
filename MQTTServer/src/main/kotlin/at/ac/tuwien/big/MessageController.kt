@@ -1,6 +1,5 @@
 package at.ac.tuwien.big
 
-import at.ac.tuwien.big.entity.message.ItemPosition
 import at.ac.tuwien.big.entity.state.*
 import at.ac.tuwien.big.entity.transition.*
 import com.google.gson.Gson
@@ -10,6 +9,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate
 import org.springframework.messaging.support.MessageBuilder
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Controller
+import java.io.File
 import javax.annotation.PreDestroy
 
 /**
@@ -64,10 +64,21 @@ final class MessageController(private val webSocket: SimpMessagingTemplate) : Mq
                 }
                 val color = if (code == null) ObjectCategory.NONE else if (code.color == "red") ObjectCategory.RED else ObjectCategory.GREEN
                 PickAndPlaceController.update(TestingRigState(objectCategory = color))
-                sendWebSocketMessageDetectionCamera(String(message.payload))
+
+                val detection = File("detection.png")
+                detection.writeBytes(CameraSignal.fromBase64(String(message.payload)))
+                val trackingResult = CameraSignal.analyzeImage(detection)
+                sendWebSocketMessageDetectionCamera("{\"image\": \"${String(message.payload)}\", \"tracking\": ${gson.toJson(trackingResult)}}")
             }
             pickupCameraTopic -> {
-                sendWebSocketMessagePickupCamera(String(message!!.payload))
+                val pickup = File("pickup.png")
+                pickup.writeBytes(CameraSignal.fromBase64(String(message!!.payload)))
+                val trackingResult = CameraSignal.analyzeImage(pickup)
+                val tracking = trackingResult.firstOrNull()
+                val detected = tracking != null
+                val inPickupWindow = tracking != null && 36 < tracking.x && tracking.x < 125 && 60 < tracking.y && tracking.y < 105
+                PickAndPlaceController.update(ConveyorState(detected = detected, inPickupWindow = inPickupWindow))
+                sendWebSocketMessagePickupCamera("{\"image\": \"${String(message.payload)}\", \"tracking\": ${gson.toJson(trackingResult)}}")
             }
         }
     }
@@ -88,14 +99,6 @@ final class MessageController(private val webSocket: SimpMessagingTemplate) : Mq
         } else {
             sendMQTTDirectCommand(command)
         }
-    }
-
-    @MessageMapping("/tracking")
-    fun receiveTrackingWebSocketMessage(message: String) {
-        val tracking = gson.fromJson(message, ItemPosition::class.java)
-        val detected = !(tracking.x == 0.0 && tracking.y == 0.0)
-        val inPickupWindow = 36 < tracking.x && tracking.x < 125 && 60 < tracking.y && tracking.y < 105
-        PickAndPlaceController.update(ConveyorState(detected = detected, inPickupWindow = inPickupWindow))
     }
 
     @Scheduled(fixedDelay = 200)

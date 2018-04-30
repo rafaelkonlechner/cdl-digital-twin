@@ -12,10 +12,12 @@ stompClient.connect({}, function (frame) {
         vue.updateContextData(response.body);
     });
     stompClient.subscribe('/topic/pickupCamera', function (response) {
-        vue.updatePickupImage(response.body);
+        console.log(response);
+        vue.updatePickupImage(JSON.parse(response.body));
     });
     stompClient.subscribe('/topic/detectionCamera', function (response) {
-        vue.updateDetectionImage(response.body);
+        console.log(response);
+        vue.updateDetectionImage(JSON.parse(response.body));
     });
     stompClient.subscribe('/topic/qrCode', function (response) {
         vue.updateQRCodeData(response.body);
@@ -63,8 +65,6 @@ truncate = function (value) {
 var vue = new Vue({
     el: '#app',
     data: {
-        x: 0.0,
-        y: 0.0,
         autoPlay: false,
         manualMode: false,
         recording: false,
@@ -151,10 +151,6 @@ var vue = new Vue({
         }
     },
     created: function () {
-        tracking.ColorTracker.registerColor('white', function (r, g, b) {
-            return r > 253 && g > 253 && b > 253;
-        });
-
         var self = this;
         $.ajax({
             url: "http://localhost:8080/all"
@@ -243,65 +239,38 @@ var vue = new Vue({
         gotoIdlePosition: function () {
             this.sendSocketMessage("goto: Idle")
         },
-        updateDetectionImage: function (image) {
-            this.detectionImageBase64 = 'data:image/png;base64, ' + image;
-            var colors = new tracking.ColorTracker(['white']);
-            var self = this;
-            colors.on('track', function (event) {
-                if (event.data.length === 0) {
-                    // No colors were detected in this frame.
-                    var rect = document.getElementById("detection-rect");
-                    var text = document.getElementById("detection-text");
-                    if (rect !== null) {
-                        document.querySelector('.detection-container').removeChild(rect);
-                        document.querySelector('.detection-container').removeChild(text);
-                    }
-                } else {
-                    event.data.forEach(function (rect) {
-                        plot(rect.x, rect.y, rect.width, rect.height, 'yellow', '.detection-container', 'detection-camera', 'detection-rect', "detection-text", 'Item');
-                    });
+        updateTrackingInformation: function (image, event, text) {
+            if (event.length === 0) {
+                // No colors were detected in this frame.
+                var rectElem = document.getElementById(image + "-rect");
+                var textElem = document.getElementById(image + "-text");
+                if (rectElem !== null) {
+                    document.querySelector('.' + image + '-container').removeChild(rectElem);
                 }
-            });
-            trackingTask = tracking.track('#detection-camera', colors);
+                if (textElem !== null) {
+                    document.querySelector('.' + image + 'detection-container').removeChild(textElem);
+                }
+            } else {
+                event.forEach(function (rect) {
+                    plot(rect.x, rect.y, rect.width, rect.height, 'yellow', '.' + image + '-container', image + '-camera', image + '-rect', image + "-text", text);
+                });
+            }
         },
-        updatePickupImage: function (image) {
+        updateDetectionImage: function (data) {
+            console.log(data.tracking);
+            this.detectionImageBase64 = 'data:image/png;base64, ' + data.image;
+            this.updateTrackingInformation('detection', data.tracking, 'Item')
+        },
+        updatePickupImage: function (data) {
             if (!this.pickupImageInitialized) {
                 plot(35, 60, 113, 68, 'yellow', '.pickup-container', 'pickup-camera', 'pickup-window-rect', "pickup-text", "Pickup Window");
                 this.pickupImageInitialized = true;
             }
-            this.pickupImageBase64 = 'data:image/png;base64, ' + image;
-            var colors = new tracking.ColorTracker(['white']);
-            var self = this;
-            colors.on('track', function (event) {
-                if (event.data.length === 0) {
-                    // No colors were detected in this frame.
-                    var rect = document.getElementById("pickup-rect");
-                    if (rect !== null) {
-                        document.querySelector('.pickup-container').removeChild(rect);
-                    }
-                    self.pickupObjects = 0;
-                    self.sendTrackingSocketMessage(JSON.stringify({
-                        x: 0,
-                        y: 0
-                    }));
-                } else {
-                    self.pickupObjects = event.data.length;
-                    event.data.forEach(function (rect) {
-                        plot(rect.x, rect.y, rect.width, rect.height, 'yellow', '.pickup-container', 'pickup-camera', 'pickup-rect');
-                        self.x = rect.x;
-                        self.y = rect.y;
-                        self.width = rect.width;
-                        self.height = rect.height;
-                        self.sendTrackingSocketMessage(JSON.stringify({
-                            x: rect.x,
-                            y: rect.y,
-                            width: rect.width,
-                            height: rect.height
-                        }));
-                    });
-                }
-            });
-            var trackingTask = tracking.track('#pickup-camera', colors);
+            this.pickupImageBase64 = 'data:image/png;base64, ' + data.image;
+            this.updateTrackingInformation('pickup', data.tracking, 'Pickup Window')
+            /*event.data.forEach(function (rect) {
+             plot(rect.x, rect.y, rect.width, rect.height, 'yellow', '.pickup-container', 'pickup-camera', 'pickup-rect');
+             });*/
         },
         updateContextData: function (message) {
             this.context = JSON.parse(message);
@@ -372,9 +341,6 @@ var vue = new Vue({
         },
         sendSocketMessage: function (message) {
             stompClient.send("/app/actuator", {}, message);
-        },
-        sendTrackingSocketMessage: function (message) {
-            stompClient.send("/app/tracking", {}, message);
         },
         keyDownUp: function () {
             this.upKey = true;
