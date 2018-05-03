@@ -146,7 +146,7 @@ def main():
     GameLogic.greenCounter = 0
     GameLogic.redCounter = 0
     GameLogic.handContact = 0
-    GameLogic.messageRate = 20
+    GameLogic.messageRate = 5
     GameLogic.secondaryMessageRate = 1
     GameLogic.messageRateCounter = 0
     GameLogic.secondaryMessageRateCounter = 0
