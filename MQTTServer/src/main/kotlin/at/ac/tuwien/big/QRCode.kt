@@ -57,9 +57,9 @@ object QRCode {
     fun write(code: ProductCode): ByteArray {
 
         val hintMap = EnumMap<EncodeHintType, Any>(EncodeHintType::class.java)
-        hintMap.put(EncodeHintType.CHARACTER_SET, "UTF-8")
-        hintMap.put(EncodeHintType.MARGIN, 1)
-        hintMap.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.L)
+        hintMap[EncodeHintType.CHARACTER_SET] = "UTF-8"
+        hintMap[EncodeHintType.MARGIN] = 1
+        hintMap[EncodeHintType.ERROR_CORRECTION] = ErrorCorrectionLevel.L
 
         val writer = QRCodeWriter()
         val text = "${code.id},${code.batchId},${code.color}"
@@ -71,8 +71,8 @@ object QRCode {
         graphics.fillRect(0, 0, image.width, image.height)
         graphics.color = Color.BLACK
 
-        for (i in 0..image.width - 1) {
-            for (j in 0..image.height - 1) {
+        for (i in 0 until image.width) {
+            for (j in 0 until image.height) {
                 if (matrix.get(i, j)) {
                     graphics.fillRect(i, j, 1, 1)
                 }
