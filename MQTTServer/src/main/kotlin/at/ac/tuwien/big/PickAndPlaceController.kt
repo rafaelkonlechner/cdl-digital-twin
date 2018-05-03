@@ -1,6 +1,7 @@
 package at.ac.tuwien.big
 
 import at.ac.tuwien.big.entity.state.*
+import at.ac.tuwien.big.entity.transition.RoboticArmTransition
 import at.ac.tuwien.big.entity.transition.Transition
 import at.ac.tuwien.big.StateMachine.States as s
 import at.ac.tuwien.big.StateMachine.Transitions as t
@@ -33,6 +34,14 @@ object PickAndPlaceController {
 
     var latestMatch: State = State()
         private set
+
+    var targetState = StateMachine.States.idle
+        private set
+
+    private var transitionStart = System.currentTimeMillis()
+    private var timeBase = 1000L
+    private var timeMainArm = 1000L
+    private var timeSecondArm = 1000L
 
     fun latest() = latestMatch
 
@@ -102,14 +111,13 @@ object PickAndPlaceController {
             current matches State(s.idle, conveyorState = s.conveyorEmpty) -> t.slider_pushed
             current matches State(sliderState = s.sliderPushedPosition, conveyorState = s.conveyorObjectDetected) -> t.slider_home
             current matches State(conveyorState = s.conveyorObjectDetected) -> t.adjuster_detected_pushed
-            current matches State(conveyorState = s.conveyorAdjusterPushed) -> t.adjuster_pushed_pickup
-            current matches State(s.idle) -> t.idle_approach
+            current matches State(conveyorState = s.conveyorAdjusterPushed) -> t.adjuster_pushed_empty
+            current matches State(s.idle, conveyorState = s.conveyorObjectInWindow) -> t.idle_approach
             current matches State(s.approach) -> t.approach_pickup
             current matches State(s.pickup) -> t.pickup_lift
             current matches State(s.lift) -> t.lift_park
             current matches State(s.park) -> t.park_halfrelease
             current matches State(s.halfRelease) -> t.halfrelease_fullrelease
-            current matches State(s.idle) -> t.fullrelease_wait
             current matches State(s.fullRelease) -> t.fullrelease_wait
             current matches State(s.wait, testingRigState = s.red_heated) -> t.wait_retrieve
             current matches State(s.wait, testingRigState = s.green_heated) -> t.wait_retrieve
@@ -123,6 +131,30 @@ object PickAndPlaceController {
             current matches State(s.depositGreen) -> t.depositgreen_releasegreen
             current matches State(s.releaseGreen) -> t.releasegreen_idle
             else -> null
+        }
+    }
+
+    fun start(transition: Transition?) {
+        if (transition is RoboticArmTransition) {
+            targetState = transition.targetState
+            transitionStart = System.currentTimeMillis()
+            val start = latestMatch.roboticArmState!!
+            timeBase = Util.timeToTarget(start.basePosition, targetState.basePosition, 0.000873, transition.baseSpeed)
+            timeMainArm = Util.timeToTarget(start.mainArmPosition, targetState.mainArmPosition, 0.000873, transition.mainArmSpeed)
+            timeSecondArm = Util.timeToTarget(start.secondArmPosition, targetState.secondArmPosition, 0.000873, transition.secondArmSpeed)
+        }
+    }
+
+    fun getReference(time: Long): RoboticArmState? {
+        val diff = time - transitionStart
+        val startState = latestMatch.roboticArmState
+        if (startState != null) {
+            val baseRef = Util.getPosition(startState.basePosition, targetState.basePosition, timeBase, Math.min(timeBase, diff))
+            val mainArmRef = Util.getPosition(startState.mainArmPosition, targetState.mainArmPosition, timeMainArm, Math.min(timeMainArm, diff))
+            val secondArmRef = Util.getPosition(startState.secondArmPosition, targetState.secondArmPosition, timeSecondArm, Math.min(timeSecondArm, diff))
+            return RoboticArmState(basePosition = baseRef, mainArmPosition = mainArmRef, secondArmPosition = secondArmRef)
+        } else {
+            return null
         }
     }
 }

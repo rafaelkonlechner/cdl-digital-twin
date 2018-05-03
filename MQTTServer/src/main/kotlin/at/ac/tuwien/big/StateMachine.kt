@@ -14,7 +14,7 @@ object StateMachine {
          */
         val idle = RoboticArmState(name = "Idle")
         val approach = RoboticArmState(
-                name = "Approach",
+                name = "Drive Down",
                 basePosition = 0.0,
                 mainArmPosition = 1.50,
                 secondArmPosition = -0.12,
@@ -140,7 +140,7 @@ object StateMachine {
                 "Conveyor Object In Window", adjusterPosition = 1.669, detected = true, inPickupWindow = true
         )
         val conveyorAdjusterPushed = ConveyorState(
-                "Conveyor Adjuster Push", adjusterPosition = 1.909, detected = true, inPickupWindow = true
+                "Conveyor Adjuster Push", adjusterPosition = 1.909, detected = false, inPickupWindow = false
         )
 
         /*
@@ -165,11 +165,8 @@ object StateMachine {
         val slider_pushed = SliderTransition(States.sliderHomePosition, States.sliderPushedPosition)
         val slider_home = SliderTransition(States.sliderPushedPosition, States.sliderHomePosition)
 
-        val adjuster_empty_detected = ConveyorTransition(States.conveyorEmpty, States.conveyorObjectDetected)
-        val adjuster_empty_pickup = ConveyorTransition(States.conveyorEmpty, States.conveyorObjectInWindow)
         val adjuster_detected_pushed = ConveyorTransition(States.conveyorObjectDetected, States.conveyorAdjusterPushed)
-        val adjuster_pushed_detected = ConveyorTransition(States.conveyorAdjusterPushed, States.conveyorObjectDetected)
-        val adjuster_pushed_pickup = ConveyorTransition(States.conveyorAdjusterPushed, States.conveyorObjectInWindow)
+        val adjuster_pushed_empty = ConveyorTransition(States.conveyorObjectInWindow, States.conveyorEmpty)
 
         val none_green = TestingRigTransition(States.none, States.green)
         val none_red = TestingRigTransition(States.none, States.red)
@@ -264,7 +261,7 @@ object StateMachine {
      * Matches two given states
      * @return true, if the states are equal with a certain tolerance for real values and false otherwise
      */
-    private fun match(a: StateEvent, b: StateEvent): Boolean {
+    fun match(a: StateEvent, b: StateEvent): Boolean {
         return if (a is RoboticArmState && b is RoboticArmState) {
             similar(a.basePosition, b.basePosition, 0.02)
                     && similar(a.mainArmPosition, b.mainArmPosition, 0.02)

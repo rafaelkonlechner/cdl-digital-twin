@@ -1,9 +1,6 @@
 package at.ac.tuwien.big
 
-import at.ac.tuwien.big.entity.state.ConveyorState
-import at.ac.tuwien.big.entity.state.GatePassed
 import at.ac.tuwien.big.entity.state.RoboticArmState
-import at.ac.tuwien.big.entity.state.TestingRigState
 import at.ac.tuwien.big.entity.transition.ConveyorTransition
 import at.ac.tuwien.big.entity.transition.RoboticArmTransition
 import at.ac.tuwien.big.entity.transition.TestingRigTransition
@@ -23,8 +20,8 @@ import java.util.concurrent.TimeUnit
  */
 object TimeSeriesCollectionService {
 
-    val dbName = "pick-and-place"
-    var influxDB: InfluxDB = InfluxDBFactory.connect("http://127.0.0.1:8086", "root", "root")
+    private const val dbName = "pick-and-place"
+    private var influxDB: InfluxDB = InfluxDBFactory.connect("http://127.0.0.1:8086", "root", "root")
 
     init {
         influxDB.createDatabase(dbName)
@@ -39,73 +36,29 @@ object TimeSeriesCollectionService {
         influxDB.createDatabase(dbName)
     }
 
-    /**
-     * Saves the event of an item passing through a gate
-     */
-    fun savePoint(state: GatePassed) {
+    fun savePoint(state: RoboticArmState, ref: RoboticArmState?, label: String? = null) {
         val batchPoints = BatchPoints
                 .database(dbName)
                 .consistency(ConsistencyLevel.ALL)
                 .build()
-        val point = Point.measurement("gate")
-                .time(System.currentTimeMillis(), TimeUnit.MILLISECONDS)
-                .addField("channel", state.channel)
-                .build()
-        batchPoints.point(point)
-        influxDB.write(batchPoints)
-    }
-
-    /**
-     * Saves the state of the conveyor
-     */
-    fun savePoint(state: ConveyorState) {
-        val batchPoints = BatchPoints
-                .database(dbName)
-                .consistency(ConsistencyLevel.ALL)
-                .build()
-        val point = Point.measurement("conveyor")
-                .time(System.currentTimeMillis(), TimeUnit.MILLISECONDS)
-                .addField("adjuster", state.adjusterPosition)
-                .addField("detected", state.detected ?: false)
-                .addField("in_pickup_window", state.inPickupWindow ?: false)
-                .build()
-        batchPoints.point(point)
-        influxDB.write(batchPoints)
-    }
-
-    /**
-     * Saves the state of the testing rig
-     */
-    fun savePoint(state: TestingRigState) {
-        val batchPoints = BatchPoints
-                .database(dbName)
-                .consistency(ConsistencyLevel.ALL)
-                .build()
-        val point = Point.measurement("testing_rig")
-                .time(System.currentTimeMillis(), TimeUnit.MILLISECONDS)
-                .addField("platform", state.platformPosition)
-                .addField("category", state.objectCategory?.name)
-                .build()
-        batchPoints.point(point)
-        influxDB.write(batchPoints)
-    }
-
-    /**
-     * Saves the state of the robotic arm
-     */
-    fun savePoint(state: RoboticArmState) {
-        val batchPoints = BatchPoints
-                .database(dbName)
-                .consistency(ConsistencyLevel.ALL)
-                .build()
-        val point = Point.measurement("robotic_arm")
+        val pointBuilder = Point.measurement("robotic_arm")
                 .time(System.currentTimeMillis(), TimeUnit.MILLISECONDS)
                 .addField("base", state.basePosition)
+                .addField("ref_base", ref?.basePosition)
+                .addField("base_re", if (ref != null) Math.abs(state.basePosition - ref.basePosition) else 0.0)
                 .addField("main_arm", state.mainArmPosition)
+                .addField("ref_main_arm", ref?.mainArmPosition)
+                .addField("main_arm_re", if (ref != null) Math.abs(state.mainArmPosition - ref.mainArmPosition) else 0.0)
                 .addField("second_arm", state.secondArmPosition)
+                .addField("ref_second_arm", ref?.secondArmPosition)
+                .addField("second_arm_re", if (ref != null) Math.abs(state.secondArmPosition - ref.secondArmPosition) else 0.0)
                 .addField("wrist", state.wristPosition)
                 .addField("gripper", state.gripperPosition)
-                .build()
+        val point = if (label != null) {
+            pointBuilder.addField("label", label).build()
+        } else {
+            pointBuilder.build()
+        }
         batchPoints.point(point)
         influxDB.write(batchPoints)
     }
@@ -157,7 +110,6 @@ object TimeSeriesCollectionService {
      */
     fun getSuccessfulProductions(since: Duration, groupBy: Duration): QueryResult {
         val query = Query("SELECT SUM(count) FROM productions WHERE time > now() - ${since.toMinutes()}m GROUP BY time(${groupBy.toMinutes()}m)", dbName)
-        val result = influxDB.query(query)
-        return result
+        return influxDB.query(query)
     }
 }

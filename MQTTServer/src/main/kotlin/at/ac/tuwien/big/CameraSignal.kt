@@ -47,11 +47,10 @@ object CameraSignal {
     /**
      * Sends a camera image to the tracking service. *Note:* This service has not yet been implemented
      */
-    fun analyzeImage(imageFile: File): List<TrackingResult> {
+    fun analyzeImage(imageFile: File, callback: (List<TrackingResult>) -> Unit) {
 
         val restTemplate = RestTemplate()
         restTemplate.messageConverters.add(ByteArrayHttpMessageConverter())
-
         val params: MultiValueMap<String, Any> = LinkedMultiValueMap<String, Any>()
         params.add("file", FileSystemResource(imageFile))
 
@@ -60,6 +59,6 @@ object CameraSignal {
         val requestEntity = HttpEntity<MultiValueMap<String, Any>>(params, headers)
         val response = restTemplate.exchange("http://localhost:3000/analyze", HttpMethod.POST, requestEntity, String::class.java)
         val turnsType = object : TypeToken<List<TrackingResult>>() {}.type
-        return gson.fromJson(response.body, turnsType)
+        callback(gson.fromJson(response.body, turnsType))
     }
 }
