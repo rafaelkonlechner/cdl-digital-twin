@@ -146,8 +146,10 @@ def main():
     GameLogic.greenCounter = 0
     GameLogic.redCounter = 0
     GameLogic.handContact = 0
-    GameLogic.messageRate = 1
+    GameLogic.messageRate = 20
+    GameLogic.secondaryMessageRate = 1
     GameLogic.messageRateCounter = 0
+    GameLogic.secondaryMessageRateCounter = 0
     GameLogic.heatplateTemperature = 120 # degree Celsius
     GameLogic.heatplateTargetTemperature = 120 # degree Celsius
 
