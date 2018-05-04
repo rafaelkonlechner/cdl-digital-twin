@@ -64,7 +64,7 @@ object MessageController {
                 detection.writeBytes(CameraSignal.fromBase64(message))
                 println(detection.totalSpace)
                 CameraSignal.analyzeImage(detection, {
-                    sendWebSocketMessageDetectionCamera("{\"image\": \"message\", \"tracking\": ${gson.toJson(it)}}")
+                    sendWebSocketMessageDetectionCamera("{\"image\": \"$message\", \"tracking\": ${gson.toJson(it)}}")
                     detection.delete()
                 })
             }
@@ -77,7 +77,7 @@ object MessageController {
                     val detected = tracking != null
                     val inPickupWindow = tracking != null && 36 < tracking.x && tracking.x < 125 && 60 < tracking.y && tracking.y < 105
                     PickAndPlaceController.update(ConveyorState(detected = detected, inPickupWindow = inPickupWindow))
-                    sendWebSocketMessagePickupCamera("{\"image\": \"message\", \"tracking\": ${gson.toJson(it)}}")
+                    sendWebSocketMessagePickupCamera("{\"image\": \"$message\", \"tracking\": ${gson.toJson(it)}}")
                     pickup.delete()
                 })
             }
