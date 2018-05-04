@@ -1,14 +1,8 @@
 package at.ac.tuwien.big
 
-import org.springframework.boot.SpringApplication
-import org.springframework.boot.autoconfigure.SpringBootApplication
-import org.springframework.scheduling.annotation.EnableScheduling
-
-@SpringBootApplication
-@EnableScheduling
-class MqttServerApplication
+import at.ac.tuwien.big.rest.WebServiceController
 
 fun main(args: Array<String>) {
-
-    SpringApplication.run(MqttServerApplication::class.java, *args)
+    MessageController.start()
+    WebServiceController.start()
 }
