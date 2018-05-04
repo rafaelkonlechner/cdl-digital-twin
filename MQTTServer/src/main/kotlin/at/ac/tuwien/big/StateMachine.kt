@@ -140,7 +140,7 @@ object StateMachine {
                 "Conveyor Object In Window", adjusterPosition = 1.669, detected = true, inPickupWindow = true
         )
         val conveyorAdjusterPushed = ConveyorState(
-                "Conveyor Adjuster Push", adjusterPosition = 1.909, detected = false, inPickupWindow = false
+                "Conveyor Adjuster Push", adjusterPosition = 1.909, detected = true, inPickupWindow = true
         )
 
         /*
@@ -166,7 +166,7 @@ object StateMachine {
         val slider_home = SliderTransition(States.sliderPushedPosition, States.sliderHomePosition)
 
         val adjuster_detected_pushed = ConveyorTransition(States.conveyorObjectDetected, States.conveyorAdjusterPushed)
-        val adjuster_pushed_empty = ConveyorTransition(States.conveyorObjectInWindow, States.conveyorEmpty)
+        val adjuster_pushed_home = ConveyorTransition(States.conveyorAdjusterPushed, States.conveyorObjectInWindow)
 
         val none_green = TestingRigTransition(States.none, States.green)
         val none_red = TestingRigTransition(States.none, States.red)

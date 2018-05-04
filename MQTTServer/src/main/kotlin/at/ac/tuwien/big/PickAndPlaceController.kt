@@ -106,12 +106,12 @@ object PickAndPlaceController {
 
     private fun next(current: State): Transition? {
         return when {
-            current matches State(s.idle, conveyorState = s.conveyorEmpty, testingRigState = s.green) -> t.fullrelease_wait
-            current matches State(s.idle, conveyorState = s.conveyorEmpty, testingRigState = s.red) -> t.fullrelease_wait
+            current matches State(s.idle, conveyorState = s.conveyorEmpty, testingRigState = s.green_heated) -> t.fullrelease_wait
+            current matches State(s.idle, conveyorState = s.conveyorEmpty, testingRigState = s.red_heated) -> t.fullrelease_wait
             current matches State(s.idle, conveyorState = s.conveyorEmpty) -> t.slider_pushed
             current matches State(sliderState = s.sliderPushedPosition, conveyorState = s.conveyorObjectDetected) -> t.slider_home
             current matches State(conveyorState = s.conveyorObjectDetected) -> t.adjuster_detected_pushed
-            current matches State(conveyorState = s.conveyorAdjusterPushed) -> t.adjuster_pushed_empty
+            current matches State(conveyorState = s.conveyorAdjusterPushed) -> t.adjuster_pushed_home
             current matches State(s.idle, conveyorState = s.conveyorObjectInWindow) -> t.idle_approach
             current matches State(s.approach) -> t.approach_pickup
             current matches State(s.pickup) -> t.pickup_lift
