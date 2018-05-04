@@ -1,4 +1,5 @@
 const tracking = require('./tracking-node')
+const fs = require('fs')
 const express = require('express')
 const fileUpload = require('express-fileupload')
 const png = require('png-js')
@@ -12,12 +13,14 @@ var tracker = new tracking.ColorTracker(['white']);
 app.post('/analyze', function(req, res) {
     if (!req.files) return res.status(400).send('No image was found in the request.');
     console.log("Analyzing image ...")
-    let imageFile = req.files.file;
-    imageFile.mv('current.png', function(err) {
+    let imageFile = req.files.image;
+    let filename = Math.random().toString(36).substring(7) + ".png";
+    let filename1 = filename + ".png";
+    imageFile.mv(filename, function(err) {
         if (err) return res.status(500).send(err);
-        jimp.read('current.png').then(function(img) {
-            img.resize(200, 200).write('current1.png', function() {
-                png.decode('current1.png', function(pixels) {
+        jimp.read(filename).then(function(img) {
+            img.resize(200, 200).write(filename1, function() {
+                png.decode(filename1, function(pixels) {
                     tracker.once('track', function(event) {
                         var rects = []
                         event.data.forEach(function(rect) {
@@ -31,6 +34,12 @@ app.post('/analyze', function(req, res) {
                         });
                         console.log("Found " + rects.length + " items")
                         res.send(rects)
+                        fs.unlink(filename, function(err) {
+                            if (err) throw err;
+                        })
+                        fs.unlink(filename1, function(err) {
+                            if (err) throw err;
+                        })
                     });
                     tracker.track(pixels, 200, 200)
                 });
