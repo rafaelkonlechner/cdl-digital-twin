@@ -1,30 +1,26 @@
-var socket = new SockJS(':8080/stomp');
-
-var stompClient = Stomp.over(socket);
-
-stompClient.connect({}, function (frame) {
-    console.log('Connected: ' + frame);
-
-    stompClient.subscribe('/topic/sensor', function (response) {
-        vue.updateSensorData(response.body);
-    });
-    stompClient.subscribe('/topic/context', function (response) {
-        vue.updateContextData(response.body);
-    });
-    stompClient.subscribe('/topic/pickupCamera', function (response) {
-        console.log(response);
-        vue.updatePickupImage(JSON.parse(response.body));
-    });
-    stompClient.subscribe('/topic/detectionCamera', function (response) {
-        console.log(response);
-        vue.updateDetectionImage(JSON.parse(response.body));
-    });
-    stompClient.subscribe('/topic/qrCode', function (response) {
-        vue.updateQRCodeData(response.body);
-    });
+var socket = new WebSocket("ws://127.0.0.1:8080/websocket");
+socket.addEventListener("open", function (event) {
+    console.log("Connected");
 });
-
-stompClient.debug = null;
+socket.addEventListener("message", function (event) {
+    var msg = event.data;
+    msg = JSON.parse(msg);
+    if (msg.topic === "sensor") {
+        vue.updateSensorData(msg.message);
+    }
+    if (msg.topic === "context") {
+        vue.updateContextData(msg.message);
+    }
+    if (msg.topic === "pickupCamera") {
+        vue.updatePickupImage(JSON.parse(msg.message));
+    }
+    if (msg.topic === "detectionCamera") {
+        vue.updateDetectionImage(JSON.parse(msg.message));
+    }
+    if (msg.topic === "qrCode") {
+        vue.updateQRCodeData(msg.message);
+    }
+});
 
 plot = function (x, y, w, h, color, container, imgId, rectId, textId, text) {
     var img = document.getElementById(imgId);
@@ -248,7 +244,7 @@ var vue = new Vue({
                     document.querySelector('.' + image + '-container').removeChild(rectElem);
                 }
                 if (textElem !== null) {
-                    document.querySelector('.' + image + 'detection-container').removeChild(textElem);
+                    //document.querySelector('.' + image + 'detection-container').removeChild(textElem);
                 }
             } else {
                 event.forEach(function (rect) {
