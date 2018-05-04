@@ -18,6 +18,7 @@ import javax.imageio.ImageIO
 object CameraSignal {
 
     private val gson = Gson()
+
     /**
      * Save an encoded image string to a file in the *png* file format.
      */
@@ -42,8 +43,8 @@ object CameraSignal {
      */
     fun analyzeImage(imageFile: File, callback: (List<TrackingResult>) -> Unit) {
 
-        Fuel.upload("http://localhost:3000/analyze").dataParts { request, url ->
-            listOf(DataPart(imageFile, "file"))
+        Fuel.upload("http://localhost:3000/analyze").dataParts { _, _ ->
+            listOf(DataPart(imageFile, "image"))
         }.responseString { _, response, _ ->
                     val turnsType = object : TypeToken<List<TrackingResult>>() {}.type
                     callback(gson.fromJson(String(response.data), turnsType))
