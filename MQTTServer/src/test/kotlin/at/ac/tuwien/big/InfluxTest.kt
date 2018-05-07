@@ -2,10 +2,9 @@ package at.ac.tuwien.big
 
 import org.influxdb.InfluxDB
 import org.influxdb.InfluxDBFactory
-import org.influxdb.dto.Point
 import org.influxdb.dto.Query
+import org.junit.Ignore
 import org.junit.Test
-import java.util.concurrent.TimeUnit
 
 class InfluxTest {
 
@@ -13,6 +12,7 @@ class InfluxTest {
     var influxDB: InfluxDB = InfluxDBFactory.connect("http://localhost:8086", "root", "root")
 
     @Test
+    @Ignore
     fun test() {
         println(influxDB.databaseExists(dbName))
         val query = Query("SELECT base FROM actuators", dbName)
