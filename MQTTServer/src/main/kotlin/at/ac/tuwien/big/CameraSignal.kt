@@ -9,13 +9,12 @@ import sun.misc.BASE64Decoder
 import java.io.ByteArrayInputStream
 import java.io.File
 import java.time.LocalDateTime
-import java.util.*
 import javax.imageio.ImageIO
 
 /**
  * Service for handling the camera signals
  */
-object CameraSignal {
+class CameraSignal(val host: String) {
 
     private val gson = Gson()
 
@@ -31,19 +30,11 @@ object CameraSignal {
     }
 
     /**
-     * Encodes a given image in the *png* file format into Base64.
-     * @return the encoded image in Base64
-     */
-    fun toBase64(img: ByteArray) = String(Base64.getEncoder().encode(img))
-
-    fun fromBase64(img: String) = Base64.getDecoder().decode(img)!!
-
-    /**
      * Sends a camera image to the tracking service. *Note:* This service has not yet been implemented
      */
     fun analyzeImage(imageFile: File, callback: (List<TrackingResult>) -> Unit) {
 
-        Fuel.upload("http://localhost:3000/analyze").dataParts { _, _ ->
+        Fuel.upload("http://$host:3000/analyze").dataParts { _, _ ->
             listOf(DataPart(imageFile, "image"))
         }.responseString { _, response, _ ->
                     val turnsType = object : TypeToken<List<TrackingResult>>() {}.type

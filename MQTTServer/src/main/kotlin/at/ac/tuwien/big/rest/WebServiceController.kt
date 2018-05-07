@@ -1,7 +1,6 @@
 package at.ac.tuwien.big.rest
 
 import at.ac.tuwien.big.*
-import at.ac.tuwien.big.MQTT.sendMQTTTransitionCommand
 import at.ac.tuwien.big.entity.state.ConveyorState
 import at.ac.tuwien.big.entity.state.RoboticArmState
 import at.ac.tuwien.big.entity.state.SliderState
@@ -21,7 +20,9 @@ import org.eclipse.jetty.websocket.api.Session
 /**
  * API Controller for WebSockets
  */
-object WebServiceController {
+class WebServiceController(private val mqtt: MQTT,
+                           private val messageController: MessageController,
+                           private val timeSeriesCollectionService: TimeSeriesCollectionService) {
 
     data class TopicMessage(val topic: String, val message: String)
 
@@ -44,7 +45,7 @@ object WebServiceController {
                 println("Received: " + message)
                 if (message != null) {
                     println("Message: $message")
-                    MQTT.send(MQTT.actuatorTopic, message)
+                    mqtt.send(mqtt.actuatorTopic, message)
                 }
             }
             ws.onClose { session, statusCode, reason -> println("Closed $session, $statusCode: $reason") }
@@ -63,41 +64,41 @@ object WebServiceController {
                 run {
                     val match = StateMachine.roboticArm[ctx.body()]
                     if (match != null)
-                        sendMQTTTransitionCommand(RoboticArmTransition(RoboticArmState(), match))
+                        mqtt.sendMQTTTransitionCommand(RoboticArmTransition(RoboticArmState(), match))
                 }
             }
             put("/sliderState") { ctx ->
                 run {
                     val match = StateMachine.slider[ctx.body()]
                     if (match != null)
-                        sendMQTTTransitionCommand(SliderTransition(SliderState(), match))
+                        mqtt.sendMQTTTransitionCommand(SliderTransition(SliderState(), match))
                 }
             }
             put("/conveyorState") { ctx ->
                 run {
                     val match = StateMachine.conveyor[ctx.body()]
                     if (match != null)
-                        sendMQTTTransitionCommand(ConveyorTransition(ConveyorState(), match))
+                        mqtt.sendMQTTTransitionCommand(ConveyorTransition(ConveyorState(), match))
                 }
             }
             put("/testingRigState") { ctx ->
                 run {
                     val match = StateMachine.testingRig[ctx.body()]
                     if (match != null)
-                        sendMQTTTransitionCommand(TestingRigTransition(TestingRigState(), match))
+                        mqtt.sendMQTTTransitionCommand(TestingRigTransition(TestingRigState(), match))
                 }
             }
 
-            get("/messageRate") { ctx -> MessageController.messageRate }
-            put("/messageRate") { ctx -> MessageController.messageRate = ctx.body().toInt() }
+            get("/messageRate") { ctx -> messageController.messageRate }
+            put("/messageRate") { ctx -> messageController.messageRate = ctx.body().toInt() }
 
-            get("/autoPlay") { ctx -> ctx.json(MessageController.autoPlay) }
-            put("/autoPlay") { ctx -> MessageController.autoPlay = ctx.body().toBoolean() }
+            get("/autoPlay") { ctx -> ctx.json(messageController.autoPlay) }
+            put("/autoPlay") { ctx -> messageController.autoPlay = ctx.body().toBoolean() }
 
-            get("/recording") { ctx -> ctx.json(MessageController.recording) }
-            put("/recording") { ctx -> MessageController.recording = ctx.body().toBoolean() }
+            get("/recording") { ctx -> ctx.json(messageController.recording) }
+            put("/recording") { ctx -> messageController.recording = ctx.body().toBoolean() }
 
-            put("/resetData") { TimeSeriesCollectionService.resetDatabase() }
+            put("/resetData") { timeSeriesCollectionService.resetDatabase() }
         }
     }
 

@@ -1,6 +1,17 @@
 package at.ac.tuwien.big
 
+import java.util.*
+
 object Util {
+
+
+    /**
+     * Encodes a given image in the *png* file format into Base64.
+     * @return the encoded image in Base64
+     */
+    fun toBase64(img: ByteArray) = String(Base64.getEncoder().encode(img))
+
+    fun fromBase64(img: String) = Base64.getDecoder().decode(img)!!
 
     fun interpolate(from: Double, to: Double, time: Int): List<Pair<Int, Double>> {
         val linearDiff = (to - from) / time

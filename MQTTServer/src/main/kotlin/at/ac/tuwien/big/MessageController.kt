@@ -1,28 +1,30 @@
 package at.ac.tuwien.big
 
-import at.ac.tuwien.big.MQTT.detectionCameraTopic
-import at.ac.tuwien.big.MQTT.pickupCameraTopic
-import at.ac.tuwien.big.MQTT.sendMQTTTransitionCommand
-import at.ac.tuwien.big.MQTT.sensorTopic
 import at.ac.tuwien.big.entity.state.*
-import at.ac.tuwien.big.rest.WebServiceController
 import com.google.gson.Gson
 import java.io.File
 import java.util.*
 import kotlin.concurrent.schedule
 
-object MessageController {
+class MessageController(private val mqtt: MQTT,
+                        private val cameraSignal: CameraSignal,
+                        private val timeSeriesCollectionService: TimeSeriesCollectionService) {
 
     private val gson = Gson()
     private val random = Random()
     private val timer = Timer()
     private var inTransition = false
+    private val subscribers = mutableListOf<(String, String) -> Unit>()
     var messageRate: Int = 10
     var autoPlay: Boolean = true
     var recording: Boolean = false
 
     init {
-        MQTT.subscribe(listOf(sensorTopic, detectionCameraTopic, pickupCameraTopic), MessageController::onMessage)
+        mqtt.subscribe(listOf(mqtt.sensorTopic, mqtt.detectionCameraTopic, mqtt.pickupCameraTopic), this::onMessage)
+    }
+
+    fun subscribe(callback: (String, String) -> Unit) {
+        subscribers.add(callback)
     }
 
     fun start() {
@@ -33,14 +35,14 @@ object MessageController {
 
     private fun onMessage(topic: String, message: String) {
         when (topic) {
-            sensorTopic -> {
+            mqtt.sensorTopic -> {
                 val state = parse(message)
                 if (recording) {
                     if (state is RoboticArmState) {
                         val ref = PickAndPlaceController.getReference(System.currentTimeMillis())
                         inTransition = !StateMachine.match(state, PickAndPlaceController.targetState)
                         val label = if (inTransition) null else PickAndPlaceController.targetState.name
-                        TimeSeriesCollectionService.savePoint(state, ref, label)
+                        timeSeriesCollectionService.savePoint(state, ref, label)
                     }
                 }
                 PickAndPlaceController.update(state)
@@ -52,7 +54,7 @@ object MessageController {
                 }
 
             }
-            detectionCameraTopic -> {
+            mqtt.detectionCameraTopic -> {
                 val code = QRCode.read(message)
                 if (code != null) {
                     sendWebSocketMessageQRCodeScanner(gson.toJson(code).toString())
@@ -61,18 +63,18 @@ object MessageController {
                 PickAndPlaceController.update(TestingRigState(objectCategory = color))
 
                 val detection = File.createTempFile("detection", ".png")
-                detection.writeBytes(CameraSignal.fromBase64(message))
+                detection.writeBytes(Util.fromBase64(message))
                 println(detection.totalSpace)
-                CameraSignal.analyzeImage(detection, {
+                cameraSignal.analyzeImage(detection, {
                     sendWebSocketMessageDetectionCamera("{\"image\": \"$message\", \"tracking\": ${gson.toJson(it)}}")
                     detection.delete()
                 })
             }
-            pickupCameraTopic -> {
+            mqtt.pickupCameraTopic -> {
                 val pickup = File.createTempFile("pickup", ".png")
-                pickup.writeBytes(CameraSignal.fromBase64(message))
+                pickup.writeBytes(Util.fromBase64(message))
                 println(pickup.totalSpace)
-                CameraSignal.analyzeImage(pickup, {
+                cameraSignal.analyzeImage(pickup, {
                     val tracking = it.firstOrNull()
                     val detected = tracking != null
                     val inPickupWindow = tracking != null && 36 < tracking.x && tracking.x < 125 && 60 < tracking.y && tracking.y < 105
@@ -92,7 +94,7 @@ object MessageController {
                 val transition = PickAndPlaceController.next()
                 println("Next: ${latest.roboticArmState?.name}, ${latest.sliderState?.name}, ${latest.conveyorState?.name}, ${latest.testingRigState?.name} -> ${transition?.targetState?.name}")
                 PickAndPlaceController.start(transition)
-                sendMQTTTransitionCommand(transition)
+                mqtt.sendMQTTTransitionCommand(transition)
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -128,6 +130,8 @@ object MessageController {
     }
 
     private fun sendWebSocketMessage(topic: String, message: String) {
-        WebServiceController.push(topic, message)
+        subscribers.forEach {
+            it(topic, message)
+        }
     }
 }

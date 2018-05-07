@@ -18,10 +18,10 @@ import java.util.concurrent.TimeUnit
 /**
  * Service for storing data points in a time series database
  */
-object TimeSeriesCollectionService {
+class TimeSeriesCollectionService(val host: String) {
 
-    private const val dbName = "pick-and-place"
-    private var influxDB: InfluxDB = InfluxDBFactory.connect("http://127.0.0.1:8086", "root", "root")
+    private val dbName = "pick-and-place"
+    private var influxDB: InfluxDB = InfluxDBFactory.connect("http://$host:8086", "root", "root")
 
     init {
         influxDB.createDatabase(dbName)

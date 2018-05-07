@@ -3,20 +3,20 @@ package at.ac.tuwien.big
 import at.ac.tuwien.big.entity.transition.Transition
 import org.eclipse.paho.client.mqttv3.*
 
-object MQTT : MqttCallback {
+class MQTT(val host: String) : MqttCallback {
 
     data class Subscription(val topics: List<String>, val callback: (String, String) -> Unit)
 
-    const val sensorTopic = "Sensor-Simulation"
-    const val actuatorTopic = "Actuator-Simulation"
-    const val sensorTopicHedgehog = "Sensor"
-    const val actuatorTopicHedgehog = "Actuator"
-    const val detectionCameraTopic = "DetectionCamera"
-    const val pickupCameraTopic = "PickupCamera"
+    val sensorTopic = "Sensor-Simulation"
+    val actuatorTopic = "Actuator-Simulation"
+    val sensorTopicHedgehog = "Sensor"
+    val actuatorTopicHedgehog = "Actuator"
+    val detectionCameraTopic = "DetectionCamera"
+    val pickupCameraTopic = "PickupCamera"
 
-    private const val qos = 0
+    private val qos = 0
 
-    private val client = MqttClient("tcp://localhost:1883", "Controller")
+    private val client = MqttClient("tcp://$host:1883", "Controller")
     private val subscribers = mutableListOf<Subscription>()
     private val lock = Any()
 

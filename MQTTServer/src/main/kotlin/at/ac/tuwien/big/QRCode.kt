@@ -23,7 +23,7 @@ object QRCode {
     /**
      * Reads a QR code and creates a textual code representation
      * @param base64Image the encoded image
-     * @return the code in [ProductCode], or [null] if an error occurred
+     * @return the code in [ProductCode], or null if an error occurred
      */
     fun read(base64Image: String): ProductCode? {
 
@@ -39,7 +39,7 @@ object QRCode {
             val text = result.text.split(",")
             if (text.size == 3) {
                 val code = ProductCode(text[0], text[1], text[2], null)
-                code.base64 = CameraSignal.toBase64(write(code))
+                code.base64 = Util.toBase64(write(code))
                 return code
             } else {
                 return null
