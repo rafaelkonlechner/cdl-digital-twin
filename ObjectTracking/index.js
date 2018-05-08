@@ -12,7 +12,6 @@ tracking.ColorTracker.registerColor('white', function(r, g, b) {
 var tracker = new tracking.ColorTracker(['white']);
 app.post('/analyze', function(req, res) {
     if (!req.files) return res.status(400).send('No image was found in the request.');
-    console.log("Analyzing image ...")
     let imageFile = req.files.image;
     let filename = Math.random().toString(36).substring(7) + ".png";
     let filename1 = filename + ".png";
