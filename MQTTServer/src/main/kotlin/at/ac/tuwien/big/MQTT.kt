@@ -1,21 +1,15 @@
 package at.ac.tuwien.big
 
-import at.ac.tuwien.big.entity.transition.Transition
 import org.eclipse.paho.client.mqttv3.*
 
-class MQTT(val host: String) : MqttCallback {
+/**
+ * Send and receive MQTT messages via the specified topics
+ */
+class MQTT(host: String, receivingTopics: List<String>, private val sendingTopics: List<String>) : MqttCallback {
 
-    data class Subscription(val topics: List<String>, val callback: (String, String) -> Unit)
-
-    val sensorTopic = "Sensor-Simulation"
-    val actuatorTopic = "Actuator-Simulation"
-    val sensorTopicHedgehog = "Sensor"
-    val actuatorTopicHedgehog = "Actuator"
-    val detectionCameraTopic = "DetectionCamera"
-    val pickupCameraTopic = "PickupCamera"
+    private data class Subscription(val topics: List<String>, val callback: (String, String) -> Unit)
 
     private val qos = 0
-
     private val client = MqttClient("tcp://$host:1883", "Controller")
     private val subscribers = mutableListOf<Subscription>()
     private val lock = Any()
@@ -26,20 +20,41 @@ class MQTT(val host: String) : MqttCallback {
         connOpts.isCleanSession = true
         client.connect(connOpts)
         println("Established connection.")
-
-        println("Subscribing to topic: $sensorTopic")
+        println("Subscribing to topics: $receivingTopics")
         client.setCallback(this)
-        client.subscribe(sensorTopic)
-        client.subscribe(detectionCameraTopic)
-        client.subscribe(pickupCameraTopic)
+        for (topic in receivingTopics) {
+            client.subscribe(topic)
+        }
     }
 
+    /**
+     * Disconnect from MQTT queue
+     */
     fun cleanup() {
         client.disconnect()
         client.close()
     }
 
+    /**
+     * Subscribe to the specified list of topics
+     */
     fun subscribe(topics: List<String>, callback: (String, String) -> Unit) = subscribers.add(Subscription(topics, callback))
+
+    /**
+     * Send a message via all sending topics
+     */
+    fun send(message: String) {
+        val tmp = MqttMessage(message.toByteArray())
+        tmp.qos = qos
+        synchronized(lock) {
+            if (client.isConnected) {
+                for (topic in sendingTopics) {
+                    client.publish(topic, tmp)
+                    client.publish(topic, tmp)
+                }
+            }
+        }
+    }
 
     override fun messageArrived(topic: String?, message: MqttMessage?) {
         subscribers.forEach { if (topic in it.topics) it.callback(topic!!, message.toString()) }
@@ -49,34 +64,5 @@ class MQTT(val host: String) : MqttCallback {
         throw cause ?: Exception("Connection lost.")
     }
 
-    override fun deliveryComplete(token: IMqttDeliveryToken?) {
-        println("Delivery complete.")
-    }
-
-    fun send(topic: String, message: String) {
-        val tmp = MqttMessage(message.toByteArray())
-        tmp.qos = qos
-        println("Sending via MQTT: $message")
-        client.publish(topic, tmp)
-    }
-
-    fun sendMQTTTransitionCommand(transition: Transition?) {
-        if (transition != null) {
-            val commands = StateMachine.transform(transition)
-            for (c in commands) {
-                sendMQTTDirectCommand(c)
-            }
-        }
-    }
-
-    private fun sendMQTTDirectCommand(message: String) {
-        val tmp = MqttMessage(message.toByteArray())
-        tmp.qos = qos
-        synchronized(lock) {
-            if (client.isConnected) {
-                client.publish(actuatorTopic, tmp)
-                client.publish(actuatorTopicHedgehog, tmp)
-            }
-        }
-    }
+    override fun deliveryComplete(token: IMqttDeliveryToken?) {}
 }

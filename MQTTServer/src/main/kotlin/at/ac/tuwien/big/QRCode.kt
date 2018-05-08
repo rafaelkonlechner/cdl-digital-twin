@@ -16,7 +16,7 @@ import java.util.*
 import javax.imageio.ImageIO
 
 /**
- * Service for handling QR codes
+ * Read and write QR codes
  */
 object QRCode {
 
@@ -39,7 +39,7 @@ object QRCode {
             val text = result.text.split(",")
             if (text.size == 3) {
                 val code = ProductCode(text[0], text[1], text[2], null)
-                code.base64 = Util.toBase64(write(code))
+                code.base64 = toBase64(write(code))
                 return code
             } else {
                 return null

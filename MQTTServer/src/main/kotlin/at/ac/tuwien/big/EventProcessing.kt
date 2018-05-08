@@ -8,9 +8,9 @@ import com.espertech.esper.client.EPServiceProviderManager
 /**
  * Service for complex event processing
  */
-class EventProcessing(private val timeSeriesCollectionService: TimeSeriesCollectionService) {
+class EventProcessing(private val timeSeriesDatabase: TimeSeriesDatabase) {
 
-    val runtime: EPRuntime
+    private val runtime: EPRuntime
 
     init {
         val config = Configuration()
@@ -44,7 +44,7 @@ class EventProcessing(private val timeSeriesCollectionService: TimeSeriesCollect
          */
         sensorUpdates.addListener { _, _ ->
             run {
-                timeSeriesCollectionService.logSuccessfulProduction()
+                timeSeriesDatabase.logSuccessfulProduction()
             }
         }
     }

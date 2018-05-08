@@ -20,6 +20,6 @@ class EventProcessingTest {
         cep.sendEvent(StateMachine.States.depositGreen)
         cep.sendEvent(StateMachine.States.releaseGreen)
 
-        println(TimeSeriesCollectionService.getSuccessfulProductions(Duration.ofHours(1), Duration.ofHours(1)))
+        println(TimeSeriesDatabase.getSuccessfulProductions(Duration.ofHours(1), Duration.ofHours(1)))
     }
 }

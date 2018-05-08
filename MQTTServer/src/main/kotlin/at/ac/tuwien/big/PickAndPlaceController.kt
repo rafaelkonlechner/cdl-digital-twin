@@ -1,41 +1,35 @@
 package at.ac.tuwien.big
 
 import at.ac.tuwien.big.entity.state.*
-import at.ac.tuwien.big.entity.transition.RoboticArmTransition
-import at.ac.tuwien.big.entity.transition.Transition
+import at.ac.tuwien.big.entity.transition.*
 import at.ac.tuwien.big.StateMachine.States as s
 import at.ac.tuwien.big.StateMachine.Transitions as t
 
 /**
- * This controller holds the core logic of the production steps during a simulation by searching the defined successor
- * state for a given input state.
+ * This controller holds the core logic of the production steps during a simulation by searching the defined
+ * successor state for a given input state.
  */
 object PickAndPlaceController {
 
     var roboticArmSnapshot: RoboticArmState = RoboticArmState()
         private set
-    var roboticArmState: RoboticArmState = RoboticArmState()
-        private set
+    private var roboticArmState: RoboticArmState = RoboticArmState()
 
     var sliderSnapshot: SliderState = SliderState()
         private set
-    var sliderState: SliderState = SliderState()
-        private set
+    private var sliderState: SliderState = SliderState()
 
     var conveyorSnapshot: ConveyorState = ConveyorState()
         private set
-    var conveyorState: ConveyorState = ConveyorState()
-        private set
+    private var conveyorState: ConveyorState = ConveyorState()
 
     var testingRigSnapshot: TestingRigState = TestingRigState()
         private set
-    var testingRigState: TestingRigState = TestingRigState()
-        private set
+    private var testingRigState: TestingRigState = TestingRigState()
 
-    var latestMatch: State = State()
-        private set
+    private var latestMatch: State = State()
 
-    var targetState = StateMachine.States.idle
+    var targetState = s.idle
         private set
 
     private var transitionStart = System.currentTimeMillis()
@@ -43,14 +37,20 @@ object PickAndPlaceController {
     private var timeMainArm = 1000L
     private var timeSecondArm = 1000L
 
+    /**
+     * Return latest matching state
+     */
     fun latest() = latestMatch
 
+    /**
+     * Update the unit with new sensor information. This includes matching the updated state to the set of defined states.
+     */
     fun update(e: StateEvent) {
         var change = false
         when (e) {
             is RoboticArmState -> {
                 roboticArmSnapshot = e
-                val match = StateMachine.matchState(roboticArmSnapshot)
+                val match = matchState(roboticArmSnapshot)
                 if (match != null && roboticArmSnapshot != match) {
                     roboticArmState = match
                     change = true
@@ -58,7 +58,7 @@ object PickAndPlaceController {
             }
             is SliderState -> {
                 sliderSnapshot = e
-                val match = StateMachine.matchState(sliderSnapshot)
+                val match = matchState(sliderSnapshot)
                 if (match != null && sliderSnapshot != match) {
                     sliderState = match
                     change = true
@@ -74,7 +74,7 @@ object PickAndPlaceController {
                 if (e.inPickupWindow != null) {
                     conveyorSnapshot = conveyorSnapshot.copy(inPickupWindow = e.inPickupWindow)
                 }
-                val match = StateMachine.matchState(conveyorSnapshot)
+                val match = matchState(conveyorSnapshot)
                 if (match != null && conveyorSnapshot != match) {
                     conveyorState = match
                     change = true
@@ -90,7 +90,7 @@ object PickAndPlaceController {
                 if (e.heatplateTemperature != null) {
                     testingRigSnapshot = testingRigSnapshot.copy(heatplateTemperature = e.heatplateTemperature)
                 }
-                val match = StateMachine.matchState(testingRigSnapshot)
+                val match = matchState(testingRigSnapshot)
                 if (match != null && e != match) {
                     testingRigState = match
                     change = true
@@ -102,59 +102,113 @@ object PickAndPlaceController {
         }
     }
 
-    fun next() = next(latestMatch)
+    /**
+     * Return the defined successor state of the lastest matching state, according to the state machine
+     */
+    fun next() = StateMachine.successor(latestMatch)
 
-    private fun next(current: State): Transition? {
-        return when {
-            current matches State(s.idle, conveyorState = s.conveyorEmpty, testingRigState = s.green) -> t.fullrelease_wait
-            current matches State(s.idle, conveyorState = s.conveyorEmpty, testingRigState = s.red) -> t.fullrelease_wait
-            current matches State(s.idle, conveyorState = s.conveyorEmpty) -> t.slider_pushed
-            current matches State(sliderState = s.sliderPushedPosition, conveyorState = s.conveyorObjectDetected) -> t.slider_home
-            current matches State(conveyorState = s.conveyorObjectDetected) -> t.adjuster_detected_pushed
-            current matches State(conveyorState = s.conveyorAdjusterPushed) -> t.adjuster_pushed_home
-            current matches State(s.idle, conveyorState = s.conveyorObjectInWindow) -> t.idle_approach
-            current matches State(s.approach) -> t.approach_pickup
-            current matches State(s.pickup) -> t.pickup_lift
-            current matches State(s.lift) -> t.lift_park
-            current matches State(s.park) -> t.park_halfrelease
-            current matches State(s.halfRelease) -> t.halfrelease_fullrelease
-            current matches State(s.fullRelease) -> t.fullrelease_wait
-            current matches State(s.wait, testingRigState = s.red_heated) -> t.wait_retrieve
-            current matches State(s.wait, testingRigState = s.green_heated) -> t.wait_retrieve
-            current matches State(testingRigState = s.green) -> t.green_heatup
-            current matches State(testingRigState = s.red) -> t.red_heatup
-            current matches State(s.retrieve) -> t.retrieve_retrievegrip
-            current matches State(s.retrieveGrip, testingRigState = s.red_heated) -> t.retrievegrip_depositred
-            current matches State(s.retrieveGrip, testingRigState = s.green_heated) -> t.retrievegrip_depositgreen
-            current matches State(s.depositRed) -> t.depositred_releasered
-            current matches State(s.releaseRed) -> t.releasered_idle
-            current matches State(s.depositGreen) -> t.depositgreen_releasegreen
-            current matches State(s.releaseGreen) -> t.releasegreen_idle
-            else -> null
-        }
-    }
-
+    /**
+     * Indicate the start of a transition. This sets the starting time for finding reference points.
+     */
     fun start(transition: Transition?) {
         if (transition is RoboticArmTransition) {
             targetState = transition.targetState
             transitionStart = System.currentTimeMillis()
             val start = latestMatch.roboticArmState!!
-            timeBase = Util.timeToTarget(start.basePosition, targetState.basePosition, 0.000873, transition.baseSpeed)
-            timeMainArm = Util.timeToTarget(start.mainArmPosition, targetState.mainArmPosition, 0.000873, transition.mainArmSpeed)
-            timeSecondArm = Util.timeToTarget(start.secondArmPosition, targetState.secondArmPosition, 0.000873, transition.secondArmSpeed)
+            timeBase = timeToTarget(start.basePosition, targetState.basePosition, 0.000873, transition.baseSpeed)
+            timeMainArm = timeToTarget(start.mainArmPosition, targetState.mainArmPosition, 0.000873, transition.mainArmSpeed)
+            timeSecondArm = timeToTarget(start.secondArmPosition, targetState.secondArmPosition, 0.000873, transition.secondArmSpeed)
         }
     }
 
+    /**
+     * Return a reference point indicating the desired state during state transitions. Reference points are linear
+     * interpolations between the attribute values of the start and the target state.
+     */
     fun getReference(time: Long): RoboticArmState? {
         val diff = time - transitionStart
         val startState = latestMatch.roboticArmState
-        if (startState != null) {
-            val baseRef = Util.getPosition(startState.basePosition, targetState.basePosition, timeBase, Math.min(timeBase, diff))
-            val mainArmRef = Util.getPosition(startState.mainArmPosition, targetState.mainArmPosition, timeMainArm, Math.min(timeMainArm, diff))
-            val secondArmRef = Util.getPosition(startState.secondArmPosition, targetState.secondArmPosition, timeSecondArm, Math.min(timeSecondArm, diff))
-            return RoboticArmState(basePosition = baseRef, mainArmPosition = mainArmRef, secondArmPosition = secondArmRef)
+        return if (startState != null) {
+            val baseRef = getPosition(startState.basePosition, targetState.basePosition, timeBase, Math.min(timeBase, diff))
+            val mainArmRef = getPosition(startState.mainArmPosition, targetState.mainArmPosition, timeMainArm, Math.min(timeMainArm, diff))
+            val secondArmRef = getPosition(startState.secondArmPosition, targetState.secondArmPosition, timeSecondArm, Math.min(timeSecondArm, diff))
+            RoboticArmState(basePosition = baseRef, mainArmPosition = mainArmRef, secondArmPosition = secondArmRef)
         } else {
-            return null
+            null
         }
+    }
+
+    /**
+     * Transform successor into 'goto' commands for the MQTT API
+     */
+    fun transform(transition: Transition): List<String> {
+        return when (transition) {
+            is RoboticArmTransition -> {
+                val target = transition.targetState
+                listOf(
+                        "base-goto ${target.basePosition} ${transition.baseSpeed}",
+                        "main-arm-goto ${target.mainArmPosition} ${transition.mainArmSpeed}",
+                        "second-arm-goto ${target.secondArmPosition} ${transition.secondArmSpeed}",
+                        "wrist-goto ${target.wristPosition}",
+                        "gripper-goto ${target.gripperPosition}"
+                )
+            }
+            is SliderTransition -> {
+                listOf("slider-goto ${transition.targetState.sliderPosition}")
+            }
+            is ConveyorTransition -> {
+                listOf("adjuster-goto ${transition.targetState.adjusterPosition}")
+            }
+            is TestingRigTransition -> {
+                val t = transition.targetState
+                listOf(
+                        if (t.platformPosition != null) {
+                            "platform-goto ${t.platformPosition}"
+                        } else {
+                            ""
+                        },
+                        if (t.heatplateTemperature != null) {
+                            "platform-heatup ${t.heatplateTemperature}"
+                        } else {
+                            ""
+                        }
+                ).filter { !it.isEmpty() }
+            }
+            else -> emptyList()
+        }
+    }
+
+    /**
+     * Match the given state against all states defined in this class and returns a match
+     * @return the matching state or null, if no match was found
+     */
+    private fun matchState(roboticArmState: RoboticArmState): RoboticArmState? {
+        return s.roboticArm.values.firstOrNull { roboticArmState.match(it, doubleAccuracy) }
+    }
+
+    /**
+     * Match the given state against all states defined in this class and returns a match
+     * @return the matching state or null, if no match was found
+     */
+    private fun matchState(sliderState: SliderState): SliderState? {
+        return s.slider.values.firstOrNull { sliderState.match(it, doubleAccuracy) }
+    }
+
+    /**
+     * Match the given state against all states defined in this class and returns a match
+     * @return the matching state or null, if no match was found
+     */
+    private fun matchState(conveyorState: ConveyorState): ConveyorState? {
+        return s.conveyor.values.firstOrNull { conveyorState.match(it, doubleAccuracy) }
+    }
+
+    /**
+     * Match the given state against all states defined in this class and returns a match
+     * @return the matching state or null, if no match was found
+     */
+    private fun matchState(testingRigState: TestingRigState): TestingRigState? {
+        return s.testingRig.values
+                .filter { testingRigState.match(it, singleAccuracy) }
+                .find { it.criterion(testingRigState) }
     }
 }

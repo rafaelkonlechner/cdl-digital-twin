@@ -16,9 +16,9 @@ import java.time.Duration
 import java.util.concurrent.TimeUnit
 
 /**
- * Service for storing data points in a time series database
+ * Store data points in a time series database
  */
-class TimeSeriesCollectionService(val host: String) {
+class TimeSeriesDatabase(host: String) {
 
     private val dbName = "pick-and-place"
     private var influxDB: InfluxDB = InfluxDBFactory.connect("http://$host:8086", "root", "root")
@@ -36,6 +36,9 @@ class TimeSeriesCollectionService(val host: String) {
         influxDB.createDatabase(dbName)
     }
 
+    /**
+     * Save a robotic arm measurement point together with a reference point.
+     */
     fun savePoint(state: RoboticArmState, ref: RoboticArmState?, label: String? = null) {
         val batchPoints = BatchPoints
                 .database(dbName)
@@ -64,7 +67,7 @@ class TimeSeriesCollectionService(val host: String) {
     }
 
     /**
-     * Saves the event of a state transition
+     * Save the measurement event of a state transition
      */
     fun savePoint(transition: Transition) {
         val batchPoints = BatchPoints
@@ -77,7 +80,7 @@ class TimeSeriesCollectionService(val host: String) {
             is TestingRigTransition -> "testing_rig"
             else -> ""
         }
-        val point = Point.measurement("transitions")
+        val point = Point.measurement("successor")
                 .time(System.currentTimeMillis(), TimeUnit.MILLISECONDS)
                 .tag("unit", tag)
                 .addField("state", transition.targetState.name)
@@ -88,7 +91,7 @@ class TimeSeriesCollectionService(val host: String) {
     }
 
     /**
-     * Logs a successful production cycle, i.e. from picking up the item to dropping it
+     * Log a successful production cycle, i.e. from picking up the item to dropping it
      */
     fun logSuccessfulProduction() {
         val batchPoints = BatchPoints
@@ -104,12 +107,13 @@ class TimeSeriesCollectionService(val host: String) {
     }
 
     /**
-     * Returns the number of successful productions
+     * Return the number of successful productions
      * @param since the duration for the query window into the past, starting from now
      * @param groupBy the duration for grouping the aggregation values
      */
     fun getSuccessfulProductions(since: Duration, groupBy: Duration): QueryResult {
-        val query = Query("SELECT SUM(count) FROM productions WHERE time > now() - ${since.toMinutes()}m GROUP BY time(${groupBy.toMinutes()}m)", dbName)
+        val query = Query("SELECT SUM(count) FROM productions WHERE time > now() - ${since.toMinutes()}m "
+                + "GROUP BY time(${groupBy.toMinutes()}m)", dbName)
         return influxDB.query(query)
     }
 }
