@@ -25,7 +25,7 @@ class TimeSeriesDatabase(host: String) {
 
     init {
         influxDB.createDatabase(dbName)
-        influxDB.enableBatch(100, 100, TimeUnit.MILLISECONDS)
+        influxDB.enableBatch(100, 1000, TimeUnit.MILLISECONDS)
     }
 
     /**
@@ -56,7 +56,11 @@ class TimeSeriesDatabase(host: String) {
                 .addField("ref_second_arm", ref?.secondArmPosition)
                 .addField("second_arm_re", if (ref != null) Math.abs(state.secondArmPosition - ref.secondArmPosition) else 0.0)
                 .addField("wrist", state.wristPosition)
+                .addField("ref_wrist", ref?.wristPosition)
+                .addField("wrist_re", if (ref != null) Math.abs(state.wristPosition - ref.wristPosition) else 0.0)
                 .addField("gripper", state.gripperPosition)
+                .addField("ref_gripper", ref?.gripperPosition)
+                .addField("gripper_re", if (ref != null) Math.abs(state.gripperPosition - ref.gripperPosition) else 0.0)
         val point = if (label != null) {
             pointBuilder.addField("label", label).build()
         } else {

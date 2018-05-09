@@ -48,6 +48,15 @@ fun getPosition(y1: Double, y2: Double, duration: Long, time: Long): Double {
 }
 
 /**
+ * Compute the time a linear actuator takes from [start][from] to [finish][to] in milliseconds.
+ */
+fun timeToTarget(from: Double, to: Double): Long {
+    val radPerMillisecond = (0.00872665 * 60) / 1000
+    val dist = distance(from, to)
+    return (dist / radPerMillisecond).toLong()
+}
+
+/**
  * Compute the time an accelerated actuator takes from [start][from] to [finish][to] in milliseconds.
  */
 fun timeToTarget(from: Double, to: Double, acceleration: Double, maxSpeed: Double): Long {

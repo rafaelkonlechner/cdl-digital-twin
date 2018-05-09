@@ -34,57 +34,53 @@ class MessageController(private val mqtt: MQTT,
     }
 
     private fun onMessage(topic: String, message: String) {
-        try {
-            when (topic) {
-                sensor, simSensor -> {
-                    val state = parse(message)
-                    if (recording) {
-                        if (state is RoboticArmState) {
-                            val ref = PickAndPlaceController.getReference(System.currentTimeMillis())
-                            inTransition = state.match(PickAndPlaceController.targetState, doubleAccuracy)
-                            val label = if (inTransition) null else PickAndPlaceController.targetState.name
-                            timeSeriesDatabase.savePoint(state, ref, label)
-                        }
+        when (topic) {
+            sensor, simSensor -> {
+                val state = parse(message)
+                if (recording) {
+                    if (state is RoboticArmState) {
+                        val ref = PickAndPlaceController.getReference(System.currentTimeMillis())
+                        val inTransition = state.match(PickAndPlaceController.targetState, doubleAccuracy)
+                        val label = if (inTransition) null else PickAndPlaceController.targetState.name
+                        timeSeriesDatabase.savePoint(state, ref, label)
                     }
-                    PickAndPlaceController.update(state)
-                    /*
-                 * For 20 sensor updates per second, on average send one frame per second
-                 */
-                    if (random.nextDouble() < 0.05) {
-                        sendWebSocketMessageSensor(message)
-                    }
+                }
+                PickAndPlaceController.update(state)
+                /*
+             * For 20 sensor updates per second, on average send one frame per second
+             */
+                if (random.nextDouble() < 0.05) {
+                    sendWebSocketMessageSensor(message)
+                }
 
-                }
-                detectionCamera -> {
-                    val code = QRCode.read(message)
-                    if (code != null) {
-                        sendWebSocketMessageQRCodeScanner(gson.toJson(code).toString())
-                    }
-                    val color = if (code == null) ObjectCategory.NONE else if (code.color == "red") ObjectCategory.RED else ObjectCategory.GREEN
-                    PickAndPlaceController.update(TestingRigState(objectCategory = color))
-
-                    val detection = File.createTempFile("detection", ".png")
-                    detection.writeBytes(fromBase64(message))
-                    objectTracker.track(detection, {
-                        sendWebSocketMessageDetectionCamera("{\"image\": \"$message\", \"tracking\": ${gson.toJson(it)}}")
-                        detection.delete()
-                    })
-                }
-                pickupCamera -> {
-                    val pickup = File.createTempFile("pickup", ".png")
-                    pickup.writeBytes(fromBase64(message))
-                    objectTracker.track(pickup, {
-                        val tracking = it.firstOrNull()
-                        val detected = tracking != null
-                        val inPickupWindow = tracking != null && 36 < tracking.x && tracking.x < 125 && 60 < tracking.y && tracking.y < 105
-                        PickAndPlaceController.update(ConveyorState(detected = detected, inPickupWindow = inPickupWindow))
-                        sendWebSocketMessagePickupCamera("{\"image\": \"$message\", \"tracking\": ${gson.toJson(it)}}")
-                        pickup.delete()
-                    })
-                }
             }
-        } catch (e: Throwable) {
-            e.printStackTrace()
+            detectionCamera -> {
+                val code = QRCode.read(message)
+                if (code != null) {
+                    sendWebSocketMessageQRCodeScanner(gson.toJson(code).toString())
+                }
+                val color = if (code == null) ObjectCategory.NONE else if (code.color == "red") ObjectCategory.RED else ObjectCategory.GREEN
+                PickAndPlaceController.update(TestingRigState(objectCategory = color))
+
+                val detection = File.createTempFile("detection", ".png")
+                detection.writeBytes(fromBase64(message))
+                objectTracker.track(detection, {
+                    sendWebSocketMessageDetectionCamera("{\"image\": \"$message\", \"tracking\": ${gson.toJson(it)}}")
+                    detection.delete()
+                })
+            }
+            pickupCamera -> {
+                val pickup = File.createTempFile("pickup", ".png")
+                pickup.writeBytes(fromBase64(message))
+                objectTracker.track(pickup, {
+                    val tracking = it.firstOrNull()
+                    val detected = tracking != null
+                    val inPickupWindow = tracking != null && 36 < tracking.x && tracking.x < 125 && 60 < tracking.y && tracking.y < 105
+                    PickAndPlaceController.update(ConveyorState(detected = detected, inPickupWindow = inPickupWindow))
+                    sendWebSocketMessagePickupCamera("{\"image\": \"$message\", \"tracking\": ${gson.toJson(it)}}")
+                    pickup.delete()
+                })
+            }
         }
     }
 

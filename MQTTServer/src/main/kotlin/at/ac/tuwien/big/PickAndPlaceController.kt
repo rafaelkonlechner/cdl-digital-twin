@@ -36,6 +36,8 @@ object PickAndPlaceController {
     private var timeBase = 1000L
     private var timeMainArm = 1000L
     private var timeSecondArm = 1000L
+    private var timeWrist = 1000L
+    private var timeGripper = 1000L
 
     /**
      * Return latest matching state
@@ -118,6 +120,8 @@ object PickAndPlaceController {
             timeBase = timeToTarget(start.basePosition, targetState.basePosition, 0.000873, transition.baseSpeed)
             timeMainArm = timeToTarget(start.mainArmPosition, targetState.mainArmPosition, 0.000873, transition.mainArmSpeed)
             timeSecondArm = timeToTarget(start.secondArmPosition, targetState.secondArmPosition, 0.000873, transition.secondArmSpeed)
+            timeWrist = timeToTarget(start.wristPosition, targetState.wristPosition)
+            timeGripper = timeToTarget(start.gripperPosition, targetState.gripperPosition)
         }
     }
 
@@ -132,7 +136,9 @@ object PickAndPlaceController {
             val baseRef = getPosition(startState.basePosition, targetState.basePosition, timeBase, Math.min(timeBase, diff))
             val mainArmRef = getPosition(startState.mainArmPosition, targetState.mainArmPosition, timeMainArm, Math.min(timeMainArm, diff))
             val secondArmRef = getPosition(startState.secondArmPosition, targetState.secondArmPosition, timeSecondArm, Math.min(timeSecondArm, diff))
-            RoboticArmState(basePosition = baseRef, mainArmPosition = mainArmRef, secondArmPosition = secondArmRef)
+            val wristRef = getPosition(startState.wristPosition, targetState.wristPosition, timeWrist, Math.min(timeWrist, diff))
+            val gripperRef = getPosition(startState.gripperPosition, targetState.gripperPosition, timeGripper, Math.min(timeGripper, diff))
+            RoboticArmState("Reference", "RoboticArm", baseRef, mainArmRef, secondArmRef, wristRef, gripperRef)
         } else {
             null
         }
