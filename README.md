@@ -2,19 +2,9 @@
 
 This project explores model-integrated control and orchestration mechanisms of internet-enabled production robots in a simulated pick and place unit. It lets you control a 6-DOF robotic arm, simulated in Blender GE, and monitor sensor and camera signals over MQTT.
 
-<div style="text-align: center;">
-<div style="float: left; display: inline-block;">
-    <img src="docs/Simulation.gif" width="350" height="200"/>
-    <p><i>Pick and Place Unit in Blender GE</i></p>
-</div>
-<div style="display: inline-block;">
-    <img src="docs/Timeline.gif" width="210" height="90"/><br/>
-    <p><i>Sensor Timeline in <a href="https://portal.influxdata.com/downloads">Chronograf</a></i></p>
-    <img src="docs/Pickup.gif" height="100"/>
-    <img src="docs/Detection.gif" height="100" style="margin-left: 5px"/>
-    <p><i>Cameras for Conveyor and QR-Codes</i></p>
-</div>
-</div>
+| ![](docs/Simulation-small.gif)| <img src="docs/Timeline-small.gif" width="200"/><br><sup>Sensor Timeline</sup><br>![](docs/Pickup-small.gif)![](docs/Detection-small.gif)<br><sup>Cameras for Conveyor and QR-Codes</sup>
+| :--- | :---: |
+|Pick and Place Unit in Blender GE | Sensors and Cameras |
 
 ## Getting Started
 
