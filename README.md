@@ -8,10 +8,10 @@ This project explores model-integrated control and orchestration mechanisms of i
     <p><i>Pick and Place Unit in Blender GE</i></p>
 </div>
 <div style="display: inline-block;">
-    <img src="docs/Timeline.gif" style="width: 210px; height: 90px;"/><br/>
+    <img src="docs/Timeline.gif" width="210" height="90"/><br/>
     <p><i>Sensor Timeline in <a href="https://portal.influxdata.com/downloads">Chronograf</a></i></p>
-    <img src="docs/Pickup.gif" style="height: 100px;"/>
-    <img src="docs/Detection.gif" style="margin-left: 5px; height: 100px;"/>
+    <img src="docs/Pickup.gif" height="100"/>
+    <img src="docs/Detection.gif" height="100" style="margin-left: 5px"/>
     <p><i>Cameras for Conveyor and QR-Codes</i></p>
 </div>
 </div>
