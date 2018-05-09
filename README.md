@@ -4,15 +4,15 @@ This project explores model-integrated control and orchestration mechanisms of i
 
 <div style="text-align: center;">
 <div style="float: left; display: inline-block;">
-    <img src="docs/Simulation.gif" height="230"/>
-    <p>*Pick and Place Unit in Blender GE*</p>
+    <img src="docs/Simulation.gif" width="350" height="200"/>
+    <p><i>Pick and Place Unit in Blender GE</i></p>
 </div>
 <div style="display: inline-block;">
-    <img src="docs/Timeline.gif" style="width: 230px; height: 90px;"/><br/>
-    <p>*Sensor Timeline in [Chronograf](https://portal.influxdata.com/downloads)*</p>
+    <img src="docs/Timeline.gif" style="width: 210px; height: 90px;"/><br/>
+    <p><i>Sensor Timeline in <a href="https://portal.influxdata.com/downloads">Chronograf</a></i></p>
     <img src="docs/Pickup.gif" style="height: 100px;"/>
-    <img src="docs/Detection.gif" style="margin-left: 20px; height: 100px;"/>
-    <p>*Cameras for Conveyor and QR-Codes*</p>
+    <img src="docs/Detection.gif" style="margin-left: 5px; height: 100px;"/>
+    <p><i>Cameras for Conveyor and QR-Codes</i></p>
 </div>
 </div>
 
