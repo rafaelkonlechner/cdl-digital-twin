@@ -2,24 +2,26 @@ package at.ac.tuwien.big
 
 import org.junit.Ignore
 import org.junit.Test
-import java.time.Duration
 
 class EventProcessingTest {
 
     @Test
     @Ignore
     fun basicCEPTest() {
-        val cep = EventProcessing.runtime
-        cep.sendEvent(StateMachine.States.idle)
-        cep.sendEvent(StateMachine.States.approach)
-        cep.sendEvent(StateMachine.States.pickup)
-        cep.sendEvent(StateMachine.States.lift)
-        cep.sendEvent(StateMachine.States.park)
-        cep.sendEvent(StateMachine.States.halfRelease)
-        cep.sendEvent(StateMachine.States.fullRelease)
-        cep.sendEvent(StateMachine.States.depositGreen)
-        cep.sendEvent(StateMachine.States.releaseGreen)
-
-        println(TimeSeriesDatabase.getSuccessfulProductions(Duration.ofHours(1), Duration.ofHours(1)))
+        val cep = EventProcessing()
+        cep.subscribe({ new, old ->
+            run {
+                println(new)
+            }
+        })
+        cep.submitEvent(StateMachine.States.idle)
+        cep.submitEvent(StateMachine.States.approach)
+        cep.submitEvent(StateMachine.States.pickup)
+        cep.submitEvent(StateMachine.States.lift)
+        cep.submitEvent(StateMachine.States.park)
+        cep.submitEvent(StateMachine.States.halfRelease)
+        cep.submitEvent(StateMachine.States.fullRelease)
+        cep.submitEvent(StateMachine.States.depositGreen)
+        cep.submitEvent(StateMachine.States.releaseGreen)
     }
 }

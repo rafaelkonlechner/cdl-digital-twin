@@ -4,13 +4,15 @@ import at.ac.tuwien.big.entity.state.*
 import com.espertech.esper.client.Configuration
 import com.espertech.esper.client.EPRuntime
 import com.espertech.esper.client.EPServiceProviderManager
+import com.espertech.esper.client.EventBean
 
 /**
  * Service for complex event processing
  */
-class EventProcessing(private val timeSeriesDatabase: TimeSeriesDatabase) {
+class EventProcessing {
 
     private val runtime: EPRuntime
+    private val subscribers = mutableListOf<(Array<out EventBean>, Array<out EventBean>) -> Unit>()
 
     init {
         val config = Configuration()
@@ -42,11 +44,17 @@ class EventProcessing(private val timeSeriesDatabase: TimeSeriesDatabase) {
         /*
          * Register event listeners here
          */
-        sensorUpdates.addListener { _, _ ->
+        sensorUpdates.addListener { new, old ->
             run {
-                timeSeriesDatabase.logSuccessfulProduction()
+                for (callback in subscribers) {
+                    callback(new, old)
+                }
             }
         }
+    }
+
+    fun subscribe(callback: (Array<out EventBean>, Array<out EventBean>) -> Unit) {
+        subscribers.add(callback)
     }
 
     /**

@@ -10,9 +10,6 @@ import org.influxdb.InfluxDB.ConsistencyLevel
 import org.influxdb.InfluxDBFactory
 import org.influxdb.dto.BatchPoints
 import org.influxdb.dto.Point
-import org.influxdb.dto.Query
-import org.influxdb.dto.QueryResult
-import java.time.Duration
 import java.util.concurrent.TimeUnit
 
 /**
@@ -108,16 +105,5 @@ class TimeSeriesDatabase(host: String) {
                 .build()
         batchPoints.point(point)
         influxDB.write(batchPoints)
-    }
-
-    /**
-     * Return the number of successful productions
-     * @param since the duration for the query window into the past, starting from now
-     * @param groupBy the duration for grouping the aggregation values
-     */
-    fun getSuccessfulProductions(since: Duration, groupBy: Duration): QueryResult {
-        val query = Query("SELECT SUM(count) FROM productions WHERE time > now() - ${since.toMinutes()}m "
-                + "GROUP BY time(${groupBy.toMinutes()}m)", dbName)
-        return influxDB.query(query)
     }
 }
