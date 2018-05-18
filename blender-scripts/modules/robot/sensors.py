@@ -31,7 +31,11 @@ def main():
         "secondArmPosition": %s,
         "wristPosition": %s,
         "gripperPosition": %s,
-        "handPosition": "%s",
+        "handPosition": {
+            "x": %s,
+            "y": %s,
+            "z": %s
+        },
         "gripperHasContact": "%s"
         }
         """ % (
@@ -40,7 +44,9 @@ def main():
         str(second_arm_position),
         str(wrist_position),
         str(gripper_position),
-        str(hand_position),
+        str(hand_position.x),
+        str(hand_position.y),
+        str(hand_position.z),
         str(hand_contact)
         )
         GameLogic.server.client.publish("Sensor-Simulation", payload=message_roboticarm, qos=0, retain=False)

@@ -11,7 +11,8 @@ data class RoboticArmState(
         var secondArmPosition: Double = 0.0,
         var wristPosition: Double = 0.0,
         var gripperPosition: Double = 0.0,
-        var gripperHasContact: Boolean = false
+        var gripperHasContact: Boolean = false,
+        var handPosition: Point3D? = null
 ) : StateEvent {
     override fun match(other: StateEvent, similar: (Double, Double) -> Boolean): Boolean {
         return if (other is RoboticArmState) {
