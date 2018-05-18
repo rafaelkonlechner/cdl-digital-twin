@@ -47,12 +47,11 @@ class MessageController(private val mqtt: MQTT,
                 }
                 PickAndPlaceController.update(state)
                 /*
-             * For 20 sensor updates per second, on average send one frame per second
-             */
-                if (random.nextDouble() < 0.05) {
-                    sendWebSocketMessageSensor(message)
+                 * For 20 sensor updates per second, on average send one frame per second
+                 */
+                if (random.nextDouble() < 0.8) {
+                    sendWebSocketMessageSensor(gson.toJson(state))
                 }
-
             }
             detectionCamera -> {
                 val code = QRCode.read(message)
@@ -91,6 +90,8 @@ class MessageController(private val mqtt: MQTT,
             println("Next: ${latest.roboticArmState?.name}, ${latest.sliderState?.name}, ${latest.conveyorState?.name}, ${latest.testingRigState?.name} -> ${transition?.targetState?.name}")
             PickAndPlaceController.start(transition)
             if (transition != null) {
+                val context = PickAndPlaceController.latest()
+                sendWebSocketMessageContext(gson.toJson(context))
                 val commands = PickAndPlaceController.transform(transition)
                 for (c in commands) {
                     mqtt.send(c)
@@ -111,25 +112,29 @@ class MessageController(private val mqtt: MQTT,
         }
     }
 
-    private fun sendWebSocketMessageSensor(message: String) {
-        sendWebSocketMessage("sensor", message)
+    private fun sendWebSocketMessageSensor(data: String) {
+        sendWebSocketMessage("sensor", data)
     }
 
-    private fun sendWebSocketMessagePickupCamera(message: String) {
-        sendWebSocketMessage("pickupCamera", message)
+    private fun sendWebSocketMessageContext(data: String) {
+        sendWebSocketMessage("context", data)
     }
 
-    private fun sendWebSocketMessageDetectionCamera(message: String) {
-        sendWebSocketMessage("detectionCamera", message)
+    private fun sendWebSocketMessagePickupCamera(data: String) {
+        sendWebSocketMessage("pickupCamera", data)
     }
 
-    private fun sendWebSocketMessageQRCodeScanner(message: String) {
-        sendWebSocketMessage("qrCode", message)
+    private fun sendWebSocketMessageDetectionCamera(data: String) {
+        sendWebSocketMessage("detectionCamera", data)
     }
 
-    private fun sendWebSocketMessage(topic: String, message: String) {
+    private fun sendWebSocketMessageQRCodeScanner(data: String) {
+        sendWebSocketMessage("qrCode", data)
+    }
+
+    private fun sendWebSocketMessage(topic: String, data: String) {
         subscribers.forEach {
-            it(topic, message)
+            it(topic, data)
         }
     }
 }
