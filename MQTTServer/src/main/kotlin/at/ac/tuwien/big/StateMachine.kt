@@ -219,33 +219,33 @@ object StateMachine {
      * the platform, scan the QR code, heat the plate according to the item class and unload the item into one of two
      * different ramps - again, according to the item class.
      */
-    fun successor(current: State): Transition? {
+    fun successor(current: Environment): Transition? {
         return when {
-            current matches State(s.idle, conveyorState = s.conveyorEmpty, testingRigState = s.green) -> t.fullrelease_wait
-            current matches State(s.idle, conveyorState = s.conveyorEmpty, testingRigState = s.red) -> t.fullrelease_wait
-            current matches State(s.idle, conveyorState = s.conveyorEmpty) -> t.slider_pushed
-            current matches State(sliderState = s.sliderPushedPosition, conveyorState = s.conveyorObjectDetected) -> t.slider_home
-            current matches State(s.idle, conveyorState = s.conveyorObjectDetected) -> t.adjuster_detected_pushed
-            current matches State(s.approach, conveyorState = s.conveyorObjectDetected) -> t.adjuster_detected_pushed
-            current matches State(conveyorState = s.conveyorAdjusterPushed) -> t.adjuster_pushed_home
-            current matches State(s.idle, conveyorState = s.conveyorObjectInWindow) -> t.idle_approach
-            current matches State(s.approach) -> t.approach_pickup
-            current matches State(s.pickup) -> t.pickup_lift
-            current matches State(s.lift) -> t.lift_park
-            current matches State(s.park) -> t.park_halfrelease
-            current matches State(s.halfRelease) -> t.halfrelease_fullrelease
-            current matches State(s.fullRelease) -> t.fullrelease_wait
-            current matches State(s.wait, testingRigState = s.red_heated) -> t.wait_retrieve
-            current matches State(s.wait, testingRigState = s.green_heated) -> t.wait_retrieve
-            current matches State(testingRigState = s.green) -> t.green_heatup
-            current matches State(testingRigState = s.red) -> t.red_heatup
-            current matches State(s.retrieve) -> t.retrieve_retrievegrip
-            current matches State(s.retrieveGrip, testingRigState = s.red_heated) -> t.retrievegrip_depositred
-            current matches State(s.retrieveGrip, testingRigState = s.green_heated) -> t.retrievegrip_depositgreen
-            current matches State(s.depositRed) -> t.depositred_releasered
-            current matches State(s.releaseRed) -> t.releasered_idle
-            current matches State(s.depositGreen) -> t.depositgreen_releasegreen
-            current matches State(s.releaseGreen) -> t.releasegreen_idle
+            current matches Environment(s.idle, conveyorState = s.conveyorEmpty, testingRigState = s.green) -> t.fullrelease_wait
+            current matches Environment(s.idle, conveyorState = s.conveyorEmpty, testingRigState = s.red) -> t.fullrelease_wait
+            current matches Environment(s.idle, conveyorState = s.conveyorEmpty) -> t.slider_pushed
+            current matches Environment(sliderState = s.sliderPushedPosition, conveyorState = s.conveyorObjectDetected) -> t.slider_home
+            current matches Environment(s.idle, conveyorState = s.conveyorObjectDetected) -> t.adjuster_detected_pushed
+            current matches Environment(s.approach, conveyorState = s.conveyorObjectDetected) -> t.adjuster_detected_pushed
+            current matches Environment(conveyorState = s.conveyorAdjusterPushed) -> t.adjuster_pushed_home
+            current matches Environment(s.idle, conveyorState = s.conveyorObjectInWindow) -> t.idle_approach
+            current matches Environment(s.approach) -> t.approach_pickup
+            current matches Environment(s.pickup) -> t.pickup_lift
+            current matches Environment(s.lift) -> t.lift_park
+            current matches Environment(s.park) -> t.park_halfrelease
+            current matches Environment(s.halfRelease) -> t.halfrelease_fullrelease
+            current matches Environment(s.fullRelease) -> t.fullrelease_wait
+            current matches Environment(s.wait, testingRigState = s.red_heated) -> t.wait_retrieve
+            current matches Environment(s.wait, testingRigState = s.green_heated) -> t.wait_retrieve
+            current matches Environment(testingRigState = s.green) -> t.green_heatup
+            current matches Environment(testingRigState = s.red) -> t.red_heatup
+            current matches Environment(s.retrieve) -> t.retrieve_retrievegrip
+            current matches Environment(s.retrieveGrip, testingRigState = s.red_heated) -> t.retrievegrip_depositred
+            current matches Environment(s.retrieveGrip, testingRigState = s.green_heated) -> t.retrievegrip_depositgreen
+            current matches Environment(s.depositRed) -> t.depositred_releasered
+            current matches Environment(s.releaseRed) -> t.releasered_idle
+            current matches Environment(s.depositGreen) -> t.depositgreen_releasegreen
+            current matches Environment(s.releaseGreen) -> t.releasegreen_idle
             else -> null
         }
     }

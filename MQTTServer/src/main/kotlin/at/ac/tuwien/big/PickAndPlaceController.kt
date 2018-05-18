@@ -27,7 +27,7 @@ object PickAndPlaceController {
         private set
     private var testingRigState: TestingRigState = TestingRigState()
 
-    private var latestMatch: State = State()
+    private var latestMatch: Environment = Environment()
 
     var targetState = s.idle
         private set
@@ -100,7 +100,7 @@ object PickAndPlaceController {
             }
         }
         if (change) {
-            latestMatch = State(roboticArmState, sliderState, conveyorState, testingRigState)
+            latestMatch = Environment(roboticArmState, sliderState, conveyorState, testingRigState)
         }
     }
 
