@@ -50,7 +50,6 @@ class MQTT(host: String, receivingTopics: List<String>, private val sendingTopic
             if (client.isConnected) {
                 for (topic in sendingTopics) {
                     client.publish(topic, tmp)
-                    client.publish(topic, tmp)
                 }
             }
         }
