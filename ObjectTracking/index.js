@@ -7,7 +7,7 @@ const jimp = require('jimp');
 const app = express()
 app.use(fileUpload())
 tracking.ColorTracker.registerColor('white', function(r, g, b) {
-    return r > 253 && g > 253 && b > 253;
+    return r > 240 && g > 240 && b > 240;
 });
 var tracker = new tracking.ColorTracker(['white']);
 app.post('/analyze', function(req, res) {
