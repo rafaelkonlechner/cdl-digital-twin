@@ -44,7 +44,7 @@ class WebController(private val mqtt: MQTT,
                 println("Opened $session")
             }
             ws.onMessage { _, message ->
-                println("Received: " + message)
+                println("Received: $message")
                 if (message != null) {
                     println("Message: $message")
                     mqtt.send(message)
