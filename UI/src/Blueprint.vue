@@ -70,9 +70,9 @@
 <template>
 <div class="blueprint">
     <div class="absolute blueprint-text small" style="top: 56%; left: 44%; height: 35px; text-align: left;">
-        x: {{context.roboticArmState.handPosition.x.toFixed(2)}}
+        <!--x: {{context.roboticArmState.handPosition.x.toFixed(2)}}
         <br/> y: {{context.roboticArmState.handPosition.y.toFixed(2)}}
-        <br/> z: {{context.roboticArmState.handPosition.z.toFixed(2)}}
+        <br/> z: {{context.roboticArmState.handPosition.z.toFixed(2)}}-->
     </div>
     <div class="absolute blueprint-text small" style="top: 33%; left: 44%; height: 35px; text-align: left;">
         contact: {{context.roboticArmState.gripperHasContact}}
@@ -150,7 +150,7 @@
                         </thead>
                         <tr>
                             <td>Base</td>
-                            <td>{{basePosition}}</td>
+                            <td>{{context.roboticArmState.basePosition}}</td>
                             <td>
                                 <input v-model="baseTargetPosition" type="number" step="0.01" />
                                 <button @click="baseGoto()">Set</button>
@@ -158,7 +158,7 @@
                         </tr>
                         <tr>
                             <td>Main Arm</td>
-                            <td>{{mainArmPosition}}</td>
+                            <td>{{context.roboticArmState.mainArmPosition}}</td>
                             <td>
                                 <input v-model="mainArmTargetPosition" type="number" step="0.01" />
                                 <button @click="mainArmGoto()">Set</button>
@@ -166,7 +166,7 @@
                         </tr>
                         <tr>
                             <td>Forearm</td>
-                            <td>{{secondArmPosition}}</td>
+                            <td>{{context.roboticArmState.secondArmPosition}}</td>
                             <td>
                                 <input v-model="secondArmTargetPosition" type="number" step="0.01" />
                                 <button @click="secondArmGoto()">Set</button>
@@ -174,7 +174,7 @@
                         </tr>
                         <tr>
                             <td>Wrist</td>
-                            <td>{{wristPosition}}</td>
+                            <td>{{context.roboticArmState.wristPosition}}</td>
                             <td>
                                 <input v-model="wristTargetPosition" type="number" step="0.01" />
                                 <button @click="wristGoto()">Set</button>
@@ -182,16 +182,15 @@
                         </tr>
                         <tr>
                             <td>Gripper</td>
-                            <td>{{gripperPosition}}</td>
+                            <td>{{context.roboticArmState.gripperPosition}}</td>
                             <td>
                                 <input v-model="gripperTargetPosition" type="number" step="0.01" />
                                 <button @click="gripperGoto()">Set</button>
-                                <small v-if="gripperHasContact">has-contact</small>
                             </td>
                         </tr>
                         <tr>
                             <td>Slider</td>
-                            <td>{{sliderPosition}}</td>
+                            <td>{{context.sliderState.sliderPosition}}</td>
                             <td>
                                 <button>Push</button>
                                 <button>Pull</button>
@@ -199,7 +198,7 @@
                         </tr>
                         <tr>
                             <td>Adjuster</td>
-                            <td>{{adjusterPosition}}</td>
+                            <td>{{context.conveyorState.adjusterPosition}}</td>
                             <td>
                                 <button>Push</button>
                                 <button>Pull</button>
@@ -207,14 +206,14 @@
                         </tr>
                         <tr>
                             <td>Platform</td>
-                            <td>{{platformPosition}}</td>
+                            <td>{{context.testingRigState.platformPosition}}</td>
                             <td>
                                 <button>Tilt</button>
                                 <button>Level</button>
                             </td>
                         </tr>
                     </table>
-                    <div style="height: 36px"></div>
+                    <key-controls :socket="socket"></key-controls>
                 </div>
             </div>
         </div>
@@ -226,6 +225,7 @@
 import Conveyor from './models/Conveyor.vue'
 import RoboticArm from './models/RoboticArm.vue'
 import TestingRig from './models/TestingRig.vue'
+import KeyControls from './KeyControls.vue'
 import StateMachine from './StateMachine.vue'
 import * as request from 'superagent'
 
@@ -234,7 +234,8 @@ export default {
         conveyorModel: Conveyor,
         roboticArmModel: RoboticArm,
         testingRigModel: TestingRig,
-        stateMachine: StateMachine
+        stateMachine: StateMachine,
+        keyControls: KeyControls
     },
     props: ["socket"],
     data() {
