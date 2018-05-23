@@ -1,10 +1,15 @@
 package at.ac.tuwien.big
 
 import at.ac.tuwien.big.entity.state.*
+import com.github.sarxos.webcam.Webcam
 import com.google.gson.Gson
+import java.awt.Dimension
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.util.*
+import javax.imageio.ImageIO
 import kotlin.concurrent.schedule
+
 
 class MessageController(private val mqtt: MQTT,
                         private val objectTracker: ObjectTracker,
@@ -18,9 +23,13 @@ class MessageController(private val mqtt: MQTT,
     var messageRate: Int = 10
     var autoPlay: Boolean = false
     var recording: Boolean = false
+    val webcam: Webcam
 
     init {
         mqtt.subscribe(listOf(simSensor, sensor, detectionCamera, pickupCamera), this::onMessage)
+        webcam = Webcam.getWebcams()[1]
+        webcam.viewSize = Dimension(640, 480)
+        webcam.open()
     }
 
     fun subscribe(callback: (String, String) -> Unit) {
@@ -30,6 +39,18 @@ class MessageController(private val mqtt: MQTT,
     fun start() {
         timer.schedule(0, 200) {
             observe()
+        }
+        timer.schedule(0, 1000) {
+            val file = File.createTempFile("webcam", ".png")
+            val stream = ByteArrayOutputStream()
+            val img = webcam.image.getSubimage(320, 220, 260, 260)
+            ImageIO.write(img, "PNG", file)
+            ImageIO.write(img, "PNG", stream)
+            objectTracker.track(file, {
+                val base64 = Base64.getEncoder().encodeToString(stream.toByteArray())
+                sendWebSocketMessagePickupCamera("{\"image\": \"$base64\", \"tracking\": ${gson.toJson(it)}}")
+                file.delete()
+            })
         }
     }
 
