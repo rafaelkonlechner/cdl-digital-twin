@@ -2,6 +2,7 @@
 
 package at.ac.tuwien.big
 
+import at.ac.tuwien.big.api.HedgehogController
 import at.ac.tuwien.big.api.WebController
 
 /**
@@ -23,13 +24,17 @@ const val simActuator = "Actuator-Simulation"
 const val actuator = "Actuator"
 
 fun main(args: Array<String>) {
-
+    Runtime.getRuntime().addShutdownHook(Thread {
+        if (HedgehogController.hasStarted()) {
+            HedgehogController.stop()
+        }
+    })
+    HedgehogController.start()
     val hosts = if (args.firstOrNull() == "--docker") {
         docker
     } else {
         default
     }
-
     val sensors = listOf(simSensor, sensor, detectionCamera, pickupCamera)
     val actuators = listOf(simActuator, actuator)
     val objectTracker = ObjectTracker(hosts.objectTracker)
@@ -37,6 +42,5 @@ fun main(args: Array<String>) {
     val mqtt = MQTT(hosts.mqtt, sensors, actuators)
     val controller = MessageController(mqtt, objectTracker, influx)
     val web = WebController(mqtt, controller, influx)
-    controller.start()
     web.start()
 }
