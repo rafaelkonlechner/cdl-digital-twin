@@ -1,4 +1,4 @@
-# LN Simulation
+# CDL-MINT Dashboard
 
 ## Build Setup
 
