@@ -1,13 +1,8 @@
 <style scoped>
-.description {
-    margin-top: 10px;
-    color: #757575;
-    font-size: 0.9em;
-}
 </style>
 <template>
 <div style="max-width: 320px;">
-    <h2>Work Item Information</h2>
+    <h6>Work Item Information</h6>
     <div style="display: inline-block;">
         <table>
             <tr>
@@ -39,11 +34,9 @@
             </tr>
         </table>
     </div>
-    <div style="display: inline-block; float: right;">
+    <div style="display: inline-block; float: right; margin-left: 40px; border-style: solid; border-width: 3px; border-color: black;">
         <img v-if="qrCode.base64" style="width: 75px; height: 75px; margin: 0;" v-bind:src="qrCode.base64" />
     </div>
-    <p class="description">Read current item info contained in the QR code, currently scanned by the testing rig.
-    </p>
 </div>
 </template>
 <script>

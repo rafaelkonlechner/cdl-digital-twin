@@ -4,13 +4,12 @@
 }
 
 .signal {
-    width: 200px;
-    height: 200px;
+    width: 150px;
+    height: 150px;
 }
 </style>
 <template>
 <div class="container">
-    <p>{{title}}</p>
     <div v-bind:id="containerId" style="position: relative;">
         <img v-bind:id="imageId" class="signal" v-bind:src="imageBase64" />
     </div>

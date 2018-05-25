@@ -40,7 +40,17 @@
             style="fill:#00cb00;stroke:#1e88e5;stroke-width:4.17px;" />
         <path d="M837.827,38.098l117.201,218.728" style="fill:#3677da;stroke:#fff;stroke-width:12.5px;"
         />
-        <circle cx="837.827" cy="129.07" r="27.49" style="fill:#18ffff;stroke:#00b8d4;stroke-width:4.17px;"
+        <circle @click="show()" cx="837.827" cy="129.07" r="27.49" style="fill:#18ffff;stroke:#00b8d4;stroke-width:4.17px;"
         />
     </svg>
 </template>
+<script>
+export default {
+    props: ["click"],
+    methods: {
+        show() {
+            this.click();
+        }
+    }
+}
+</script>

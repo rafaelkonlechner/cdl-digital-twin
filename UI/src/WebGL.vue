@@ -1,5 +1,7 @@
 <template>
-<div id="webgl"></div>
+<div style="background-color: #1E88E5;">
+    <div id="webgl"></div>
+</div>
 </template>
 <script>
 import * as THREE from "three";
@@ -24,7 +26,7 @@ export default {
             ),
             renderer: new THREE.WebGLRenderer({
                 antialias: true,
-                clearColor: 0xa0a0a0,
+                clearColor: 0x1E88E5,
                 alpha: 1
             }),
             controls: null,
@@ -36,19 +38,19 @@ export default {
         };
     },
     mounted() {
+
         let self = this;
         var light = new THREE.AmbientLight(0x404040);
         self.scene.add(light);
+        var light1 = new THREE.PointLight(0x808080, 1);
+        var light2 = new THREE.PointLight(0x808080, 1);
+        var light3 = new THREE.PointLight(0x808080, 1);
+        var light4 = new THREE.PointLight(0x808080, 1);
 
-        var light1 = new THREE.PointLight(0x404040, 0.3, 100);
-        var light2 = new THREE.PointLight(0x404040, 0.3, 100);
-        var light3 = new THREE.PointLight(0x404040, 0.3, 100);
-        var light4 = new THREE.PointLight(0x404040, 0.3, 100);
-
-        light1.position.set(-2, -2, 16);
-        light2.position.set(-2, 2, 16);
-        light3.position.set(2, -2, 16);
-        light4.position.set(2, 2, 16);
+        light1.position.set(-5, 15, -5);
+        light2.position.set(-5, 15, 5);
+        light3.position.set(5, 15, -5);
+        light4.position.set(5, 15, 5);
         self.scene.add(light1);
         self.scene.add(light2);
         self.scene.add(light3);
@@ -59,19 +61,16 @@ export default {
         self.renderer.setSize(self.width, self.height);
         self.controls = new OrbitControls(self.camera, self.renderer.domElement);
 
-        self.plane = new THREE.GridHelper(100, 10);
-        self.scene.add(self.plane);
+        self.scene.add(new THREE.GridHelper(100, 10, 0xFFFFFF, 0xFFFFFF));
 
         var geometry = new THREE.PlaneGeometry(100, 100, 1, 1);
         var material = new THREE.MeshBasicMaterial({
-            color: 0xcccccc,
+            color: 0x1E88E5,
             side: THREE.DoubleSide
         });
         var plane = new THREE.Mesh(geometry, material);
         plane.rotateOnAxis(self.x, THREE.Math.degToRad(-90));
-        plane.roatet
         self.scene.add(plane);
-
 
         window.addEventListener("click", self.onMouseClick, false);
         document.getElementById("webgl").appendChild(self.renderer.domElement);
