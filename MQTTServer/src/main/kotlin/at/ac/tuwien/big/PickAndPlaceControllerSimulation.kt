@@ -2,14 +2,14 @@ package at.ac.tuwien.big
 
 import at.ac.tuwien.big.entity.state.*
 import at.ac.tuwien.big.entity.transition.*
-import at.ac.tuwien.big.StateMachine.States as s
-import at.ac.tuwien.big.StateMachine.Transitions as t
+import at.ac.tuwien.big.StateMachineSimulation.States as s
+import at.ac.tuwien.big.StateMachineSimulation.Transitions as t
 
 /**
  * This controller holds the core logic of the production steps during a simulation by searching the defined
  * successor state for a given input state.
  */
-object PickAndPlaceController {
+object PickAndPlaceControllerSimulation {
 
     var roboticArmSnapshot: RoboticArmState = RoboticArmState()
         private set

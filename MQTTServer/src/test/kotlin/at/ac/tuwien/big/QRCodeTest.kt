@@ -30,7 +30,7 @@ class QRCodeTest {
     @Test
     fun checkColors() {
         for (i in 1..100) {
-            val image = ObjectTracker.toBase64(FileUtils.readFileToByteArray(File("../qr-codes/code-$i.png")))
+            val image = toBase64(FileUtils.readFileToByteArray(File("../qr-codes/code-$i.png")))
             try {
                 val result = QRCode.read(image)
                 println("$i: ${result?.color}")

@@ -14,14 +14,14 @@ class EventProcessingTest {
                 println(new)
             }
         })
-        cep.submitEvent(StateMachine.States.idle)
-        cep.submitEvent(StateMachine.States.approach)
-        cep.submitEvent(StateMachine.States.pickup)
-        cep.submitEvent(StateMachine.States.lift)
-        cep.submitEvent(StateMachine.States.park)
-        cep.submitEvent(StateMachine.States.halfRelease)
-        cep.submitEvent(StateMachine.States.fullRelease)
-        cep.submitEvent(StateMachine.States.depositGreen)
-        cep.submitEvent(StateMachine.States.releaseGreen)
+        cep.submitEvent(StateMachineSimulation.States.idle)
+        cep.submitEvent(StateMachineSimulation.States.approach)
+        cep.submitEvent(StateMachineSimulation.States.pickup)
+        cep.submitEvent(StateMachineSimulation.States.lift)
+        cep.submitEvent(StateMachineSimulation.States.park)
+        cep.submitEvent(StateMachineSimulation.States.halfRelease)
+        cep.submitEvent(StateMachineSimulation.States.fullRelease)
+        cep.submitEvent(StateMachineSimulation.States.depositGreen)
+        cep.submitEvent(StateMachineSimulation.States.releaseGreen)
     }
 }

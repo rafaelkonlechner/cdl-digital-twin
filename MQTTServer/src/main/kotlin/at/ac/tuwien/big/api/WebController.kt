@@ -1,9 +1,6 @@
 package at.ac.tuwien.big.api
 
-import at.ac.tuwien.big.MQTT
-import at.ac.tuwien.big.MessageController
-import at.ac.tuwien.big.PickAndPlaceController
-import at.ac.tuwien.big.TimeSeriesDatabase
+import at.ac.tuwien.big.*
 import at.ac.tuwien.big.entity.state.ConveyorState
 import at.ac.tuwien.big.entity.state.RoboticArmState
 import at.ac.tuwien.big.entity.state.SliderState
@@ -16,7 +13,7 @@ import io.javalin.Javalin
 import kotlinx.coroutines.experimental.channels.Channel
 import kotlinx.coroutines.experimental.runBlocking
 import org.eclipse.jetty.websocket.api.Session
-import at.ac.tuwien.big.StateMachine.States as s
+import at.ac.tuwien.big.StateMachineSimulation.States as s
 
 /**
  * Controller for web-based APIs: Static frontend, HTTP API and WebSocket
@@ -47,7 +44,14 @@ class WebController(private val mqtt: MQTT,
                 println("Received: $message")
                 if (message != null) {
                     println("Message: $message")
-                    mqtt.send(message)
+                    if (message == "idle") {
+                        val transitions = PickAndPlaceControllerSimulation.transform(StateMachine.Transitions.park_idle)
+                        for (t in transitions) {
+                            mqtt.send(t)
+                        }
+                    } else {
+                        mqtt.send(message)
+                    }
                 }
             }
             ws.onClose { session, statusCode, reason -> println("Closed $session, $statusCode: $reason") }
@@ -92,7 +96,9 @@ class WebController(private val mqtt: MQTT,
      */
     private fun setupRoutes() {
         app.routes {
-            get("/messageRate") { ctx -> messageController.messageRate }
+            get("/") { messageController.messageRate }
+            put("/messageRate") { ctx -> messageController.messageRate = ctx.body().toInt() }
+            get("/messageRate") { messageController.messageRate }
             put("/messageRate") { ctx -> messageController.messageRate = ctx.body().toInt() }
             get("/autoPlay") { ctx -> ctx.json(messageController.autoPlay) }
             put("/autoPlay") { ctx -> messageController.autoPlay = ctx.body().toBoolean() }
@@ -137,7 +143,7 @@ class WebController(private val mqtt: MQTT,
 
     private fun send(match: Transition?) {
         if (match != null) {
-            val commands = PickAndPlaceController.transform(match)
+            val commands = PickAndPlaceControllerSimulation.transform(match)
             for (c in commands) {
                 mqtt.send(c)
             }
