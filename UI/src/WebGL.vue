@@ -74,8 +74,8 @@ export default {
 
         window.addEventListener("click", self.onMouseClick, false);
         document.getElementById("webgl").appendChild(self.renderer.domElement);
-        self.loader.load("./src/kuka.dae", function(collada) {
-            var child = collada.scene.children[2];
+        self.loader.load("assets/kuka.dae", function(collada) {
+            var child = collada.scene;
             var children = [];
             child.traverse(function(x) {
                 if (x instanceof THREE.Mesh) {
