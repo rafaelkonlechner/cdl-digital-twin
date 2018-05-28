@@ -16,8 +16,9 @@ object HedgehogController {
         if (hasStarted()) {
             return
         }
-        val data = "{\"data\":{\"type\":\"process\",\"attributes\":{\"programId\":\"QXJt\",\"fileId\":\"Li9tYWluLnB5\",\"args\":[\"$ip\"]}}}"
+        println("Starting Hedgehog")
 
+        val data = "{\"data\":{\"type\":\"process\",\"attributes\":{\"programId\":\"QXJt\",\"fileId\":\"Li9tYWluLnB5\",\"args\":[\"$ip\"]}}}"
         Fuel.post("http://raspberrypi.local/api/processes")
                 .header(Pair("content-type", "application/json"),
                         Pair("accept", "application/json, text/plain"))
@@ -25,9 +26,9 @@ object HedgehogController {
                     if (result.component2() == null) {
                         val json = gson.fromJson(String(resp.data), JsonObject::class.java)
                         process = json["data"].asJsonObject["id"].asInt
-                        println("Started Hedgehog with Process ID: $process")
+                        println("Started Hedgehog PID $process")
                     } else {
-                        println("Error starting Hedgehog")
+                        println("Error: Starting Hedgehog")
                     }
                 }
     }
@@ -35,8 +36,9 @@ object HedgehogController {
     fun hasStarted() = process != 0
 
     fun stop() {
+        println("Stopping Hedgehog PID $process")
         Fuel.delete("http://raspberrypi.local/api/processes/$process").response { req, resp, result ->
-            println("Stopped Hedgehog with Process ID: $process")
+            println("Stopped Hedgehog PID $process")
         }
     }
 }
