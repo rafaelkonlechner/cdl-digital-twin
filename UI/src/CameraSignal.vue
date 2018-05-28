@@ -36,8 +36,10 @@ export default {
         }
         this.socket.addEventListener("message", event => {
             let msg = JSON.parse(event.data);
+            console.log(msg)
             if (msg.topic === this.topic) {
                 let data = JSON.parse(msg.message)
+                console.log(data)
                 this.imageBase64 = 'data:image/png;base64, ' + data.image;
                 this.updateTrackingInformation(data.tracking, 'Item')
             }

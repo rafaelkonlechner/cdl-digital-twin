@@ -65,13 +65,19 @@
     <div class="absolute" style="top: 30%; left: 4%;">
         <work-item-information :socket="socket"></work-item-information>
     </div>
+    <div class="absolute blueprint-text small" style="top: 14%; left: 85%; height: 35px;">
+        <h2>{{selected}}</h2>
+        <br>Current:
+        <br>Target:
+        <!--<line-chart width="200" height="100" min="0" max="100" :data="data"></line-chart>-->
+    </div>
     <div class="blueprint-main">
         <div class="mdl-grid">
             <div v-if="show2D" class="mdl-cell mdl-cell--10-col mdl-cell--1-offset">
                 <div class="absolute blueprint-text small" style="top: 56%; left: 54%; height: 35px; text-align: left;">
-                    x: {{context.roboticArmState.handPosition.x.toFixed(2)}}
+                    <!--x: {{context.roboticArmState.handPosition.x.toFixed(2)}}
                     <br/> y: {{context.roboticArmState.handPosition.y.toFixed(2)}}
-                    <br/> z: {{context.roboticArmState.handPosition.z.toFixed(2)}}
+                    <br/> z: {{context.roboticArmState.handPosition.z.toFixed(2)}}-->
                 </div>
                 <div class="absolute" style="top: 25%; left: 33%;">
                     <camera-signal v-if="showDetectionCamera" :socket="socket" topic="detectionCamera" title="Detection Camera"></camera-signal>
@@ -103,7 +109,7 @@
                         <br/>
                         <small>&mdash; {{context.roboticArmState.name}}</small>
                     </h2>
-                    <robotic-arm-model></robotic-arm-model>
+                    <robotic-arm-model v-on:select="selectionChanged($event)"></robotic-arm-model>
                 </div>
                 <div class="blueprint-img">
                     <h2 class="blueprint-text">Conveyor
@@ -113,7 +119,7 @@
                     <conveyor-model :click="togglePickupCamera"></conveyor-model>
                 </div>
             </div>
-            <webgl v-if="show3D" style="text-align: center; margin: 0 auto" width="800" height="360"></webgl>
+            <webgl v-if="show3D" v-on:select="selectionChanged($event)" style="text-align: center; margin: 0 auto" width="800" height="360"></webgl>
         </div>
     </div>
 </div>
@@ -125,6 +131,7 @@ import Conveyor from './models/Conveyor.vue'
 import RoboticArm from './models/RoboticArm.vue'
 import TestingRig from './models/TestingRig.vue'
 import WorkItemInformation from "./WorkItemInformation.vue";
+import LineChart from "./LineChart.vue";
 import WebGL from "./WebGL.vue";
 import * as request from 'superagent'
 
@@ -132,6 +139,7 @@ export default {
     components: {
         cameraSignal: CameraSignal,
         conveyorModel: Conveyor,
+        lineChart: LineChart,
         roboticArmModel: RoboticArm,
         testingRigModel: TestingRig,
         workItemInformation: WorkItemInformation,
@@ -140,10 +148,18 @@ export default {
     props: ["socket", "context"],
     data() {
         return {
+            selected: null,
             show2D: true,
             show3D: false,
             showDetectionCamera: false,
-            showPickupCamera: false
+            showPickupCamera: false,
+            data: [{
+                x: 1,
+                y: 10
+            }, {
+                x: 2,
+                y: 20
+            }]
         }
     },
     methods: {
@@ -156,6 +172,11 @@ export default {
         },
         togglePickupCamera() {
             this.showPickupCamera = !this.showPickupCamera
+        },
+        selectionChanged(event) {
+            if (event != null) {
+                this.selected = event.name;
+            }
         }
     }
 }

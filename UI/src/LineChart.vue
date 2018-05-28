@@ -1,7 +1,6 @@
 <template>
 <div :id="chartId" style="text-align: left;" v-bind:style="{'width': width + 'px', 'height': height + 'px'}"></div>
 </template>
-
 <script>
 import * as Plottable from "plottable";
 import "plottable/plottable.css";

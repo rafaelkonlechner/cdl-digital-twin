@@ -77,10 +77,13 @@ export default {
         self.loader.load("assets/kuka.dae", function(collada) {
             var child = collada.scene;
             var children = [];
+            var counter = -1;
+            var names = ["Base", "Main Arm", "Second Arm", "Forearm", "Wrist", "Mount"];
             child.traverse(function(x) {
                 if (x instanceof THREE.Mesh) {
                     x.rotateOnAxis(self.x, THREE.Math.degToRad(-90));
                     x.scale.set(10, 10, 10);
+                    x.name = names[counter++];
                     children.push(x);
                     self.selectableObjects.push(x);
                 }
@@ -120,10 +123,12 @@ export default {
             if (intersects.length > 0) {
                 var first = intersects[0].object;
                 this.scene.remove(this.selectedObjectBox);
-                this.selectedObjectBox = new THREE.BoxHelper(first, 0xffff00);
+                this.selectedObjectBox = new THREE.BoxHelper(first, 0x18ffff);
                 this.scene.add(this.selectedObjectBox);
+                this.$emit('select', first)
             } else {
                 this.scene.remove(this.selectedObjectBox);
+                this.$emit('select', null)
             }
         }
     }

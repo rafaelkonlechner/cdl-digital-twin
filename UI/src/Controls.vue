@@ -25,6 +25,7 @@ input {
                                     Stop</span>
                         </button>
     <button class="tabs active-tab" @click="gotoIdle()">Idle</button>
+    <key-controls :socket="socket"></key-controls>
     <table class="control-table">
         <thead>
             <tr>
