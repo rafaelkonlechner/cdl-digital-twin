@@ -34,6 +34,7 @@ fun main(args: Array<String>) {
         docker
     } else {
         default
+
     }
     val sensors = listOf(simSensor, sensor, detectionCamera, pickupCamera)
     val actuators = listOf(simActuator, actuator)
@@ -42,5 +43,6 @@ fun main(args: Array<String>) {
     val mqtt = MQTT(hosts.mqtt, sensors, actuators)
     val controller = MessageController(mqtt, objectTracker, influx)
     val web = WebController(mqtt, controller, influx)
+    controller.start()
     web.start()
 }
