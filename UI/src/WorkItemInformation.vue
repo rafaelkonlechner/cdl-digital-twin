@@ -34,8 +34,8 @@
             </tr>
         </table>
     </div>
-    <div style="display: inline-block; float: right; margin-left: 40px; border-style: solid; border-width: 3px; border-color: black;">
-        <img v-if="qrCode.base64" style="width: 75px; height: 75px; margin: 0;" v-bind:src="qrCode.base64" />
+    <div style="display: inline-block; float: right; margin-left: 40px;">
+        <img v-if="qrCode.base64" style="width: 75px; height: 75px; margin: 0; border-style: solid; border-width: 3px; border-color: black;" v-bind:src="qrCode.base64" />
     </div>
 </div>
 </template>
