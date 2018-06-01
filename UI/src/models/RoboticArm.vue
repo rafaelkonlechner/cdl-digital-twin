@@ -44,21 +44,48 @@
             <ellipse cx="399.145" cy="1321.34" rx="58.975" ry="60.941" style="fill:#fff;stroke:#1e88e5;stroke-width:4.17px;"/>
             <ellipse cx="399.145" cy="657.335" rx="58.975" ry="60.941" style="fill:#fff;stroke:#1e88e5;stroke-width:4.17px;"/>
             <ellipse cx="1167.25" cy="478.322" rx="58.975" ry="60.941" style="fill:#fff;stroke:#1e88e5;stroke-width:4.17px;"/>
-            <circle @click="emit('Gripper')" cx="1511.46" cy="478.322" r="36.65" style="fill:#18ffff;stroke:#00b8d4;stroke-width:4.17px;"/>
-            <circle @click="emit('Wrist')" cx="1167.25" cy="478.322" r="36.65" style="fill:#18ffff;stroke:#00b8d4;stroke-width:4.17px;"/>
-            <circle @click="emit('Forearm')" cx="900.468" cy="481.882" r="36.65" style="fill:#18ffff;stroke:#00b8d4;stroke-width:4.17px;"/>
-            <circle @click="emit('Second Arm')" cx="399.145" cy="657.335" r="36.65" style="fill:#18ffff;stroke:#00b8d4;stroke-width:4.17px;"/>
-            <circle @click="emit('Main Arm')" cx="399.145" cy="1321.34" r="36.65" style="fill:#18ffff;stroke:#00b8d4;stroke-width:4.17px;"/>
-            <circle @click="emit('Base')" cx="255.68" cy="1595.57" r="36.65" style="fill:#18ffff;stroke:#00b8d4;stroke-width:4.17px;"/>
+            <circle @click="emit(components[5])" cx="1511.46" cy="478.322" r="36.65" style="fill:#18ffff;stroke:#00b8d4;stroke-width:4.17px;"/>
+            <circle @click="emit(components[4])" cx="1167.25" cy="478.322" r="36.65" style="fill:#18ffff;stroke:#00b8d4;stroke-width:4.17px;"/>
+            <circle @click="emit(components[3])" cx="900.468" cy="481.882" r="36.65" style="fill:#18ffff;stroke:#00b8d4;stroke-width:4.17px;"/>
+            <circle @click="emit(components[2])" cx="399.145" cy="657.335" r="36.65" style="fill:#18ffff;stroke:#00b8d4;stroke-width:4.17px;"/>
+            <circle @click="emit(components[1])" cx="399.145" cy="1321.34" r="36.65" style="fill:#18ffff;stroke:#00b8d4;stroke-width:4.17px;"/>
+            <circle @click="emit(components[0])" cx="255.68" cy="1595.57" r="36.65" style="fill:#18ffff;stroke:#00b8d4;stroke-width:4.17px;"/>
         </svg>
 </template>
 <script>
 export default {
+    data() {
+        return {
+            components: [{
+                name: "Base",
+                value: 0.0,
+                target: 0.0
+            }, {
+                name: "Main Arm",
+                value: 0.0,
+                target: 0.0
+            }, {
+                name: "Second Arm",
+                value: 0.0,
+                target: 0.0
+            }, {
+                name: "Forearm",
+                value: 0.0,
+                target: 0.0
+            }, {
+                name: "Wrist",
+                value: 0.0,
+                target: 0.0
+            }, {
+                name: "Mount",
+                value: 0.0,
+                target: 0.0
+            }]
+        }
+    },
     methods: {
-        emit: function(name) {
-            this.$emit('select', {
-                name: name
-            });
+        emit: function(component) {
+            this.$emit('select', component);
         }
     }
 };
