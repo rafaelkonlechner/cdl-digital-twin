@@ -39,6 +39,28 @@ article {
 .mdl-grid {
     width: 90vw;
 }
+
+.control-button {
+    border: 0px solid white;
+    padding: 2px;
+}
+
+em {
+    color: grey;
+}
+
+.selected-job {
+    border-radius: 5px;
+    background: #1E88E5;
+}
+
+.selected-job h3 {
+    color: white;
+}
+
+.job {
+    width: 50%;
+}
 </style>
 <template>
 <div id="app">
@@ -51,25 +73,26 @@ article {
     <main style="height: 100%;">
         <div class="mdl-grid">
             <div class="mdl-cell--2-col">
-                <inputs></inputs>
-            </div>
-            <div class="mdl-cell--10-col">
-                <div class="mdl-grid">
-                    <div class="mdl-cell--2-col">
-                        <controls :socket="socket" :context="context"></controls>
-                    </div>
+                <h2>Saved Jobs</h2>
+                <div v-for="job in jobs" @click="selectedJob = job" v-bind:class="{'job': true, 'selected-job': job === selectedJob}">
+                    <h3>{{job.name}}</h3>
                 </div>
+            </div>
+            <div class="mdl-cell--8-col">
+                <div style="display: inline-block;">
+                    <h2 v-if="!editTitle" @click="editTitle=true">{{selectedJob.name}}</h2>
+                    <input style="margin: 18.4px 0; font-size: 1.5em;" v-if="editTitle" v-on:keyup.enter="editTitle=false" v-model="selectedJob.name" />
+                </div>
+                <div style="display: inline-block; margin-left: 50px;">
+                    <button class="control-button"><i class="material-icons">play_arrow</i></button>
+                    <button class="control-button"><i class="material-icons">stop</i></button>
+                    <em>Changes saved ...</em>
+                </div>
+                <state-machine :job="selectedJob"></state-machine>
             </div>
         </div>
     </main>
     <hr/>
-    <article>
-        <h1>Project description</h1>
-        <p>This
-            <a href="https://cdl-mint.big.tuwien.ac.at/" target="_blank">CDL-MINT</a> project explores technologies for the model-integrated development and monitoring of production systems. This includes the simulation of a 3D robotic arm model in Blender
-            GE, a MQTT message pipeline, a controller that runs on a server and the dashboard that can be seen above. A detailed description of the setup can be found on
-            <a href="https://github.com/rafaelkonlechner/cdl-digital-twin">GitHub</a>.</p>
-    </article>
     <footer>
         <h5>
         <strong>Christian Doppler Laboratory</strong><br/>
@@ -82,17 +105,20 @@ article {
 <script>
 import Inputs from "./Inputs.vue";
 import Controls from "./Controls.vue";
+import StateMachine from "./StateMachine.vue";
 import SensorMonitor from "./SensorMonitor.vue";
 import StateChart from "./StateChart.vue";
 import KeyControls from "./KeyControls.vue";
 import BluePrint from "./Blueprint.vue";
 import CameraSignal from "./CameraSignal.vue";
+import jobs from "./jobs.json";
 
 export default {
     name: "app",
     components: {
         inputs: Inputs,
         controls: Controls,
+        stateMachine: StateMachine,
         sensorMonitor: SensorMonitor,
         keyControls: KeyControls,
         blueprint: BluePrint,
@@ -102,6 +128,10 @@ export default {
         return {
             socket: null,
             messageRate: 0,
+            newJobTitle: "New Job",
+            editTitle: false,
+            jobs: jobs,
+            selectedJob: jobs[0],
             context: {
                 roboticArmState: {
                     name: "Snapshot",
@@ -144,6 +174,13 @@ export default {
         }
     },
     created() {
+        if (window.localStorage.getItem("jobs") == null) {
+            this.jobs = jobs
+            this.selectedJob = this.jobs[0]
+        } else {
+            this.jobs = window.localStorage.getItem("jobs")
+            this.selectedJob = this.jobs[0]
+        }
         let self = this;
         this.socket = new WebSocket("ws://127.0.0.1:8080/websocket");
         this.socket.addEventListener("open", function(event) {

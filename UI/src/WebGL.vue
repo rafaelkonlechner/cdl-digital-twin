@@ -38,7 +38,6 @@ export default {
         };
     },
     mounted() {
-
         let self = this;
         var light = new THREE.AmbientLight(0x404040);
         self.scene.add(light);
@@ -78,7 +77,31 @@ export default {
             var child = collada.scene;
             var children = [];
             var counter = -1;
-            var names = ["Base", "Main Arm", "Second Arm", "Forearm", "Wrist", "Mount"];
+            var names = [{
+                name: "Base",
+                value: 0.0,
+                target: 0.0
+            }, {
+                name: "Main Arm",
+                value: 0.0,
+                target: 0.0
+            }, {
+                name: "Second Arm",
+                value: 0.0,
+                target: 0.0
+            }, {
+                name: "Forearm",
+                value: 0.0,
+                target: 0.0
+            }, {
+                name: "Wrist",
+                value: 0.0,
+                target: 0.0
+            }, {
+                name: "Mount",
+                value: 0.0,
+                target: 0.0
+            }];
             child.traverse(function(x) {
                 if (x instanceof THREE.Mesh) {
                     x.rotateOnAxis(self.x, THREE.Math.degToRad(-90));
@@ -125,7 +148,8 @@ export default {
                 this.scene.remove(this.selectedObjectBox);
                 this.selectedObjectBox = new THREE.BoxHelper(first, 0x18ffff);
                 this.scene.add(this.selectedObjectBox);
-                this.$emit('select', first)
+                console.log(first.name)
+                this.$emit('select', first.name)
             } else {
                 this.scene.remove(this.selectedObjectBox);
                 this.$emit('select', null)

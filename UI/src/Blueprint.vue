@@ -65,10 +65,14 @@
     <div class="absolute" style="top: 30%; left: 4%;">
         <work-item-information :socket="socket"></work-item-information>
     </div>
-    <div class="absolute blueprint-text small" style="top: 14%; left: 85%; height: 35px;">
-        <h2>{{selected}}</h2>
-        <br>Current:
-        <br>Target:
+    <div class="absolute" style="top: 30%; left: 84%;">
+        <h2>Running Jobs</h2>
+    </div>
+    <div v-if="selected" class="absolute blueprint-text small" style="top: 14%; left: 85%; height: 35px; text-align: left;">
+        <h2>{{selected.name}}</h2>
+        <p><small>Current: {{selected.value}}</small></p>
+        <p><small>Target: <input style="width: 50px;" v-model="selected.target"></input></small>
+        </p>
         <!--<line-chart width="200" height="100" min="0" max="100" :data="data"></line-chart>-->
     </div>
     <div class="blueprint-main">
@@ -175,7 +179,9 @@ export default {
         },
         selectionChanged(event) {
             if (event != null) {
-                this.selected = event.name;
+                this.selected = event;
+            } else {
+                this.selected = null
             }
         }
     }
