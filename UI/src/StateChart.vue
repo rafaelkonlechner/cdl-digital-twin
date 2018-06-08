@@ -1,31 +1,31 @@
 <style scoped>
 .state {
-  width: 155px;
-  height: 150px;
-  background-color: white;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: 10px;
-  padding: 5px 10px;
-  font-size: 9px;
+    width: 155px;
+    height: 150px;
+    background-color: white;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    padding: 5px 10px;
+    font-size: 9px;
 }
 
 .shadow {
-  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }
 
 .state .active {
-  border: 1px solid deepskyblue;
+    border: 1px solid deepskyblue;
 }
 
 .transition-detail {
-  text-align: center;
-  width: 250px;
-  height: 150px;
-  background-color: white;
+    text-align: center;
+    width: 250px;
+    height: 150px;
+    background-color: white;
 }
 </style>
 <template>
-  <svg width="1000" height="400">
+<svg width="1000" height="400">
     <defs>
       <marker id="arrow" markerWidth="10" markerHeight="10" refX="0" refY="3" orient="auto" markerUnits="strokeWidth" viewBox="0 0 20 20">
         <path d="M0,0 L0,6 L9,3 z" fill="#00C8FF" />
@@ -45,56 +45,54 @@
 </template>
 
 <script>
-let states = [
-  {
-    id: "idle",
-    name: "Idle",
-    basePosition: 1000,
-    upperArmPosition: 210,
-    lowerArmPosition: 200,
-    x: 100,
-    y: 250
-  },
-  {
-    id: "pickup",
-    name: "Pickup",
-    basePosition: 1000,
-    upperArmPosition: 2000,
-    lowerArmPosition: 1380,
-    x: 600,
-    y: 250
-  },
-  {
-    id: "move",
-    name: "Move",
-    basePosition: 2000,
-    upperArmPosition: 1250,
-    lowerArmPosition: 2000,
-    x: 1100,
-    y: 250
-  }
+let states = [{
+        id: "idle",
+        name: "Idle",
+        basePosition: 1000,
+        upperArmPosition: 210,
+        lowerArmPosition: 200,
+        x: 100,
+        y: 250
+    },
+    {
+        id: "pickup",
+        name: "Pickup",
+        basePosition: 1000,
+        upperArmPosition: 2000,
+        lowerArmPosition: 1380,
+        x: 600,
+        y: 250
+    },
+    {
+        id: "move",
+        name: "Move",
+        basePosition: 2000,
+        upperArmPosition: 1250,
+        lowerArmPosition: 2000,
+        x: 1100,
+        y: 250
+    }
 ];
-let transitions = [
-  {
-    id: "t1",
-    from: states[0],
-    to: states[1]
-  },
-  {
-    id: "t2",
-    from: states[1],
-    to: states[2]
-  }
+let transitions = [{
+        id: "t1",
+        from: states[0],
+        to: states[1]
+    },
+    {
+        id: "t2",
+        from: states[1],
+        to: states[2]
+    }
 ];
 
 export default {
-  name: "state-chart",
-  props: [],
-  data() {
-    return {
-      states: states,
-      transitions: transitions
-    };
-  }
+    name: "state-chart",
+    props: [],
+    data() {
+        return {
+            states: states,
+            transitions: transitions
+        };
+    }
 };
 </script>

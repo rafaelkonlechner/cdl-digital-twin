@@ -1,15 +1,16 @@
 <style scoped>
 #keypad {
-    width: 30px;
-    height: 30px;
+    width: 80px;
     border: 1px solid rgba(0, 0, 0, 0.1);
 }
 </style>
 <template>
-<button id="keypad" v-on:keyup.up="keyUpUp()" v-on:keydown.up="keyDownUp()" v-on:keyup.down="keyUpDown()" v-on:keydown.down="keyDownDown()" v-on:keyup.left="keyUpLeft()" v-on:keydown.left="keyDownLeft()" v-on:keyup.right="keyUpRight()" v-on:keydown.right="keyDownRight()"
-    v-on:keyup.87="keyUpW()" v-on:keydown.87="keyDownW()" v-on:keyup.83="keyUpS()" v-on:keydown.83="keyDownS()" v-on:keyup.65="keyUpA()" v-on:keydown.65="keyDownA()" v-on:keyup.68="keyUpD()" v-on:keydown.68="keyDownD()" v-on:keyup.69="keyUpE()" v-on:keydown.69="keyDownE()"
-    v-on:keyup.81="keyUpQ()" v-on:keydown.81="keyDownQ()" v-on:keyup.82="keyUpR()" v-on:keydown.82="keyDownR()" v-on:keyup.70="keyUpF()" v-on:keydown.70="keyDownF()" v-on:keyup.88="keyUpX()" v-on:keydown.88="keyDownX()" v-on:keyup.89="keyUpY()" v-on:keydown.89="keyDownY()">
-  </button>
+<div>
+    <input type="image" src="../assets/arrow-keys.jpg" id="keypad" v-on:keyup.up="keyUpUp()" v-on:keydown.up="keyDownUp()" v-on:keyup.down="keyUpDown()" v-on:keydown.down="keyDownDown()" v-on:keyup.left="keyUpLeft()" v-on:keydown.left="keyDownLeft()" v-on:keyup.right="keyUpRight()"
+        v-on:keydown.right="keyDownRight()" v-on:keyup.87="keyUpW()" v-on:keydown.87="keyDownW()" v-on:keyup.83="keyUpS()" v-on:keydown.83="keyDownS()" v-on:keyup.65="keyUpA()" v-on:keydown.65="keyDownA()" v-on:keyup.68="keyUpD()" v-on:keydown.68="keyDownD()"
+        v-on:keyup.69="keyUpE()" v-on:keydown.69="keyDownE()" v-on:keyup.81="keyUpQ()" v-on:keydown.81="keyDownQ()" v-on:keyup.82="keyUpR()" v-on:keydown.82="keyDownR()" v-on:keyup.70="keyUpF()" v-on:keydown.70="keyDownF()" v-on:keyup.88="keyUpX()" v-on:keydown.88="keyDownX()"
+        v-on:keyup.89="keyUpY()" v-on:keydown.89="keyDownY()" />
+</div>
 </template>
 
 <script>

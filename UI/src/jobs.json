@@ -52,12 +52,15 @@
         ]
     },
     {
-        "name": "Job 2"
+        "name": "Job 2",
+        "states": []
     }, {
 
-        "name": "Job 3"
+        "name": "Job 3",
+        "states": []
     }, {
 
-        "name": "Job 4"
+        "name": "Job 4",
+        "states": []
     }
 ]

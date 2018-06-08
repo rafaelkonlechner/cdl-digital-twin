@@ -1,6 +1,7 @@
 <style scoped>
 .state-machine {
     font-size: 0.8em;
+    min-height: 50vh;
 }
 
 .dim {
@@ -29,6 +30,8 @@
 
 .new {
     border: 0px solid white;
+    border-radius: 10px;
+    box-shadow: 1px 1px 10px grey;
     padding: 2px;
     width: 64px;
     height: 64px;
@@ -36,6 +39,7 @@
 
 .new i {
     font-size: 4em;
+    color: darkslategray;
 }
 </style>
 <template>
@@ -46,19 +50,19 @@
         </div>
     </div>
     <div class="mdl-grid">
-        <div v-for="(s, index) in job.states" class="mdl-cell--3-col">
-            <!--<div @click="showPopup = true; selected = s;" class="state">-->
-            <state-preview :state="s" :index="index" :active="s.active" v-on:moveLeft="moveLeft($event)" v-on:moveRight="moveRight($event)" v-on:remove="remove($event)"></state-preview>
-            <svg v-if="index < job.states.length - 1" @click="showPopup = true;" xmlns="http://www.w3.org/2000/svg" style="position: relative; bottom: 35%; left: 10%;" width="24" height="24">
+        <div v-for="(s, index) in job.states" class="mdl-cell--3-col" style="position: relative;">
+            <svg @click="showPopup = true;" xmlns="http://www.w3.org/2000/svg" style="position: absolute; top: 40%; left: 82%;" width="24" height="24">
                 <path v-show="!s.active" d="M12 8V4l8 8-8 8v-4H4V8z" fill="#888"/>
                 <path v-show="s.active" d="M12 8V4l8 8-8 8v-4H4V8z" fill="#1E88E5"/>
                 <path d="M0 0h24v24H0z" fill="none"/>
             </svg>
+            <state-preview :state="s" :index="index" :active="s.active" :context="context" :socket="socket" v-on:moveLeft="moveLeft($event)" v-on:moveRight="moveRight($event)" v-on:remove="remove($event)">
+            </state-preview>
         </div>
         <div class="mdl-cell--3-col">
-            <button @click="addState" class="new" style="margin-top: 26%;">
+            <button @click="addState" class="new" style="position: relative; top: 32%;">
                     <i class="material-icons">add</i>
-                </button>
+            </button>
         </div>
     </div>
 </div>
@@ -68,7 +72,7 @@
 import StatePreview from "./StatePreview.vue";
 
 export default {
-    props: ["job"],
+    props: ["job", "context", "socket"],
     components: {
         statePreview: StatePreview
     },

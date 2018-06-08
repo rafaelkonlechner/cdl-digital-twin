@@ -45,10 +45,6 @@ article {
     padding: 2px;
 }
 
-em {
-    color: grey;
-}
-
 .selected-job {
     border-radius: 5px;
     background: #1E88E5;
@@ -60,6 +56,12 @@ em {
 
 .job {
     width: 50%;
+}
+
+.job-controls,
+.job-controls i,
+.job-controls em {
+    color: darkslategray;
 }
 </style>
 <template>
@@ -79,16 +81,18 @@ em {
                 </div>
             </div>
             <div class="mdl-cell--8-col">
-                <div style="display: inline-block;">
-                    <h2 v-if="!editTitle" @click="editTitle=true">{{selectedJob.name}}</h2>
-                    <input style="margin: 18.4px 0; font-size: 1.5em;" v-if="editTitle" v-on:keyup.enter="editTitle=false" v-model="selectedJob.name" />
+                <div class="job-controls">
+                    <div style="display: inline-block;">
+                        <h2 v-if="!editTitle" @click="editTitle=true">{{selectedJob.name}}</h2>
+                        <input style="margin: 18.4px 0; font-size: 1.5em;" v-if="editTitle" v-on:keyup.enter="editTitle=false" v-model="selectedJob.name" />
+                    </div>
+                    <div style="display: inline-block; margin-left: 70px;">
+                        <button class="control-button"><i class="material-icons">play_arrow</i></button>
+                        <button class="control-button"><i class="material-icons">stop</i></button>
+                        <em style="position: relative; bottom: 7px;">Changes saved ...</em>
+                    </div>
                 </div>
-                <div style="display: inline-block; margin-left: 50px;">
-                    <button class="control-button"><i class="material-icons">play_arrow</i></button>
-                    <button class="control-button"><i class="material-icons">stop</i></button>
-                    <em>Changes saved ...</em>
-                </div>
-                <state-machine :job="selectedJob"></state-machine>
+                <state-machine :job="selectedJob" :context="context" :socket="socket"></state-machine>
             </div>
         </div>
     </main>
@@ -108,7 +112,6 @@ import Controls from "./Controls.vue";
 import StateMachine from "./StateMachine.vue";
 import SensorMonitor from "./SensorMonitor.vue";
 import StateChart from "./StateChart.vue";
-import KeyControls from "./KeyControls.vue";
 import BluePrint from "./Blueprint.vue";
 import CameraSignal from "./CameraSignal.vue";
 import jobs from "./jobs.json";
@@ -120,7 +123,6 @@ export default {
         controls: Controls,
         stateMachine: StateMachine,
         sensorMonitor: SensorMonitor,
-        keyControls: KeyControls,
         blueprint: BluePrint,
         cameraSignal: CameraSignal
     },
