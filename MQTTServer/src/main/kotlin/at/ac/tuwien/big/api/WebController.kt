@@ -20,6 +20,7 @@ import at.ac.tuwien.big.StateMachineSimulation.States as s
  */
 class WebController(private val mqtt: MQTT,
                     private val messageController: MessageController,
+                    private val jobController: JobController,
                     private val timeSeriesDatabase: TimeSeriesDatabase) {
 
     data class TopicMessage(val topic: String, val message: String)
@@ -96,7 +97,6 @@ class WebController(private val mqtt: MQTT,
      */
     private fun setupRoutes() {
         app.routes {
-            get("/") { messageController.messageRate }
             put("/messageRate") { ctx -> messageController.messageRate = ctx.body().toInt() }
             get("/messageRate") { messageController.messageRate }
             put("/messageRate") { ctx -> messageController.messageRate = ctx.body().toInt() }
@@ -138,6 +138,7 @@ class WebController(private val mqtt: MQTT,
                         send(TestingRigTransition(TestingRigState(), match))
                 }
             }
+
             get("/jobs") { ctx -> ctx.json(jobController.getJobs()) }
         }
     }
