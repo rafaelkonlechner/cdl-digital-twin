@@ -2,7 +2,7 @@ group 'at.ac.tuwien.big'
 version = '0.0.1-SNAPSHOT'
 
 buildscript {
-    ext.kotlin_version = '1.2.21'
+    ext.kotlin_version = '1.2.41'
 
     repositories {
         mavenCentral()
@@ -39,7 +39,7 @@ run {
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     compile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
-    compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:0.19.3"
+    compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:0.23.0"
     compile "io.javalin:javalin:0.5.4"
     compile "org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.1.1"
     compile "org.eclipse.jetty.websocket:websocket-server:9.4.7.v20170914"
