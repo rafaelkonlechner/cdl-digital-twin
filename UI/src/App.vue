@@ -63,6 +63,15 @@ article {
 .job-controls em {
     color: darkslategray;
 }
+
+.new-job {
+    border: 0px solid white;
+    margin-top: 20px;
+    border-radius: 5px;
+    box-shadow: 1px 1px 5px grey;
+    padding: 2px;
+    width: 64px;
+}
 </style>
 <template>
 <div id="app">
@@ -79,15 +88,18 @@ article {
                 <div v-for="job in jobs" @click="selectedJob = job" v-bind:class="{'job': true, 'selected-job': job === selectedJob}">
                     <h3>{{job.name}}</h3>
                 </div>
+                <div class="job" style="text-align: center;">
+                    <button @click="newJob()" class="new-job"><i class="material-icons">add</i></button>
+                </div>
             </div>
-            <div class="mdl-cell--8-col">
+            <div class="mdl-cell--10-col">
                 <div class="job-controls">
                     <div style="display: inline-block;">
                         <h2 v-if="!editTitle" @click="editTitle=true">{{selectedJob.name}}</h2>
                         <input style="margin: 18.4px 0; font-size: 1.5em;" v-if="editTitle" v-on:keyup.enter="editTitle=false" v-model="selectedJob.name" />
                     </div>
                     <div style="display: inline-block; margin-left: 70px;">
-                        <button class="control-button"><i class="material-icons">play_arrow</i></button>
+                        <button class="control-button" @click="toggleAutoPlay()"><i class="material-icons">play_arrow</i></button>
                         <button class="control-button"><i class="material-icons">stop</i></button>
                         <em style="position: relative; bottom: 7px;">Changes saved ...</em>
                     </div>
@@ -115,6 +127,7 @@ import StateChart from "./StateChart.vue";
 import BluePrint from "./Blueprint.vue";
 import CameraSignal from "./CameraSignal.vue";
 import jobs from "./jobs.json";
+var request = require("request")
 
 export default {
     name: "app",
@@ -130,6 +143,7 @@ export default {
         return {
             socket: null,
             messageRate: 0,
+            autoPlay: false,
             newJobTitle: "New Job",
             editTitle: false,
             jobs: jobs,
@@ -209,6 +223,25 @@ export default {
                 }
             }
         });
+    },
+    methods: {
+        newJob() {
+            this.jobs.push({
+                name: "New Job",
+                states: []
+            })
+        },
+        toggleAutoPlay: function() {
+            console.log("Toggle AutoPlay");
+            this.autoPlay = !this.autoPlay;
+            var xhr = new XMLHttpRequest();
+            xhr.open("PUT", 'http://localhost:8080/autoPlay', true);
+            xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+            xhr.send(this.autoPlay);
+        },
+        gotoIdle() {
+            this.sendSocketMessage("idle");
+        }
     }
 };
 </script>

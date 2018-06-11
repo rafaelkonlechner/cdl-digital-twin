@@ -166,18 +166,6 @@ export default {
         sendSocketMessage: function(message) {
             this.socket.send(message);
         },
-        toggleAutoPlay: function() {
-            console.log("Toggle AutoPlay");
-            this.autoPlay = !this.autoPlay;
-            var self = this;
-            request.put("http://localhost:8080/autoPlay")
-                .set('Content-Type', 'application/json')
-                .send(JSON.stringify(self.autoPlay))
-                .end();
-        },
-        gotoIdle() {
-            this.sendSocketMessage("idle");
-        },
         set() {
             this.sendSocketMessage("base-goto " + this.basePosition + " 1.0");
             this.sendSocketMessage("main-arm-goto " + this.mainArmPosition + " 1.0");
