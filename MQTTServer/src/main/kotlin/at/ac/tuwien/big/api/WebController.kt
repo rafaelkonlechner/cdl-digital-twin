@@ -138,6 +138,7 @@ class WebController(private val mqtt: MQTT,
                         send(TestingRigTransition(TestingRigState(), match))
                 }
             }
+            get("/jobs") { ctx -> ctx.json(jobController.getJobs()) }
         }
     }
 

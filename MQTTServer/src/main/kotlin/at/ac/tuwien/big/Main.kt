@@ -3,6 +3,7 @@
 package at.ac.tuwien.big
 
 import at.ac.tuwien.big.api.HedgehogController
+import at.ac.tuwien.big.api.JobController
 import at.ac.tuwien.big.api.WebController
 
 /**
@@ -42,7 +43,11 @@ fun main(args: Array<String>) {
     val influx = TimeSeriesDatabase(hosts.influx)
     val mqtt = MQTT(hosts.mqtt, sensors, actuators)
     val controller = MessageController(mqtt, objectTracker, influx)
-    val web = WebController(mqtt, controller, influx)
+    val jobs = JobController()
+    val web = WebController(mqtt, controller, jobs, influx)
+
+    PickAndPlaceControllerHedgehog.stateMachine = StateMachineHedgehog(jobs.getJobs().first().states)
+
     controller.start()
     web.start()
 }
