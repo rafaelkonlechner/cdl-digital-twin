@@ -24,6 +24,11 @@
     font-family: 'Roboto Mono' monospace;
 }
 
+.material-icons {
+    font-size: 1.5em;
+    color: darkslategrey;
+}
+
 .state-content p {
     font-size: 1.1em;
     color: darkslategray;
@@ -32,7 +37,7 @@
 <template>
 <div v-bind:class="{ 'active': active, 'state': true }">
     <div class="state-head">
-        <i @click="remove(index)" style="float: right;" class="material-icons">close</i>
+        <i @click="remove(index)" style="float: right;" class="material-icons">delete</i>
         <i @click="moveRight(index)" style="float: right;" class="material-icons">arrow_right</i>
         <i @click="moveLeft(index)" style="float: right;" class="material-icons">arrow_left</i>
         <!--<i v-if="index === 0" style="float: right;" class="material-icons">check_circle</i>
