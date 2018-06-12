@@ -101,6 +101,7 @@ article {
                     <div style="display: inline-block; margin-left: 70px;">
                         <button class="control-button" @click="toggleAutoPlay()"><i class="material-icons">play_arrow</i></button>
                         <button class="control-button"><i class="material-icons">stop</i></button>
+                        <button class="control-button"><i class="material-icons">replay</i></button>
                         <em style="position: relative; bottom: 7px;">Changes saved ...</em>
                     </div>
                 </div>
@@ -127,7 +128,6 @@ import StateChart from "./StateChart.vue";
 import BluePrint from "./Blueprint.vue";
 import CameraSignal from "./CameraSignal.vue";
 import jobs from "./jobs.json";
-var request = require("request")
 
 export default {
     name: "app",
