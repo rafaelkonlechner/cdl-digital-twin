@@ -1,6 +1,7 @@
 [
   {
     "name": "Job 1",
+    "id": "4a64b65d",
     "states": [
       {
         "name": "Idle",
@@ -43,14 +44,12 @@
   },
   {
     "name": "Job 2",
+    "id": "04b881dd",
     "states": []
   },
   {
     "name": "Job 3",
-    "states": []
-  },
-  {
-    "name": "Job 4",
+    "id": "e191049b",
     "states": []
   }
 ]

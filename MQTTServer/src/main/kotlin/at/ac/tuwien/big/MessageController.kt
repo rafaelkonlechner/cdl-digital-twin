@@ -1,12 +1,11 @@
 package at.ac.tuwien.big
 
 import at.ac.tuwien.big.entity.state.*
-import at.ac.tuwien.big.entity.transition.RoboticArmTransition
 import com.google.gson.Gson
 import java.io.File
 import java.util.*
 import kotlin.concurrent.schedule
-import at.ac.tuwien.big.PickAndPlaceControllerHedgehog as controller
+import at.ac.tuwien.big.StateObserver as controller
 
 
 class MessageController(private val mqtt: MQTT,
@@ -58,9 +57,9 @@ class MessageController(private val mqtt: MQTT,
                 val state = parse(message)
                 if (recording) {
                     if (state is RoboticArmState) {
-                        //val ref = PickAndPlaceControllerHedgehog.getReference(System.currentTimeMillis())
-                        //val inTransition = state.match(PickAndPlaceControllerHedgehog.targetState, doubleAccuracy)
-                        //val label = if (inTransition) null else PickAndPlaceControllerHedgehog.targetState.name
+                        //val ref = StateObserver.getReference(System.currentTimeMillis())
+                        //val inTransition = state.match(StateObserver.targetState, doubleAccuracy)
+                        //val label = if (inTransition) null else StateObserver.targetState.name
                         //timeSeriesDatabase.savePoint(state, ref, label)
                     }
                 }
@@ -99,26 +98,33 @@ class MessageController(private val mqtt: MQTT,
 
     private fun observe() {
         if (autoPlay) {
-            val latest = controller.latest()
-            val transition = controller.next()
-            if (transition != null /*&& !controller.snapshot.match(controller.target(), doubleAccuracy)*/) {
+            val latest = controller.latestMatch
+            val transition = if (controller.atEndState()) {
+                controller.next()
+            } else {
+                controller.reset()
+            }
+            if (transition != null) {
                 println("Next: ${latest.name} -> ${transition.targetState.name}")
-                val context = controller.latest()
-                sendWebSocketMessageContext(gson.toJson(context))
-                val commands = controller.transform(transition)
-                for (c in commands) {
-                    mqtt.send(c)
-                }
-            } else if (controller.hasFinished()) {
-                val transition = RoboticArmTransition(controller.latest(), controller.first())
-                println("Next: ${latest.name} -> ${transition.targetState}")
-                val context = controller.latest()
+                val context = controller.latestMatch
                 sendWebSocketMessageContext(gson.toJson(context))
                 val commands = controller.transform(transition)
                 for (c in commands) {
                     mqtt.send(c)
                 }
             }
+        }
+    }
+
+    fun reset() {
+        val latest = controller.latestMatch
+        val transition = controller.reset()
+        println("Resetting: ${latest.name} -> ${transition.targetState.name}")
+        val context = controller.latestMatch
+        sendWebSocketMessageContext(gson.toJson(context))
+        val commands = controller.transform(transition)
+        for (c in commands) {
+            mqtt.send(c)
         }
     }
 

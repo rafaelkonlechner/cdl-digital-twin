@@ -46,7 +46,7 @@ fun main(args: Array<String>) {
     val jobs = JobController()
     val web = WebController(mqtt, controller, jobs, influx)
 
-    PickAndPlaceControllerHedgehog.stateMachine = StateMachineHedgehog(jobs.getJobs().first().states)
+    StateObserver.stateMachine = StateMachineHedgehog(jobs.getJobs().first().states)
 
     controller.start()
     web.start()

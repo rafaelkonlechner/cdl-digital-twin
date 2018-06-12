@@ -8,43 +8,39 @@ import at.ac.tuwien.big.entity.transition.*
  * This controller holds the core logic of the production steps during a simulation by searching the defined
  * successor state for a given input state.
  */
-object PickAndPlaceControllerHedgehog {
+object StateObserver {
 
-    var stateMachine = StateMachineHedgehog(listOf(RoboticArmState()))
-
-    var snapshot: RoboticArmState = RoboticArmState()
-        private set
-
-    private var roboticArmState: RoboticArmState = RoboticArmState()
-
-    private var latestMatch: RoboticArmState = RoboticArmState()
-
-    private var targetState: StateEvent = RoboticArmState()
+    var stateMachine: StateMachineHedgehog? = null
 
     /**
-     * Return latest matching state
+     * Most recently observed state
      */
-    fun latest() = latestMatch
+    private var snapshot: RoboticArmState = RoboticArmState()
 
-    fun target() = targetState
+    /**
+     * Latest matching state, given the current job
+     */
+    var latestMatch: RoboticArmState = RoboticArmState()
+        private set
+
+    /**
+     * Successor state, given the latest maching state
+     */
+    var targetState: StateEvent = RoboticArmState()
+        private set
 
     /**
      * Update the unit with new sensor information. This includes matching the updated state to the set of defined states.
      */
     fun update(e: StateEvent) {
-        var change = false
         when (e) {
             is RoboticArmState -> {
                 snapshot = e
                 val match = matchState(snapshot)
                 if (match != null && snapshot != match) {
-                    roboticArmState = match
-                    change = true
+                    latestMatch = match
                 }
             }
-        }
-        if (change) {
-            latestMatch = roboticArmState
         }
     }
 
@@ -52,16 +48,24 @@ object PickAndPlaceControllerHedgehog {
      * Return the defined successor state of the latest matching state, according to the state machine
      */
     fun next(): Transition? {
-        val transition = stateMachine.successor(latestMatch)
-        if (transition != null) {
-            targetState = transition.targetState
+        val successor = stateMachine?.successor(latestMatch)
+        if (successor != null) {
+            targetState = successor
+            return RoboticArmTransition(latestMatch, successor)
+        } else {
+            return null
         }
-        return transition
     }
 
-    fun hasFinished() = stateMachine.isEndState(latestMatch)
+    /**
+     * Return the defined successor state of the latest matching state, according to the state machine
+     */
+    fun reset(): Transition {
+        return RoboticArmTransition(latestMatch, stateMachine?.states?.first() ?: RoboticArmState())
+    }
 
-    fun first() = stateMachine.states.first()
+    fun atEndState() = stateMachine?.isEndState(latestMatch) ?: true
+
     /**
      * Transform successor into 'goto' commands for the MQTT API
      */
@@ -109,6 +113,6 @@ object PickAndPlaceControllerHedgehog {
      * @return the matching state or null, if no match was found
      */
     private fun matchState(roboticArmState: RoboticArmState): RoboticArmState? {
-        return stateMachine.states.firstOrNull { roboticArmState.match(it, doubleAccuracy) }
+        return stateMachine?.states?.firstOrNull { roboticArmState.match(it, doubleAccuracy) }
     }
 }
