@@ -6,9 +6,9 @@ import at.ac.tuwien.big.entity.state.RoboticArmState
 import at.ac.tuwien.big.entity.state.SliderState
 import at.ac.tuwien.big.entity.state.TestingRigState
 import at.ac.tuwien.big.entity.transition.*
+import at.ac.tuwien.big.sm.Job
 import com.google.gson.Gson
-import io.javalin.ApiBuilder.get
-import io.javalin.ApiBuilder.put
+import io.javalin.ApiBuilder.*
 import io.javalin.Javalin
 import kotlinx.coroutines.experimental.channels.Channel
 import kotlinx.coroutines.experimental.runBlocking
@@ -140,6 +140,46 @@ class WebController(private val mqtt: MQTT,
             }
 
             get("/jobs") { ctx -> ctx.json(jobController.getJobs()) }
+            get("/jobs/:id") { ctx ->
+                run {
+                    val id = ctx.param("id") ?: ""
+                    ctx.json(jobController.getJob(id) ?: Any())
+                }
+            }
+            put("/jobs/:id") { ctx ->
+                run {
+                    val id = ctx.param("id") ?: ""
+                    val job = jobController.getJob(id)
+                    if (job != null) {
+                        val element = gson.fromJson(ctx.body(), Job::class.java)
+                        jobController.setJob(element)
+                        ctx.status(200)
+                    } else {
+                        ctx.status(404)
+                    }
+                }
+            }
+            post("/jobs") { ctx ->
+                run {
+                    val element = gson.fromJson(ctx.body(), Job::class.java)
+                    val id = jobController.addJob(element)
+                    ctx.json(id)
+                }
+            }
+            put("/selected") { ctx ->
+                run {
+                    val selected = jobController.getJob(ctx.body())
+                    if (selected != null) {
+                        messageController.autoPlay = false
+                        StateObserver.stateMachine = StateMachineHedgehog(selected.states)
+                    }
+                }
+            }
+            put("/reset") { ctx ->
+                run {
+                    messageController.reset()
+                }
+            }
         }
     }
 
