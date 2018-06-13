@@ -151,8 +151,9 @@ class WebController(private val mqtt: MQTT,
                     val id = ctx.param("id") ?: ""
                     val job = jobController.getJob(id)
                     if (job != null) {
-                        val element = gson.fromJson(ctx.body(), Job::class.java)
-                        jobController.setJob(element)
+                        val newJob = gson.fromJson(ctx.body(), Job::class.java)
+                        jobController.setJob(newJob)
+                        StateObserver.stateMachine = StateMachineHedgehog(newJob.states)
                         ctx.status(200)
                     } else {
                         ctx.status(404)
@@ -161,23 +162,26 @@ class WebController(private val mqtt: MQTT,
             }
             post("/jobs") { ctx ->
                 run {
-                    val element = gson.fromJson(ctx.body(), Job::class.java)
-                    val id = jobController.addJob(element)
+                    val newJob = gson.fromJson(ctx.body(), Job::class.java)
+                    val id = jobController.addJob(newJob)
+                    StateObserver.stateMachine = StateMachineHedgehog(newJob.states)
                     ctx.json(id)
                 }
             }
-            put("/selected") { ctx ->
+            put("/selectedJob") { ctx ->
                 run {
-                    val selected = jobController.getJob(ctx.body())
-                    if (selected != null) {
-                        messageController.autoPlay = false
-                        StateObserver.stateMachine = StateMachineHedgehog(selected.states)
-                    }
+                    jobController.setSelectedJob(ctx.body())
+                    messageController.autoPlay = false
+                    StateObserver.stateMachine = StateMachineHedgehog(jobController.selected.states)
                 }
+            }
+            get("/selectedJob") { ctx ->
+                ctx.json(jobController.selected)
             }
             put("/reset") { ctx ->
                 run {
                     messageController.reset()
+                    ctx.status(200)
                 }
             }
         }

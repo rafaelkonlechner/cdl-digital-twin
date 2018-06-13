@@ -8,7 +8,7 @@ import at.ac.tuwien.big.entity.transition.*
  * This controller holds the core logic of the production steps during a simulation by searching the defined
  * successor state for a given input state.
  */
-object StateObserver {
+object StateObserver : Observable<RoboticArmState>() {
 
     var stateMachine: StateMachineHedgehog? = null
 
@@ -37,8 +37,9 @@ object StateObserver {
             is RoboticArmState -> {
                 snapshot = e
                 val match = matchState(snapshot)
-                if (match != null && snapshot != match) {
+                if (match != null && latestMatch != match) {
                     latestMatch = match
+                    notify(latestMatch)
                 }
             }
         }

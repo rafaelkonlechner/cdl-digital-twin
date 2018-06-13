@@ -5,7 +5,6 @@
     "states": [
       {
         "name": "Idle",
-        "active": true,
         "basePosition": 1.8,
         "mainArmPosition": 1.5,
         "secondArmPosition": 1.5,
@@ -45,11 +44,31 @@
   {
     "name": "Job 2",
     "id": "04b881dd",
-    "states": []
+    "states": [
+      {
+        "name": "Idle",
+        "basePosition": 2.0,
+        "mainArmPosition": 1.5,
+        "secondArmPosition": 1.5,
+        "wristPosition": 2.6,
+        "wristRotation": 1.5,
+        "gripperPosition": 2.3
+      }
+    ]
   },
   {
     "name": "Job 3",
     "id": "e191049b",
-    "states": []
+    "states": [
+      {
+        "name": "Idle",
+        "basePosition": 2.4,
+        "mainArmPosition": 1.5,
+        "secondArmPosition": 1.5,
+        "wristPosition": 2.6,
+        "wristRotation": 1.5,
+        "gripperPosition": 2.3
+      }
+    ]
   }
 ]

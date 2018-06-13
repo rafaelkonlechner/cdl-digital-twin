@@ -23,6 +23,9 @@ class MessageController(private val mqtt: MQTT,
 
     init {
         mqtt.subscribe(listOf(simSensor, sensor, detectionCamera, pickupCamera), this::onMessage)
+        controller.subscribe {
+            sendWebSocketMessageState(it.name)
+        }
         //webcam = Webcam.getWebcams()[1]
         //webcam.viewSize = Dimension(640, 480)
     }
@@ -99,7 +102,7 @@ class MessageController(private val mqtt: MQTT,
     private fun observe() {
         if (autoPlay) {
             val latest = controller.latestMatch
-            val transition = if (controller.atEndState()) {
+            val transition = if (!controller.atEndState()) {
                 controller.next()
             } else {
                 controller.reset()
@@ -142,6 +145,10 @@ class MessageController(private val mqtt: MQTT,
 
     private fun sendWebSocketMessageSensor(data: String) {
         sendWebSocketMessage("sensor", data)
+    }
+
+    private fun sendWebSocketMessageState(data: String) {
+        sendWebSocketMessage("state", data)
     }
 
     private fun sendWebSocketMessageContext(data: String) {

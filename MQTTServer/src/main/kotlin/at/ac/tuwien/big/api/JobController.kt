@@ -10,11 +10,14 @@ typealias ID = String
 class JobController {
 
     private val jobs: MutableMap<ID, Job>
+    var selected: Job
+        private set
 
     init {
         val jobsText = this::class.java.classLoader.getResource("jobs.json").readText()
         val jobsType = object : TypeToken<List<Job>>() {}.type
         jobs = Gson().fromJson<List<Job>>(jobsText, jobsType).map { Pair(it.id, it) }.toMap().toMutableMap()
+        selected = jobs.values.first()
     }
 
     fun getJobs(): List<Job> {
@@ -33,6 +36,10 @@ class JobController {
         val uuid = generateID()
         jobs[uuid] = job
         return uuid
+    }
+
+    fun setSelectedJob(id: String) {
+        selected = jobs[id]!!
     }
 
     private fun generateID() = UUID.randomUUID().toString().take(16)
