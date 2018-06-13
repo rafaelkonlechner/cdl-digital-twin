@@ -56,7 +56,7 @@
                 <path v-show="s.active" d="M12 8V4l8 8-8 8v-4H4V8z" fill="#1E88E5"/>
                 <path d="M0 0h24v24H0z" fill="none"/>
             </svg>
-            <state-preview :state="s" :index="index" :active="s.active" :context="context" :socket="socket" v-on:moveLeft="moveLeft($event)" v-on:moveRight="moveRight($event)" v-on:remove="remove($event)">
+            <state-preview :state="s" :index="index" :active="s.active" :context="context" :socket="socket" v-on:moveLeft="moveLeft($event)" v-on:moveRight="moveRight($event)" v-on:remove="remove($event)" v-on:recordPosition="saveChanges()">
             </state-preview>
         </div>
         <div class="mdl-cell--3-col">
@@ -83,6 +83,24 @@ export default {
             selected: null
         }
     },
+    mounted() {
+        var self = this;
+        this.socket.addEventListener("message", function(event) {
+            let msg = JSON.parse(event.data);
+            if (msg.topic === "state") {
+                let name = msg.message
+                self.job.states.forEach(function(x) {
+                    if (x.name === name) {
+                        console.log(name)
+                        x.active = true;
+                    } else {
+                        x.active = false;
+                    }
+                    self.$forceUpdate();
+                });
+            }
+        });
+    },
     methods: {
         addState() {
             this.job.states.push({
@@ -96,6 +114,7 @@ export default {
             this.job.states.splice(i, 1, right)
             this.job.states.splice(i - 1, 1, elem)
             this.$emit('changes')
+            this.saveChanges();
         },
         moveRight(i) {
             if (i + 1 > this.job.states.length - 1) return;
@@ -104,10 +123,18 @@ export default {
             this.job.states.splice(i, 1, right)
             this.job.states.splice(i + 1, 1, elem)
             this.$emit('changes')
+            this.saveChanges();
         },
         remove(i) {
             this.job.states.splice(i, 1);
             this.$emit('changes')
+            this.saveChanges();
+        },
+        saveChanges() {
+            var xhr = new XMLHttpRequest();
+            xhr.open("PUT", 'http://localhost:8080/jobs/' + this.job.id, true);
+            xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+            xhr.send(JSON.stringify(this.job));
         }
     }
 }

@@ -90,6 +90,7 @@ export default {
             this.state.wristRotation = r.wristRotation.toFixed(2);
             this.state.gripperPosition = r.gripperPosition.toFixed(2);
             console.log(this.state)
+            this.$emit('recordPosition');
             this.$forceUpdate();
         }
     }

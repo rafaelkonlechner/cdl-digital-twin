@@ -85,7 +85,7 @@ article {
         <div class="mdl-grid">
             <div class="mdl-cell--2-col">
                 <h2>Saved Jobs</h2>
-                <div v-for="job in jobs" @click="selectedJob = job" v-bind:class="{'job': true, 'selected-job': job === selectedJob}">
+                <div v-for="job in jobs" @click="selectJob(job)" v-bind:class="{'job': true, 'selected-job': job === selectedJob}">
                     <h3>{{job.name}}</h3>
                 </div>
                 <div class="job" style="text-align: center;">
@@ -94,14 +94,14 @@ article {
             </div>
             <div class="mdl-cell--10-col">
                 <div class="job-controls">
-                    <div style="display: inline-block;">
+                    <div style="display: inline-block;" v-if="selectedJob">
                         <h2 v-if="!editTitle" @click="editTitle=true">{{selectedJob.name}}</h2>
                         <input style="margin: 18.4px 0; font-size: 1.5em;" v-if="editTitle" v-on:keyup.enter="editTitle=false" v-model="selectedJob.name" />
                     </div>
                     <div style="display: inline-block; margin-left: 70px;">
-                        <button class="control-button" @click="toggleAutoPlay()"><i class="material-icons">play_arrow</i></button>
+                        <button class="control-button" @click="toggleAutoPlay()"><i class="material-icons" v-if="!autoPlay">play_arrow</i><i class="material-icons" v-if="autoPlay">pause</i></button>
                         <button class="control-button"><i class="material-icons">stop</i></button>
-                        <button class="control-button"><i class="material-icons">replay</i></button>
+                        <button class="control-button" @click="reset()"><i class="material-icons">replay</i></button>
                         <em style="position: relative; bottom: 7px;">Changes saved ...</em>
                     </div>
                 </div>
@@ -127,7 +127,6 @@ import SensorMonitor from "./SensorMonitor.vue";
 import StateChart from "./StateChart.vue";
 import BluePrint from "./Blueprint.vue";
 import CameraSignal from "./CameraSignal.vue";
-import jobs from "./jobs.json";
 
 export default {
     name: "app",
@@ -141,13 +140,13 @@ export default {
     },
     data() {
         return {
-            socket: null,
+            socket: new WebSocket("ws://127.0.0.1:8080/websocket"),
             messageRate: 0,
             autoPlay: false,
             newJobTitle: "New Job",
             editTitle: false,
-            jobs: jobs,
-            selectedJob: jobs[0],
+            jobs: [],
+            selectedJob: null,
             context: {
                 roboticArmState: {
                     name: "Snapshot",
@@ -190,15 +189,19 @@ export default {
         }
     },
     created() {
-        if (window.localStorage.getItem("jobs") == null) {
-            this.jobs = jobs
-            this.selectedJob = this.jobs[0]
-        } else {
-            this.jobs = window.localStorage.getItem("jobs")
-            this.selectedJob = this.jobs[0]
-        }
         let self = this;
-        this.socket = new WebSocket("ws://127.0.0.1:8080/websocket");
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function() {
+            try {
+                self.jobs = JSON.parse(this.responseText)
+            } catch (err) {
+                console.log("error")
+            }
+            self.selectedJob = self.jobs[0]
+        }
+        xhr.open("GET", 'http://localhost:8080/jobs', true);
+        xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+        xhr.send();
         this.socket.addEventListener("open", function(event) {
             console.log("Connected");
         });
@@ -238,6 +241,19 @@ export default {
             xhr.open("PUT", 'http://localhost:8080/autoPlay', true);
             xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
             xhr.send(this.autoPlay);
+        },
+        reset() {
+            var xhr = new XMLHttpRequest();
+            xhr.open("PUT", 'http://localhost:8080/reset', true);
+            xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+            xhr.send();
+        },
+        selectJob(job) {
+            this.selectedJob = job;
+            var xhr = new XMLHttpRequest();
+            xhr.open("PUT", 'http://localhost:8080/selectedJob/', true);
+            xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+            xhr.send(job.id);
         },
         gotoIdle() {
             this.sendSocketMessage("idle");
