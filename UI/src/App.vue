@@ -96,7 +96,7 @@ article {
                 <div class="job-controls">
                     <div style="display: inline-block;" v-if="selectedJob">
                         <h2 v-if="!editTitle" @click="editTitle=true">{{selectedJob.name}}</h2>
-                        <input style="margin: 18.4px 0; font-size: 1.5em;" v-if="editTitle" v-on:keyup.enter="editTitle=false" v-model="selectedJob.name" />
+                        <input style="margin: 18.4px 0; font-size: 1.5em;" v-if="editTitle" v-on:keyup.enter="updateTitle()" v-model="selectedJob.name" />
                     </div>
                     <div style="display: inline-block; margin-left: 70px;">
                         <button class="control-button" @click="toggleAutoPlay()"><i class="material-icons" v-if="!autoPlay">play_arrow</i><i class="material-icons" v-if="autoPlay">pause</i></button>
@@ -229,10 +229,27 @@ export default {
     },
     methods: {
         newJob() {
-            this.jobs.push({
+            var job = {
                 name: "New Job",
                 states: []
-            })
+            }
+            this.jobs.push(job);
+            var xhr = new XMLHttpRequest();
+            var self = this;
+            xhr.onreadystatechange = function() {
+                console.log(this.responseText)
+                self.jobs[self.jobs.length - 1].id = this.responseText
+            }
+            xhr.open("POST", 'http://localhost:8080/jobs', true);
+            xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+            xhr.send(JSON.stringify(job));
+        },
+        updateTitle() {
+            this.editTitle = false;
+            var xhr = new XMLHttpRequest();
+            xhr.open("PUT", 'http://localhost:8080/jobs/' + this.selectedJob.id, true);
+            xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+            xhr.send(JSON.stringify(this.selectedJob));
         },
         toggleAutoPlay: function() {
             console.log("Toggle AutoPlay");
@@ -250,6 +267,7 @@ export default {
         },
         selectJob(job) {
             this.selectedJob = job;
+            console.log(this.selectedJob.id)
             var xhr = new XMLHttpRequest();
             xhr.open("PUT", 'http://localhost:8080/selectedJob/', true);
             xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');

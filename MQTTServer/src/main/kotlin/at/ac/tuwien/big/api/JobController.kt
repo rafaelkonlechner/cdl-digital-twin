@@ -42,5 +42,5 @@ class JobController {
         selected = jobs[id]!!
     }
 
-    private fun generateID() = UUID.randomUUID().toString().take(16)
+    private fun generateID() = UUID.randomUUID().toString().take(8)
 }
