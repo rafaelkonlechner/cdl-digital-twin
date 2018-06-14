@@ -89,7 +89,7 @@ article {
                     <h3>{{job.name}}</h3>
                 </div>
                 <div class="job" style="text-align: center;">
-                    <button @click="newJob()" class="new-job"><i class="material-icons">add</i></button>
+                    <button @click="newJob()" class="new-job"><i class="material-icons" style="color: darkslategrey;">add</i></button>
                 </div>
             </div>
             <div class="mdl-cell--10-col">

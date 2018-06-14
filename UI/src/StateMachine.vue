@@ -24,7 +24,7 @@
     width: 40vw;
     height: 40vh;
     background: white;
-    border-radius: 20px;
+    border-radius: 10px;
     z-index: 11;
 }
 
@@ -44,19 +44,24 @@
 </style>
 <template>
 <div class="state-machine">
-    <div v-if="showPopup" @click="showPopup = false" class="dim">
+    <div v-if="showPopup" @click="showPopup = false;" class="dim">
         <div class="popup">
-            <h1>{{selected.name}}</h1>
+            <div v-if="selectedState">
+                <h1>{{selectedState.name}}</h1>
+            </div>
+            <div v-if="selectedTransition">
+                <h1>{{selectedTransition.first.name}} - {{selectedTransition.second.name}}</h1>
+            </div>
         </div>
     </div>
     <div class="mdl-grid">
         <div v-for="(s, index) in job.states" class="mdl-cell--3-col" style="position: relative;">
-            <svg @click="showPopup = true;" xmlns="http://www.w3.org/2000/svg" style="position: absolute; top: 40%; left: 82%;" width="24" height="24">
+            <svg @click="showTransition(index)" xmlns="http://www.w3.org/2000/svg" style="position: absolute; top: 40%; left: 82%;" width="24" height="24">
                 <path v-show="!s.active" d="M12 8V4l8 8-8 8v-4H4V8z" fill="#888"/>
                 <path v-show="s.active" d="M12 8V4l8 8-8 8v-4H4V8z" fill="#1E88E5"/>
                 <path d="M0 0h24v24H0z" fill="none"/>
             </svg>
-            <state-preview :state="s" :index="index" :active="s.active" :context="context" :socket="socket" v-on:moveLeft="moveLeft($event)" v-on:moveRight="moveRight($event)" v-on:remove="remove($event)" v-on:recordPosition="saveChanges()">
+            <state-preview v-on:click.native="showState(s)" :state="s" :index="index" :active="s.active" :context="context" :socket="socket" v-on:moveLeft="moveLeft($event)" v-on:moveRight="moveRight($event)" v-on:remove="remove($event)" v-on:recordPosition="saveChanges()">
             </state-preview>
         </div>
         <div class="mdl-cell--3-col">
@@ -80,7 +85,8 @@ export default {
         return {
             editName: false,
             showPopup: false,
-            selected: null
+            selectedState: null,
+            selectedTransition: null
         }
     },
     mounted() {
@@ -108,6 +114,7 @@ export default {
             })
         },
         moveLeft(i) {
+            event.stopPropagation()
             if (i - 1 < 0) return;
             var elem = this.job.states[i];
             var right = this.job.states[i - 1];
@@ -117,6 +124,7 @@ export default {
             this.saveChanges();
         },
         moveRight(i) {
+            event.stopPropagation()
             if (i + 1 > this.job.states.length - 1) return;
             var elem = this.job.states[i];
             var right = this.job.states[i + 1];
@@ -126,6 +134,7 @@ export default {
             this.saveChanges();
         },
         remove(i) {
+            event.stopPropagation()
             this.job.states.splice(i, 1);
             this.$emit('changes')
             this.saveChanges();
@@ -135,6 +144,21 @@ export default {
             xhr.open("PUT", 'http://localhost:8080/jobs/' + this.job.id, true);
             xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
             xhr.send(JSON.stringify(this.job));
+        },
+        showState(s) {
+            this.showPopup = true;
+            this.selectedTransition = null;
+            this.selectedState = s;
+        },
+        showTransition(index) {
+            this.showPopup = true;
+            var first = this.job.states[index]
+            var second = this.job.states[index + 1]
+            this.selectedState = null;
+            this.selectedTransition = {
+                first: first,
+                second: second
+            }
         }
     }
 }

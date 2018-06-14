@@ -37,14 +37,14 @@
 <template>
 <div v-bind:class="{ 'active': active, 'state': true }">
     <div class="state-head">
-        <i @click="remove(index)" style="float: right;" class="material-icons">delete</i>
-        <i @click="moveRight(index)" style="float: right;" class="material-icons">arrow_right</i>
-        <i @click="moveLeft(index)" style="float: right;" class="material-icons">arrow_left</i>
+        <i @click="remove(index)" style="float: right; cursor: default;" class="material-icons">delete</i>
+        <i @click="moveRight(index)" style="float: right; cursor: default;" class="material-icons">arrow_right</i>
+        <i @click="moveLeft(index)" style="float: right; cursor: default;" class="material-icons">arrow_left</i>
         <!--<i v-if="index === 0" style="float: right;" class="material-icons">check_circle</i>
         <i v-if="index === 1" style="float: right;" class="material-icons">cached</i>
         <i v-if="index >= 2" style="float: right;" class="material-icons">schedule</i>
         <i v-if="false" style="float: right;" class="material-icons">offline_bolt</i>-->
-        <h3 v-if="!editName" @click="editName=true">{{state.name}}</h3>
+        <h3 v-if="!editName" @click="event.stopPropagation(); editName=true;">{{state.name}}</h3>
         <input style="color: darkslategray; font-family: 'Roboto'; font-size: 14px; margin-top: 14px; width: 80px;" v-if="editName" v-on:keyup.enter="editName=false" v-model="state.name" />
     </div>
     <div class="state-content">
@@ -82,6 +82,7 @@ export default {
             this.$emit('remove', i);
         },
         savePosition() {
+            event.stopPropagation();
             var r = this.context.roboticArmState
             this.state.basePosition = r.basePosition.toFixed(2);
             this.state.mainArmPosition = r.mainArmPosition.toFixed(2);
