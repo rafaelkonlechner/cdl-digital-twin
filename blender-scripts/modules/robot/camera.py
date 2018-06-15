@@ -41,7 +41,6 @@ def main():
         thread = Worker(None)
         thread.run(imgDetectorX, imgDetectorY, imgPickupX, imgPickupY)
     else:
-        contr = GameLogic.getCurrentController()
         scene = GameLogic.getCurrentScene()
         screen1 = scene.objects['Screen1']
         screen2 = scene.objects['Screen2']
