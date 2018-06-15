@@ -79,8 +79,8 @@ object StateObserver : Observable<RoboticArmState>() {
                         "main-arm-goto ${target.mainArmPosition} ${transition.mainArmSpeed}",
                         "second-arm-goto ${target.secondArmPosition} ${transition.secondArmSpeed}",
                         "second-arm-roto ${target.secondArmRotation} ${transition.secondArmSpeed}",
-                        "wrist-goto ${target.wristPosition} 1.0",
-                        "wrist-roto ${target.wristRotation} 1.0",
+                        "head-mount-goto ${target.headMountPosition} 1.0",
+                        "head-goto ${target.headPosition} 1.0",
                         "gripper-goto ${target.gripperPosition} 1.0"
                 )
             }

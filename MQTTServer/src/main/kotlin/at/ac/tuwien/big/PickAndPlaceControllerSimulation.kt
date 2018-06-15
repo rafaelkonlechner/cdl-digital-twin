@@ -120,7 +120,7 @@ object PickAndPlaceControllerSimulation {
             timeBase = timeToTarget(start.basePosition, targetState.basePosition, 0.000873, transition.baseSpeed)
             timeMainArm = timeToTarget(start.mainArmPosition, targetState.mainArmPosition, 0.000873, transition.mainArmSpeed)
             timeSecondArm = timeToTarget(start.secondArmPosition, targetState.secondArmPosition, 0.000873, transition.secondArmSpeed)
-            timeWrist = timeToTarget(start.wristPosition, targetState.wristPosition)
+            timeWrist = timeToTarget(start.headMountPosition, targetState.headMountPosition)
             timeGripper = timeToTarget(start.gripperPosition, targetState.gripperPosition)
         }
     }
@@ -136,7 +136,7 @@ object PickAndPlaceControllerSimulation {
             val baseRef = getPosition(startState.basePosition, targetState.basePosition, timeBase, Math.min(timeBase, diff))
             val mainArmRef = getPosition(startState.mainArmPosition, targetState.mainArmPosition, timeMainArm, Math.min(timeMainArm, diff))
             val secondArmRef = getPosition(startState.secondArmPosition, targetState.secondArmPosition, timeSecondArm, Math.min(timeSecondArm, diff))
-            val wristRef = getPosition(startState.wristPosition, targetState.wristPosition, timeWrist, Math.min(timeWrist, diff))
+            val wristRef = getPosition(startState.headMountPosition, targetState.headMountPosition, timeWrist, Math.min(timeWrist, diff))
             val gripperRef = getPosition(startState.gripperPosition, targetState.gripperPosition, timeGripper, Math.min(timeGripper, diff))
             RoboticArmState("Reference", "RoboticArm", baseRef, mainArmRef, secondArmRef, wristRef, gripperRef)
         } else {
@@ -156,8 +156,8 @@ object PickAndPlaceControllerSimulation {
                         "main-arm-goto ${target.mainArmPosition} ${transition.mainArmSpeed}",
                         "second-arm-goto ${target.secondArmPosition} ${transition.secondArmSpeed}",
                         "second-arm-roto ${target.secondArmRotation} ${transition.secondArmSpeed}",
-                        "wrist-goto ${target.wristPosition}",
-                        "wrist-roto ${target.wristRotation}",
+                        "head-mount-goto ${target.headMountPosition}",
+                        "head-goto ${target.headPosition}",
                         "gripper-goto ${target.gripperPosition}"
                 )
             }

@@ -7,14 +7,16 @@ def main():
         base_joint = GameLogic.getCurrentScene().objects["base_joint"]
         main_arm = GameLogic.getCurrentScene().objects["main_arm"]
         second_arm = GameLogic.getCurrentScene().objects["second_arm"]
-        wrist = GameLogic.getCurrentScene().objects["wrist"]
+        head = GameLogic.getCurrentScene().objects["head"]
+        head_mount = GameLogic.getCurrentScene().objects["head_mount"]
         hand = GameLogic.getCurrentScene().objects["BarrettHand"]
         gripper = GameLogic.getCurrentScene().objects["Finger1.1"]
 
         base_position = base_joint.localOrientation.to_euler().z
         main_arm_position = main_arm.localOrientation.to_euler().y
         second_arm_position = second_arm.localOrientation.to_euler().y
-        wrist_position = wrist.localOrientation.to_euler().x
+        head_mount_position = head_mount.localOrientation.to_euler().x
+        head_position = head.localOrientation.to_euler().y
         hand_position = hand.worldPosition
         gripper_position = gripper.localOrientation.to_euler().y
 
@@ -30,6 +32,7 @@ def main():
         "mainArmPosition": %s,
         "secondArmPosition": %s,
         "wristPosition": %s,
+        "headPosition": %s,
         "gripperPosition": %s,
         "handPosition": {
             "x": %s,
@@ -39,11 +42,12 @@ def main():
         "gripperHasContact": "%s"
         }
         """ % (
-        str(base_position),
-        str(main_arm_position),
-        str(second_arm_position),
-        str(wrist_position),
-        str(gripper_position),
+        str(base_position + 1.68),
+        str(main_arm_position + 1.50),
+        str(second_arm_position + 2.08),
+        str(head_mount_position + 1.50),
+        str(head_position + 2.0),
+        str(gripper_position + 2.30),
         str(hand_position.x),
         str(hand_position.y),
         str(hand_position.z),

@@ -8,8 +8,8 @@
         "basePosition": 1.8,
         "mainArmPosition": 1.5,
         "secondArmPosition": 1.5,
-        "wristPosition": 2.6,
-        "wristRotation": 1.5,
+        "headPosition": 2.6,
+        "headMountPosition": 1.5,
         "gripperPosition": 2.3
       },
       {
@@ -17,8 +17,8 @@
         "basePosition": 1.6,
         "mainArmPosition": 1.8,
         "secondArmPosition": 1.8,
-        "wristPosition": 2.6,
-        "wristRotation": 1.5,
+        "headPosition": 2.6,
+        "headMountPosition": 1.5,
         "gripperPosition": 3.14
       },
       {
@@ -26,8 +26,8 @@
         "basePosition": 1.5,
         "mainArmPosition": 2.0,
         "secondArmPosition": 2.0,
-        "wristPosition": 2.6,
-        "wristRotation": 1.5,
+        "headPosition": 2.6,
+        "headMountPosition": 1.5,
         "gripperPosition": 2.3
       },
       {
@@ -35,8 +35,8 @@
         "basePosition": 1.0,
         "mainArmPosition": 2.0,
         "secondArmPosition": 3.0,
-        "wristPosition": 2.6,
-        "wristRotation": 0.0,
+        "headPosition": 2.6,
+        "headMountPosition": 0.0,
         "gripperPosition": 2.2
       }
     ]
@@ -52,8 +52,8 @@
         "mainArmPosition": 1.5,
         "secondArmPosition": 1.5,
         "secondArmRotation": 0.0,
-        "wristPosition": 2.6,
-        "wristRotation": 1.5,
+        "headPosition": 2.6,
+        "headMountPosition": 1.5,
         "gripperPosition": 2.3,
         "gripperHasContact": false,
         "handPosition": null
@@ -65,8 +65,8 @@
         "mainArmPosition": 1.2,
         "secondArmPosition": 1.72,
         "secondArmRotation": 0.0,
-        "wristPosition": 1.67,
-        "wristRotation": 1.42,
+        "headPosition": 1.67,
+        "headMountPosition": 1.42,
         "gripperPosition": 3.04,
         "gripperHasContact": false,
         "handPosition": null
@@ -78,8 +78,8 @@
         "mainArmPosition": 0.93,
         "secondArmPosition": 1.68,
         "secondArmRotation": 0.0,
-        "wristPosition": 1.67,
-        "wristRotation": 1.42,
+        "headPosition": 1.67,
+        "headMountPosition": 1.42,
         "gripperPosition": 2.82,
         "gripperHasContact": false,
         "handPosition": null
@@ -91,8 +91,8 @@
         "mainArmPosition": 0.9,
         "secondArmPosition": 1.68,
         "secondArmRotation": 0.0,
-        "wristPosition": 1.67,
-        "wristRotation": 1.42,
+        "headPosition": 1.67,
+        "headMountPosition": 1.42,
         "gripperPosition": 2.48,
         "gripperHasContact": false,
         "handPosition": null
@@ -104,8 +104,8 @@
         "mainArmPosition": 0.93,
         "secondArmPosition": 1.1,
         "secondArmRotation": 0.0,
-        "wristPosition": 2.56,
-        "wristRotation": 2.88,
+        "headPosition": 2.56,
+        "headMountPosition": 2.88,
         "gripperPosition": 2.48,
         "gripperHasContact": false,
         "handPosition": null
@@ -117,8 +117,8 @@
         "mainArmPosition": 1.5,
         "secondArmPosition": 1.88,
         "secondArmRotation": 0.0,
-        "wristPosition": 2.83,
-        "wristRotation": 2.94,
+        "headPosition": 2.83,
+        "headMountPosition": 2.94,
         "gripperPosition": 2.48,
         "gripperHasContact": false,
         "handPosition": null
@@ -130,8 +130,8 @@
         "mainArmPosition": 1.35,
         "secondArmPosition": 2.19,
         "secondArmRotation": 0.0,
-        "wristPosition": 3.14,
-        "wristRotation": 2.94,
+        "headPosition": 3.14,
+        "headMountPosition": 2.94,
         "gripperPosition": 2.48,
         "gripperHasContact": false,
         "handPosition": null
@@ -143,8 +143,8 @@
         "mainArmPosition": 1.35,
         "secondArmPosition": 2.19,
         "secondArmRotation": 0.0,
-        "wristPosition": 3.14,
-        "wristRotation": 2.94,
+        "headPosition": 3.14,
+        "headMountPosition": 2.94,
         "gripperPosition": 2.56,
         "gripperHasContact": false,
         "handPosition": null
@@ -156,8 +156,8 @@
         "mainArmPosition": 1.35,
         "secondArmPosition": 2.19,
         "secondArmRotation": 0.0,
-        "wristPosition": 3.14,
-        "wristRotation": 2.94,
+        "headPosition": 3.14,
+        "headMountPosition": 2.94,
         "gripperPosition": 2.96,
         "gripperHasContact": false,
         "handPosition": null
@@ -169,8 +169,8 @@
         "mainArmPosition": 1.57,
         "secondArmPosition": 0.0,
         "secondArmRotation": 0.0,
-        "wristPosition": 0.47,
-        "wristRotation": 2.86,
+        "headPosition": 0.47,
+        "headMountPosition": 2.86,
         "gripperPosition": 2.96,
         "gripperHasContact": false,
         "handPosition": null
@@ -182,8 +182,8 @@
         "mainArmPosition": 0.67,
         "secondArmPosition": 0.0,
         "secondArmRotation": 0.0,
-        "wristPosition": 1.62,
-        "wristRotation": 2.86,
+        "headPosition": 1.62,
+        "headMountPosition": 2.86,
         "gripperPosition": 2.32,
         "gripperHasContact": false,
         "handPosition": null
@@ -195,8 +195,8 @@
         "mainArmPosition": 0.67,
         "secondArmPosition": 0.0,
         "secondArmRotation": 0.0,
-        "wristPosition": 1.62,
-        "wristRotation": 2.86,
+        "headPosition": 1.62,
+        "headMountPosition": 2.86,
         "gripperPosition": 2.26,
         "gripperHasContact": false,
         "handPosition": null
@@ -208,8 +208,8 @@
         "mainArmPosition": 0.67,
         "secondArmPosition": 0.0,
         "secondArmRotation": 0.0,
-        "wristPosition": 1.62,
-        "wristRotation": 2.86,
+        "headPosition": 1.62,
+        "headMountPosition": 2.86,
         "gripperPosition": 2.88,
         "gripperHasContact": false,
         "handPosition": null
@@ -225,8 +225,8 @@
         "basePosition": 2.4,
         "mainArmPosition": 1.5,
         "secondArmPosition": 1.5,
-        "wristPosition": 2.6,
-        "wristRotation": 1.5,
+        "headPosition": 2.6,
+        "headMountPosition": 1.5,
         "gripperPosition": 2.3
       }
     ]

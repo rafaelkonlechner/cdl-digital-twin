@@ -50,7 +50,8 @@ def main():
     base_joint = GameLogic.getCurrentScene().objects["base_joint"]
     main_arm = GameLogic.getCurrentScene().objects["main_arm"]
     second_arm = GameLogic.getCurrentScene().objects["second_arm"]
-    wrist = GameLogic.getCurrentScene().objects["wrist"]
+    head = GameLogic.getCurrentScene().objects["head"]
+    head_mount = GameLogic.getCurrentScene().objects["head_mount"]
     gripper = GameLogic.getCurrentScene().objects["Finger1.1"]
     slider = GameLogic.getCurrentScene().objects["SliderPanel"]
     adjuster = GameLogic.getCurrentScene().objects["Adjuster1"]
@@ -58,20 +59,62 @@ def main():
     base_position = base_joint.localOrientation.to_euler().z
     main_arm_position = main_arm.localOrientation.to_euler().y
     second_arm_position = second_arm.localOrientation.to_euler().y
-    wrist_position = wrist.localOrientation.to_euler().x
+    head_mount_position = head_mount.localOrientation.to_euler().x
+    head_position = head.localOrientation.to_euler().y
     gripper_position = gripper.localOrientation.to_euler().y
     slider_position = slider.worldPosition.x
     adjuster_position = adjuster.worldPosition.x
     platform_position = tilt.localOrientation.to_euler().y
-    base_speed = GameLogic.base_rotation_speed
+    base_speed = GameLogic.base_speed
     base_target_speed = GameLogic.base_target_speed
-    main_arm_speed = GameLogic.main_arm_rotation_speed
+    main_arm_speed = GameLogic.main_arm_speed
     main_arm_target_speed = GameLogic.main_arm_target_speed
-    second_arm_speed = GameLogic.second_arm_rotation_speed
+    second_arm_speed = GameLogic.second_arm_speed
     second_arm_target_speed = GameLogic.second_arm_target_speed
+    head_mount_speed = GameLogic.head_mount_speed
+    head_mount_target_speed = GameLogic.head_mount_target_speed
+    head_speed = GameLogic.head_speed
+    head_target_speed = GameLogic.head_target_speed
 
     acceleration = 0.000873 # 0.05° per frame (30 frames or 0.5 sec to top speed)
     deceleration = acceleration # 0.05° per frame (15 frames or 0.25 sec from top speed to zero)
+
+    if GameLogic.left_rotate_base:
+        GameLogic.sendMessage("left-rotate-base")
+        GameLogic.base_target_position = base_joint.localOrientation.to_euler().z
+    if GameLogic.right_rotate_base:
+        GameLogic.sendMessage("right-rotate-base")
+        GameLogic.base_target_position = base_joint.localOrientation.to_euler().z
+    if GameLogic.lift_main_arm:
+        GameLogic.sendMessage("lower-main-arm")
+        GameLogic.main_arm_target_position = main_arm.localOrientation.to_euler().y
+    if GameLogic.lower_main_arm:
+        GameLogic.sendMessage("lift-main-arm")
+        GameLogic.main_arm_target_position = main_arm.localOrientation.to_euler().y
+    if GameLogic.lift_second_arm:
+        GameLogic.sendMessage("lift-second-arm")
+        GameLogic.second_arm_target_position = second_arm.localOrientation.to_euler().y
+    if GameLogic.lower_second_arm:
+        GameLogic.sendMessage("lower-second-arm")
+        GameLogic.second_arm_target_position = second_arm.localOrientation.to_euler().y
+    if GameLogic.left_rotate_head_mount:
+        GameLogic.sendMessage("left-rotate-head-mount")
+        GameLogic.head_mount_target_position = head_mount.localOrientation.to_euler().x
+    if GameLogic.right_rotate_head_mount:
+        GameLogic.sendMessage("right-rotate-head-mount")
+        GameLogic.head_mount_target_position = head_mount.localOrientation.to_euler().x
+    if GameLogic.lift_head:
+        GameLogic.sendMessage("lift-head")
+        GameLogic.head_target_position = head.localOrientation.to_euler().y
+    if GameLogic.lower_head:
+        GameLogic.sendMessage("lower-head")
+        GameLogic.head_target_position = head.localOrientation.to_euler().y
+    if GameLogic.grip_gripper:
+        GameLogic.sendMessage("grip-gripper")
+        GameLogic.gripper_target_position = gripper.localOrientation.to_euler().x
+    if GameLogic.release_gripper:
+        GameLogic.sendMessage("release-gripper")
+        GameLogic.gripper_target_position = gripper.localOrientation.to_euler().x
 
     base_speed = calc_speed(base_position, GameLogic.base_target_position, base_speed, rad(base_target_speed), acceleration, deceleration)
     if base_speed == 0:
@@ -85,19 +128,24 @@ def main():
     if second_arm_speed == 0:
         GameLogic.second_arm_target = True
 
-    base_joint.applyRotation((0, 0, base_speed), True)
-    GameLogic.base_rotation_speed = base_speed
-    main_arm.applyRotation((0, main_arm_speed, 0), True)
-    GameLogic.main_arm_rotation_speed = main_arm_speed
-    second_arm.applyRotation((0, second_arm_speed, 0), True)
-    GameLogic.second_arm_rotation_speed = second_arm_speed
+    head_mount_speed = calc_speed(head_mount_position, GameLogic.head_mount_target_position, head_mount_speed, rad(head_mount_target_speed), acceleration, deceleration)
+    if head_mount_speed == 0:
+        GameLogic.head_mount_target = True
 
-    if math.isclose(wrist_position, GameLogic.wrist_target_position, rel_tol=0.017, abs_tol=0.017):
-        GameLogic.wrist_target = False
-    if GameLogic.wrist_target and wrist_position < GameLogic.wrist_target_position:
-        GameLogic.sendMessage("left-rotate-wrist")
-    if GameLogic.wrist_target and wrist_position > GameLogic.wrist_target_position:
-        GameLogic.sendMessage("right-rotate-wrist")
+    head_speed = calc_speed(head_position, GameLogic.head_target_position, head_speed, rad(head_target_speed), acceleration, deceleration)
+    if head_speed == 0:
+        GameLogic.head_position_target = True
+
+    base_joint.applyRotation((0, 0, base_speed), True)
+    GameLogic.base_speed = base_speed
+    main_arm.applyRotation((0, main_arm_speed, 0), True)
+    GameLogic.main_arm_speed = main_arm_speed
+    second_arm.applyRotation((0, second_arm_speed, 0), True)
+    GameLogic.second_arm_speed = second_arm_speed
+    head_mount.applyRotation((head_mount_speed, 0, 0), True)
+    GameLogic.head_mount_speed = head_mount_speed
+    head.applyRotation((0, head_speed, 0), True)
+    GameLogic.head_speed = head_speed
 
     if math.isclose(gripper_position, GameLogic.gripper_target_position, rel_tol=0.017, abs_tol=0.017):
         GameLogic.gripper_target = False
@@ -133,4 +181,3 @@ def main():
             GameLogic.heatplateTemperature += random.uniform(0, 0.1)
         else:
             GameLogic.heatplateTemperature -= random.uniform(0, 0.1)
-        print(str(GameLogic.heatplateTemperature))

@@ -24,8 +24,8 @@ object StateMachine {
                 mainArmPosition = 1.5,
                 secondArmPosition = 2.9,
                 secondArmRotation = 1.1,
-                wristPosition = 3.00,
-                wristRotation = 1.82,
+                headMountPosition = 3.00,
+                headPosition = 1.82,
                 gripperPosition = 1.0
         )
 
@@ -35,8 +35,8 @@ object StateMachine {
                 mainArmPosition = 1.98,
                 secondArmPosition = 2.18,
                 secondArmRotation = 1.1,
-                wristPosition = 2.22,
-                wristRotation = 1.82,
+                headMountPosition = 2.22,
+                headPosition = 1.82,
                 gripperPosition = 0.48
         )
         val pickup = RoboticArmState(
@@ -45,8 +45,8 @@ object StateMachine {
                 mainArmPosition = 1.9,
                 secondArmPosition = 2.24,
                 secondArmRotation = 1.1,
-                wristPosition = 2.22,
-                wristRotation = 1.82,
+                headMountPosition = 2.22,
+                headPosition = 1.82,
                 gripperPosition = 1.2
         )
         val lift = RoboticArmState(
@@ -54,8 +54,8 @@ object StateMachine {
                 basePosition = 0.86,
                 mainArmPosition = 1.9,
                 secondArmPosition = -3.71,
-                wristPosition = 0.08,
-                wristRotation = 0.52,
+                headMountPosition = 0.08,
+                headPosition = 0.52,
                 gripperPosition = 1.2
         )
         val park = RoboticArmState(
@@ -63,8 +63,8 @@ object StateMachine {
                 basePosition = 0.86,
                 mainArmPosition = 1.69,
                 secondArmPosition = -3.71,
-                wristPosition = 0.08,
-                wristRotation = 0.52,
+                headMountPosition = 0.08,
+                headPosition = 0.52,
                 gripperPosition = 1.2
         )
         val roboticArm = createMap(idle, approach, pickup, lift, park)

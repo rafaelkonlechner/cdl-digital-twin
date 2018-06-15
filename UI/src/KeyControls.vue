@@ -80,44 +80,30 @@ export default {
         },
         aKey: function(newAKey) {
             if (newAKey === true) {
-                this.sendSocketMessage("rotate-left-second-arm");
+                this.sendSocketMessage("left-rotate-head-mount");
             } else {
-                this.sendSocketMessage("stop-rotate-left-second-arm");
+                this.sendSocketMessage("stop-left-rotate-head-mount");
             }
         },
         dKey: function(newDKey) {
             if (newDKey === true) {
-                this.sendSocketMessage("rotate-right-second-arm");
+                this.sendSocketMessage("right-rotate-head-mount");
             } else {
-                this.sendSocketMessage("stop-rotate-right-second-arm");
-            }
-        },
-        qKey: function(newQKey) {
-            if (newQKey === true) {
-                this.sendSocketMessage("rotate-left-wrist");
-            } else {
-                this.sendSocketMessage("stop-rotate-left-wrist");
-            }
-        },
-        eKey: function(newEKey) {
-            if (newEKey === true) {
-                this.sendSocketMessage("rotate-right-wrist");
-            } else {
-                this.sendSocketMessage("stop-rotate-right-wrist");
+                this.sendSocketMessage("stop-right-rotate-head-mount");
             }
         },
         rKey: function(newRKey) {
             if (newRKey === true) {
-                this.sendSocketMessage("lift-wrist");
+                this.sendSocketMessage("lift-head");
             } else {
-                this.sendSocketMessage("stop-lift-wrist");
+                this.sendSocketMessage("stop-lift-head");
             }
         },
         fKey: function(newFKey) {
             if (newFKey === true) {
-                this.sendSocketMessage("lower-wrist");
+                this.sendSocketMessage("lower-head");
             } else {
-                this.sendSocketMessage("stop-lower-wrist");
+                this.sendSocketMessage("stop-lower-head");
             }
         },
         yKey: function(newYKey) {

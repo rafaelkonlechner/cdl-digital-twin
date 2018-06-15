@@ -20,14 +20,14 @@ object StateMachineSimulation {
                 basePosition = 0.0,
                 mainArmPosition = 1.50,
                 secondArmPosition = -0.12,
-                wristPosition = 0.0,
+                headMountPosition = 0.0,
                 gripperPosition = 1.5)
         val pickup = RoboticArmState(
                 name = "Pickup",
                 basePosition = 0.0,
                 mainArmPosition = 1.50,
                 secondArmPosition = -0.12,
-                wristPosition = 0.0,
+                headMountPosition = 0.0,
                 gripperPosition = -0.40
         )
         val lift = RoboticArmState(
@@ -35,7 +35,7 @@ object StateMachineSimulation {
                 basePosition = 0.0,
                 mainArmPosition = 1.315,
                 secondArmPosition = -0.12,
-                wristPosition = 0.0,
+                headMountPosition = 0.0,
                 gripperPosition = -0.40
         )
         val park = RoboticArmState(
@@ -43,7 +43,7 @@ object StateMachineSimulation {
                 basePosition = 3.142,
                 mainArmPosition = 1.40,
                 secondArmPosition = -1.55,
-                wristPosition = -1.5,
+                headMountPosition = -1.5,
                 gripperPosition = -0.40
         )
         val halfRelease = RoboticArmState(
@@ -51,7 +51,7 @@ object StateMachineSimulation {
                 basePosition = 3.142,
                 mainArmPosition = 1.36,
                 secondArmPosition = -1.34,
-                wristPosition = -1.5,
+                headMountPosition = -1.5,
                 gripperPosition = -0.2
         )
         val fullRelease = RoboticArmState(
@@ -59,7 +59,7 @@ object StateMachineSimulation {
                 basePosition = 3.142,
                 mainArmPosition = 1.36,
                 secondArmPosition = -1.334,
-                wristPosition = -1.5,
+                headMountPosition = -1.5,
                 gripperPosition = 1.0
         )
         val wait = RoboticArmState(
@@ -67,7 +67,7 @@ object StateMachineSimulation {
                 basePosition = 3.142,
                 mainArmPosition = 0.0,
                 secondArmPosition = 0.0,
-                wristPosition = -1.5,
+                headMountPosition = -1.5,
                 gripperPosition = 1.0
         )
         val retrieve = RoboticArmState(
@@ -75,7 +75,7 @@ object StateMachineSimulation {
                 basePosition = 3.142,
                 mainArmPosition = 1.30,
                 secondArmPosition = -1.30,
-                wristPosition = -1.5,
+                headMountPosition = -1.5,
                 gripperPosition = 1.0
         )
         val retrieveGrip = RoboticArmState(
@@ -83,7 +83,7 @@ object StateMachineSimulation {
                 basePosition = 3.142,
                 mainArmPosition = 1.30,
                 secondArmPosition = -1.30,
-                wristPosition = -1.5,
+                headMountPosition = -1.5,
                 gripperPosition = -0.4
         )
         val depositGreen = RoboticArmState(
@@ -91,7 +91,7 @@ object StateMachineSimulation {
                 basePosition = -1.745,
                 mainArmPosition = 0.942,
                 secondArmPosition = -0.89,
-                wristPosition = 1.5,
+                headMountPosition = 1.5,
                 gripperPosition = -0.4
         )
         val releaseGreen = RoboticArmState(
@@ -99,7 +99,7 @@ object StateMachineSimulation {
                 basePosition = -1.745,
                 mainArmPosition = 0.942,
                 secondArmPosition = -0.89,
-                wristPosition = 1.5,
+                headMountPosition = 1.5,
                 gripperPosition = 0.5
         )
         val depositRed = RoboticArmState(
@@ -107,7 +107,7 @@ object StateMachineSimulation {
                 basePosition = -1.449,
                 mainArmPosition = 0.942,
                 secondArmPosition = -0.89,
-                wristPosition = 1.5,
+                headMountPosition = 1.5,
                 gripperPosition = -0.4
         )
         val releaseRed = RoboticArmState(
@@ -115,7 +115,7 @@ object StateMachineSimulation {
                 basePosition = -1.449,
                 mainArmPosition = 0.942,
                 secondArmPosition = -0.89,
-                wristPosition = 1.5,
+                headMountPosition = 1.5,
                 gripperPosition = 0.5
         )
         val roboticArm = createMap(s.idle,
