@@ -16,18 +16,18 @@ gripper = 1
 
 delta = 0.02
 
-base_target_position = 1.8
-main_arm_target_position = 1.5
-second_arm_target_position = 1.5
-wrist_target_position = 2.6
-wrist_target_rotation = 1.5
-gripper_target_position = 2.3
+base_target_position = 3.14
+main_arm_target_position = 3.14 - 1.6
+second_arm_target_position = 2.1
+head_target_position = 3.14 - 0
+head_mount_target_position = 1.5
+gripper_target_position = 0.2
 
 base_position = base_target_position
 main_arm_position = main_arm_target_position
 second_arm_position = second_arm_target_position
-wrist_position = wrist_target_position
-wrist_rotation = wrist_target_rotation
+head_position = head_target_position
+head_mount_position = head_mount_target_position
 gripper_position = gripper_target_position
 bite_gripper = False
 release_gripper = False
@@ -45,13 +45,13 @@ second_arm_speed = 0.0
 second_arm_speed_manual = 0.0
 second_arm_target_speed = 0.1
 
-wrist_speed = 0.0
-wrist_speed_manual = 0.0
-wrist_target_speed = 0.0
+head_speed = 0.0
+head_speed_manual = 0.0
+head_target_speed = 0.0
 
-wrist_rotation_speed = 0.0
-wrist_rotation_speed_manual = 0.0
-wrist_rotation_target_speed = 0.0
+head_mount_position_speed = 0.0
+head_mount_position_speed_manual = 0.0
+head_mount_position_target_speed = 0.0
 
 acceleration = 0.000873 # 0.05° per frame (30 frames or 0.5 sec to top speed)
 deceleration = acceleration
@@ -61,9 +61,9 @@ with connect('tcp://localhost:10789', emergency=15) as hedgehog:
         hedgehog.set_servo(base, True, hu.from_rad(base_position))
         hedgehog.set_servo(main_arm, True, hu.from_rad(main_arm_position))
         hedgehog.set_servo(second_arm, True, hu.from_rad(second_arm_position))
-        hedgehog.set_servo(wrist, True, hu.from_rad(wrist_position))
+        hedgehog.set_servo(wrist, True, hu.from_rad(head_position))
 
-        hedgehog2.set_servo(wrist_r, True, hu.from_rad(wrist_rotation))
+        hedgehog2.set_servo(wrist_r, True, hu.from_rad(head_mount_position))
         hedgehog2.set_servo(gripper, True, hu.from_rad(gripper_position))
 
         def shutdown(signal, frame):
@@ -98,8 +98,8 @@ with connect('tcp://localhost:10789', emergency=15) as hedgehog:
             global base_speed_manual
             global main_arm_speed_manual
             global second_arm_speed_manual
-            global wrist_speed_manual
-            global wrist_rotation_speed_manual
+            global head_speed_manual
+            global head_mount_position_speed_manual
             global bite_gripper
             global release_gripper
 
@@ -130,23 +130,23 @@ with connect('tcp://localhost:10789', emergency=15) as hedgehog:
             if payload == "b'stop-lower-second-arm'":
                 second_arm_speed_manual = 0.0
 
-            if payload == "b'lower-wrist'":
-                wrist_speed_manual = -0.01
-            if payload == "b'stop-lower-wrist'":
-                wrist_speed_manual = 0.0
-            if payload == "b'lift-wrist'":
-                wrist_speed_manual = 0.01
-            if payload == "b'stop-lift-wrist'":
-                wrist_speed_manual = 0.0
+            if payload == "b'lower-head'":
+                head_speed_manual = -0.01
+            if payload == "b'stop-lower-head'":
+                head_speed_manual = 0.0
+            if payload == "b'lift-head'":
+                head_speed_manual = 0.01
+            if payload == "b'stop-lift-head'":
+                head_speed_manual = 0.0
 
-            if payload == "b'rotate-left-wrist'":
-                wrist_rotation_speed_manual = -0.04
-            if payload == "b'stop-rotate-left-wrist'":
-                wrist_rotation_speed_manual = 0.0
-            if payload == "b'rotate-right-wrist'":
-                wrist_rotation_speed_manual = 0.04
-            if payload == "b'stop-rotate-right-wrist'":
-                wrist_rotation_speed_manual = 0.0
+            if payload == "b'left-rotate-head-mount'":
+                head_mount_position_speed_manual = -0.04
+            if payload == "b'stop-left-rotate-head-mount'":
+                head_mount_position_speed_manual = 0.0
+            if payload == "b'right-rotate-head-mount'":
+                head_mount_position_speed_manual = 0.04
+            if payload == "b'stop-right-rotate-head-mount'":
+                head_mount_position_speed_manual = 0.0
 
             if payload == "b'grip-gripper'":
                 bite_gripper = True
@@ -165,41 +165,41 @@ with connect('tcp://localhost:10789', emergency=15) as hedgehog:
                 message_rate = int(rate)
 
         def on_three_arg_message(payload):
-            print("now")
             global base_target_position
             global base_target_speed
             global main_arm_target_position
             global main_arm_target_speed
             global second_arm_target_position
             global second_arm_target_speed
-            global wrist_target_position
-            global wrist_target_speed
-            global wrist_target_rotation
-            global wrist_rotation_target_speed
+            global head_target_position
+            global head_target_speed
+            global head_mount_target_position
+            global head_mount_position_target_speed
             global gripper_target_position
 
             component, position, speed = payload.split(' ')
             position = float(position)
             speed = float(speed[:len(speed) - 1])
             if component == "b'base-goto":
-                base_target_position = position #+ 3.14
+                position = -position
+                base_target_position = position + 3.14
                 base_target_speed = speed
             if component == "b'main-arm-goto":
-                main_arm_target_position = position #+ 1.5
+                position = -position
+                main_arm_target_position = position + 1.5
                 main_arm_target_speed = speed
-                second_arm_target_speed = speed
             if component == "b'second-arm-goto":
-                #position = -position
-                second_arm_target_position = position #+ 2.9 - (main_arm_target_position + 1.5)
+                second_arm_target_position = position + 2.1
                 second_arm_target_speed = speed
-            if component == "b'wrist-goto":
-                wrist_target_position = position
-                wrist_target_speed = speed
-            if component == "b'wrist-roto":
-                wrist_target_rotation = position
-                wrist_rotation_target_speed = speed
+            if component == "b'head-goto":
+                position = -position
+                head_target_position = position + 3.14
+                head_target_speed = speed
+            if component == "b'head-mount-goto":
+                head_mount_target_position = position + 1.5
+                head_mount_position_target_speed = speed
             if component == "b'gripper-goto":
-                gripper_target_position = position
+                gripper_target_position = position + 1.0
 
         client.on_connect = on_connect
         client.on_message = on_message
@@ -215,10 +215,10 @@ with connect('tcp://localhost:10789', emergency=15) as hedgehog:
         counter = 0
         while True:
             base_speed = hu.calc_speed(base_position, base_target_position, base_speed, base_target_speed, acceleration, deceleration)
-            main_arm_speed = hu.calc_speed(main_arm_position, main_arm_target_position, main_arm_speed, main_arm_target_speed, acceleration * 2, deceleration * 2)
-            second_arm_speed = hu.calc_speed(second_arm_position, second_arm_target_position, second_arm_speed, second_arm_target_speed, acceleration * 2, deceleration * 2)
-            wrist_rotation_speed = hu.calc_speed(wrist_rotation, wrist_target_rotation, wrist_rotation_speed, wrist_rotation_target_speed, acceleration*3, deceleration*3)
-            wrist_speed = hu.calc_speed(wrist_position, wrist_target_position, wrist_speed, wrist_target_speed, acceleration*3, deceleration*3)
+            main_arm_speed = hu.calc_speed(main_arm_position, main_arm_target_position, main_arm_speed, main_arm_target_speed, acceleration, deceleration)
+            second_arm_speed = hu.calc_speed(second_arm_position, second_arm_target_position, second_arm_speed, second_arm_target_speed, acceleration, deceleration)
+            head_mount_position_speed = hu.calc_speed(head_mount_position, head_mount_target_position, head_mount_position_speed, head_mount_position_target_speed, acceleration, deceleration)
+            head_speed = hu.calc_speed(head_position, head_target_position, head_speed, head_target_speed, acceleration, deceleration)
             old_base = hu.from_rad(base_position)
             if base_speed + base_speed_manual != 0.0:
                 if base_speed_manual != 0.0:
@@ -253,27 +253,30 @@ with connect('tcp://localhost:10789', emergency=15) as hedgehog:
                 if old_second != hu.from_rad(second_arm_position):
                     hedgehog.set_servo(2, True, hu.from_rad(second_arm_position))
 
-            if  wrist_speed + wrist_speed_manual != 0.0:
-                if wrist_speed_manual != 0.0:
-                    wrist_position = max(0.0, min(3.14, wrist_position + wrist_speed_manual))
-                    wrist_target_position = wrist_position
+            if  head_speed + head_speed_manual != 0.0:
+                if head_speed_manual != 0.0:
+                    head_position = max(0.0, min(3.14, head_position + head_speed_manual))
+                    head_target_position = head_position
                 else:
-                    wrist_position = max(0.0, min(3.14, wrist_position + wrist_speed))
-                hedgehog.set_servo(3, True, hu.from_rad(wrist_position))
+                    head_position = max(0.0, min(3.14, head_position + head_speed))
+                hedgehog.set_servo(3, True, hu.from_rad(head_position))
 
-            if  wrist_rotation_speed + wrist_rotation_speed_manual != 0.0:
-                if wrist_rotation_speed_manual != 0.0:
-                    wrist_rotation = max(0.0, min(3.14, wrist_rotation + wrist_rotation_speed_manual))
-                    wrist_target_rotation = wrist_rotation
+            if  head_mount_position_speed + head_mount_position_speed_manual != 0.0:
+                if head_mount_position_speed_manual != 0.0:
+                    head_mount_position = max(0.0, min(3.14, head_mount_position + head_mount_position_speed_manual))
+                    head_mount_target_position = head_mount_position
                 else:
-                    wrist_rotation = max(0.0, min(3.14, wrist_rotation + wrist_rotation_speed))
-                hedgehog2.set_servo(0, True, hu.from_rad(wrist_rotation))
+                    head_mount_position = max(0.0, min(3.14, head_mount_position + head_mount_position_speed))
+                hedgehog2.set_servo(0, True, hu.from_rad(head_mount_position))
 
             if bite_gripper:
-                gripper_target_position = max(2.12, min(3.14, gripper_position + delta))
+                gripper_target_position = max(0, min(3.14, gripper_position + delta))
             if release_gripper:
-                gripper_target_position = max(2.12, min(3.14, gripper_position - delta))
+                gripper_target_position = max(0, min(3.14, gripper_position - delta))
             if gripper_target_position != gripper_position:
+                gripper_target_position = max(0, min(3.14, gripper_target_position))
+                print(gripper_target_position)
+                print(hu.from_rad(gripper_target_position))
                 hedgehog2.set_servo(1, True, hu.from_rad(gripper_target_position))
                 gripper_position = gripper_target_position
 
@@ -285,16 +288,16 @@ with connect('tcp://localhost:10789', emergency=15) as hedgehog:
     "basePosition": %s,
     "mainArmPosition": %s,
     "secondArmPosition": %s,
-    "wristPosition": %s,
-    "wristRotation": %s,
+    "headPosition": %s,
+    "headMountPosition": %s,
     "gripperPosition": %s
     }""" % (
-                str(base_position),
-                str(main_arm_position),
-                str(second_arm_position),
-                str(wrist_position),
-                str(wrist_rotation),
-                str(gripper_position)
+                str(-base_position + 3.14),
+                str(-main_arm_position + 1.5),
+                str(second_arm_position - 2.1),
+                str(-head_position + 3.14),
+                str(head_mount_position - 1.5),
+                str(gripper_position - 1.0)
                 )
                 client.publish("Sensor", payload=message_roboticarm, qos=0, retain=False)
                 counter = 0

@@ -98,32 +98,32 @@ def on_goto_speed_control_message(message):
     position = float(position)
     speed = float(speed[:len(speed) - 1])
     if msg_type == "b'base-goto":
-        GameLogic.base_target_position = position - 1.68
+        GameLogic.base_target_position = -position
         GameLogic.base_target_speed = speed
         GameLogic.base_target = True
         print("New base target position: " + str(GameLogic.base_target_position))
     elif msg_type == "b'main-arm-goto":
-        GameLogic.main_arm_target_position = position - 1.50
+        GameLogic.main_arm_target_position = position
         GameLogic.main_arm_target_speed = speed
         print("New main arm target position: " + str(GameLogic.main_arm_target_position))
         GameLogic.main_arm_target = True
     elif msg_type == "b'second-arm-goto":
-        GameLogic.second_arm_target_position = position - 2.08
+        GameLogic.second_arm_target_position = position
         GameLogic.second_arm_target_speed = speed
         print("New second arm target position: " + str(GameLogic.second_arm_target_position))
         GameLogic.second_arm_target = True
     elif msg_type == "b'head-mount-goto":
-        GameLogic.head_mount_target_position = position - 1.5
+        GameLogic.head_mount_target_position = position
         GameLogic.head_mount_target_speed = speed
         print("New head_mount target position: " + str(GameLogic.head_mount_target_position))
         GameLogic.head_mount_target = True
     elif msg_type == "b'head-goto":
-        GameLogic.head_target_position = position - 2.0
+        GameLogic.head_target_position = position
         GameLogic.head_target_speed = speed
         print("New head target position: " + str(GameLogic.head_target_position))
         GameLogic.head_target = True
     elif msg_type == "b'gripper-goto":
-        GameLogic.gripper_target_position = position - 2.30
+        GameLogic.gripper_target_position = position
         print("New gripper target position: " + str(GameLogic.gripper_target_position))
         GameLogic.gripper_target = True
 

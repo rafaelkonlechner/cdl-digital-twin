@@ -42,12 +42,12 @@ def main():
         "gripperHasContact": "%s"
         }
         """ % (
-        str(base_position + 1.68),
-        str(main_arm_position + 1.50),
-        str(second_arm_position + 2.08),
-        str(head_position + 2.0),
-        str(head_mount_position + 1.50),
-        str(gripper_position + 2.30),
+        str(-base_position),
+        str(main_arm_position),
+        str(second_arm_position),
+        str(head_position),
+        str(head_mount_position),
+        str(gripper_position),
         str(hand_position.x),
         str(hand_position.y),
         str(hand_position.z),

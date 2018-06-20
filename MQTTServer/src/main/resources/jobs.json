@@ -225,12 +225,115 @@
     "states": [
       {
         "name": "Idle",
-        "basePosition": 2.4,
-        "mainArmPosition": 1.5,
-        "secondArmPosition": 1.5,
-        "headPosition": 2.6,
+        "basePosition": 0.0,
+        "mainArmPosition": 0.0,
+        "secondArmPosition": 0.0,
+        "headMountPosition": 0.0,
+        "gripperPosition": 0.0
+      },
+      {
+        "name": "Drive Down",
+        "basePosition": 0.0,
+        "mainArmPosition": 1.50,
+        "secondArmPosition": -0.12,
+        "headMountPosition": 0.0,
+        "gripperPosition": 1.5
+      },
+      {
+        "name": "Pickup",
+        "basePosition": 0.0,
+        "mainArmPosition": 1.50,
+        "secondArmPosition": -0.12,
+        "headMountPosition": 0.0,
+        "gripperPosition": -0.40
+      },
+      {
+        "name": "Lift",
+        "basePosition": 0.0,
+        "mainArmPosition": 1.315,
+        "secondArmPosition": -0.12,
+        "headMountPosition": 0.0,
+        "gripperPosition": -0.40
+      },
+      {
+        "name": "Park",
+        "basePosition": 3.1,
+        "mainArmPosition": 1.40,
+        "secondArmPosition": -1.55,
+        "headMountPosition": -1.5,
+        "gripperPosition": -0.40
+      },
+      {
+        "name": "Half Release",
+        "basePosition": 3.142,
+        "mainArmPosition": 1.36,
+        "secondArmPosition": -1.34,
+        "headMountPosition": -1.5,
+        "gripperPosition": -0.2
+      },
+      {
+        "name": "Full Release",
+        "basePosition": 3.142,
+        "mainArmPosition": 1.36,
+        "secondArmPosition": -1.334,
+        "headMountPosition": -1.5,
+        "gripperPosition": 1.0
+      },
+      {
+        "name": "Wait",
+        "basePosition": 3.142,
+        "mainArmPosition": 0.0,
+        "secondArmPosition": 0.0,
+        "headMountPosition": -1.5,
+        "gripperPosition": 1.0
+      },
+      {
+        "name": "Retrieve",
+        "basePosition": 3.142,
+        "mainArmPosition": 1.30,
+        "secondArmPosition": -1.30,
+        "headMountPosition": -1.5,
+        "gripperPosition": 1.0
+      },
+      {
+        "name": "Retrieve Grip",
+        "basePosition": 3.142,
+        "mainArmPosition": 1.30,
+        "secondArmPosition": -1.30,
+        "headMountPosition": -1.5,
+        "gripperPosition": -0.4
+      },
+      {
+        "name": "Deposit Green",
+        "basePosition": 1.745,
+        "mainArmPosition": 0.942,
+        "secondArmPosition": -0.89,
         "headMountPosition": 1.5,
-        "gripperPosition": 2.3
+        "gripperPosition": -0.4
+      },
+      {
+        "name": "Release Green",
+        "basePosition": 1.745,
+        "mainArmPosition": 0.942,
+        "secondArmPosition": -0.89,
+        "headMountPosition": 1.5,
+        "gripperPosition": 0.5
+      },
+      {
+        "name": "Deposit Red",
+        "basePosition": 1.449,
+        "mainArmPosition": 0.942,
+        "secondArmPosition": -0.89,
+        "headMountPosition": 1.5,
+        "gripperPosition": -0.4
+      },
+      {
+        "name": "Release Red",
+        "basePosition": 1.449,
+        "mainArmPosition": 0.942,
+        "secondArmPosition": -0.89,
+        "headMountPosition": 1.5,
+        "gripperPosition": 0.5
       }
     ]
   }
