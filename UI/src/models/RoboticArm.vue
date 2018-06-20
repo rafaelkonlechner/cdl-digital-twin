@@ -57,27 +57,33 @@ export default {
     data() {
         return {
             components: [{
-                name: "Base",
+                name: "Base Position",
+                component: "basePosition",
                 value: 0.0,
                 target: 0.0
             }, {
-                name: "Main Arm",
+                name: "Main Arm Position",
+                component: "mainArmPosition",
                 value: 0.0,
                 target: 0.0
             }, {
-                name: "Second Arm",
+                name: "Second Arm Position",
+                component: "secondArmPosition",
                 value: 0.0,
                 target: 0.0
             }, {
-                name: "Forearm",
+                name: "Head Position",
+                component: "headPosition",
                 value: 0.0,
                 target: 0.0
             }, {
-                name: "Wrist",
+                name: "Head Mount Position",
+                component: "headMountPosition",
                 value: 0.0,
                 target: 0.0
             }, {
-                name: "Mount",
+                name: "Gripper Position",
+                component: "gripperPosition",
                 value: 0.0,
                 target: 0.0
             }]

@@ -56,6 +56,7 @@ export default {
             this.plot.y(function(d) {
                 return d.y;
             }, this.yScale);
+            this.plot.attr("stroke", "#ffffff");
             this.dataset = new Plottable.Dataset(this.data);
             this.plot.addDataset(this.dataset);
             this.chart = new Plottable.Components.Table([

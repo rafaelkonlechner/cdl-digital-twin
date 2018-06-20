@@ -79,26 +79,32 @@ export default {
             var counter = -1;
             var names = [{
                 name: "Base",
+                component: "basePosition",
                 value: 0.0,
                 target: 0.0
             }, {
                 name: "Main Arm",
+                component: "mainArmPosition",
                 value: 0.0,
                 target: 0.0
             }, {
                 name: "Second Arm",
+                component: "secondArmPosition",
                 value: 0.0,
                 target: 0.0
             }, {
-                name: "Forearm",
+                name: "Head",
+                component: "headPosition",
                 value: 0.0,
                 target: 0.0
             }, {
-                name: "Wrist",
+                name: "Head Mount",
+                component: "headMountPosition",
                 value: 0.0,
                 target: 0.0
             }, {
-                name: "Mount",
+                name: "Gripper",
+                component: "gripperPosition",
                 value: 0.0,
                 target: 0.0
             }];

@@ -62,18 +62,13 @@
 <div class="blueprint">
     <button class="tabs" v-bind:class="{'active-tab': show2D}" @click="show2D = true; show3D = false;">Default</button>
     <button class="tabs" v-bind:class="{'active-tab': show3D}" @click="show2D = false; show3D = true;">3D</button>
-    <div class="absolute" style="top: 30%; left: 4%;">
+    <div class="absolute" style="top: 30%; left: 2%;">
         <work-item-information :socket="socket"></work-item-information>
-    </div>
-    <div class="absolute" style="top: 30%; left: 84%;">
-        <h2>Running Jobs</h2>
     </div>
     <div v-if="selected" class="absolute blueprint-text small" style="top: 14%; left: 85%; height: 35px; text-align: left;">
         <h2>{{selected.name}}</h2>
         <p><small>Current: {{selected.value}}</small></p>
-        <p><small>Target: <input style="width: 50px;" v-model="selected.target"></input></small>
-        </p>
-        <!--<line-chart width="200" height="100" min="0" max="100" :data="data"></line-chart>-->
+        <line-chart width="200" height="200" min="0" max="3.14" :data="selectedData"></line-chart>
     </div>
     <div class="blueprint-main">
         <div class="mdl-grid">
@@ -149,7 +144,7 @@ export default {
         workItemInformation: WorkItemInformation,
         webgl: WebGL
     },
-    props: ["socket", "context"],
+    props: ["socket", "context", "data"],
     data() {
         return {
             selected: null,
@@ -157,13 +152,12 @@ export default {
             show3D: false,
             showDetectionCamera: false,
             showPickupCamera: false,
-            data: [{
-                x: 1,
-                y: 10
-            }, {
-                x: 2,
-                y: 20
-            }]
+        }
+    },
+    computed: {
+        selectedData() {
+            console.log(this.selected)
+            return this.data[this.selected.component]
         }
     },
     methods: {

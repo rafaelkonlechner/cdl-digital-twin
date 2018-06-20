@@ -80,7 +80,7 @@ article {
         <small>Kuka KR5-R850</small>
       </h1>
     </header>
-    <blueprint :socket="socket" :context="context"></blueprint>
+    <blueprint :socket="socket" :context="context" :data="data"></blueprint>
     <main style="height: 100%;">
         <div class="mdl-grid">
             <div class="mdl-cell--2-col">
@@ -153,9 +153,8 @@ export default {
                     basePosition: 0.0,
                     mainArmPosition: 0.0,
                     secondArmPosition: 0.0,
-                    secondArmRotation: 0.0,
-                    wristPosition: 0.0,
-                    wristRotation: 0.0,
+                    headPosition: 0.0,
+                    headMountRotation: 0.0,
                     gripperPosition: 0.0,
                     gripperHasContact: false,
                     handPosition: {
@@ -180,6 +179,15 @@ export default {
                     name: "",
                     sliderPosition: 0.0,
                 }
+            },
+            data: {
+                count: 0,
+                basePosition: [],
+                mainArmPosition: [],
+                secondArmPosition: [],
+                headPosition: [],
+                headMountPosition: [],
+                gripperPosition: []
             }
         };
     },
@@ -211,12 +219,36 @@ export default {
                 let data = JSON.parse(msg.message)
                 if (data.entity === "RoboticArm") {
                     self.context.roboticArmState.basePosition = data.basePosition;
+                    self.data.basePosition.push({
+                        x: self.data.count,
+                        y: data.basePosition
+                    });
                     self.context.roboticArmState.mainArmPosition = data.mainArmPosition;
+                    self.data.mainArmPosition.push({
+                        x: self.data.count,
+                        y: data.mainArmPosition
+                    });
                     self.context.roboticArmState.secondArmPosition = data.secondArmPosition;
-                    self.context.roboticArmState.secondArmRotation = data.secondArmRotation;
-                    self.context.roboticArmState.wristPosition = data.wristPosition;
-                    self.context.roboticArmState.wristRotation = data.wristRotation;
+                    self.data.secondArmPosition.push({
+                        x: self.data.count,
+                        y: data.secondArmPosition
+                    });
+                    self.context.roboticArmState.headPosition = data.headPosition;
+                    self.data.headPosition.push({
+                        x: self.data.count,
+                        y: data.headPosition
+                    });
+                    self.context.roboticArmState.headMountPosition = data.headMountPosition;
+                    self.data.headMountPosition.push({
+                        x: self.data.count,
+                        y: data.headMountPosition
+                    });
                     self.context.roboticArmState.gripperPosition = data.gripperPosition;
+                    self.data.gripperPosition.push({
+                        x: self.data.count,
+                        y: data.gripperPosition
+                    });
+                    self.data.count = self.data.count + 1;
                     self.context.roboticArmState.handPosition = data.handPosition;
                 }
                 if (data.entity === "TestingRig") {
