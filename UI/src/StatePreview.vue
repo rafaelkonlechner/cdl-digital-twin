@@ -1,7 +1,6 @@
 <style scoped>
 .state {
     width: 70%;
-    min-height: 260px;
     margin-bottom: 30px;
     border-radius: 10px;
     box-shadow: 1px 1px 10px grey;
@@ -53,7 +52,6 @@
             <key-controls :socket="socket"></key-controls>
             <button style="font-size: 1.2em;" @click="savePosition()">Save</button>
         </div>
-        <span v-if="Object.keys(state).length > 1" class="attribute" v-for="(value,key) in state">{{key}}: {{value}}</br></span>
     </div>
 </div>
 </template>
@@ -87,8 +85,8 @@ export default {
             this.state.basePosition = r.basePosition.toFixed(2);
             this.state.mainArmPosition = r.mainArmPosition.toFixed(2);
             this.state.secondArmPosition = r.secondArmPosition.toFixed(2);
-            this.state.wristPosition = r.wristPosition.toFixed(2);
-            this.state.wristRotation = r.wristRotation.toFixed(2);
+            this.state.headPosition = r.headPosition.toFixed(2);
+            this.state.headMountPosition = r.headMountPosition.toFixed(2);
             this.state.gripperPosition = r.gripperPosition.toFixed(2);
             console.log(this.state)
             this.$emit('recordPosition');

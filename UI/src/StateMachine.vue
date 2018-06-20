@@ -47,16 +47,16 @@
     <div v-if="showPopup" @click="showPopup = false;" class="dim">
         <div class="popup">
             <div v-if="selectedState">
-                <h1>{{selectedState.name}}</h1>
+                <state-detail :state="selectedState"></state-detail>
             </div>
             <div v-if="selectedTransition">
-                <h1>{{selectedTransition.first.name}} - {{selectedTransition.second.name}}</h1>
+                <h1>{{selectedTransition.first.name}} &rarr; {{selectedTransition.second.name}}</h1>
             </div>
         </div>
     </div>
     <div class="mdl-grid">
         <div v-for="(s, index) in job.states" class="mdl-cell--3-col" style="position: relative;">
-            <svg @click="showTransition(index)" xmlns="http://www.w3.org/2000/svg" style="position: absolute; top: 40%; left: 82%;" width="24" height="24">
+            <svg @click="showTransition(index)" xmlns="http://www.w3.org/2000/svg" style="position: absolute; top: 25%; left: 82%;" width="24" height="24">
                 <path v-show="!s.active" d="M12 8V4l8 8-8 8v-4H4V8z" fill="#888"/>
                 <path v-show="s.active" d="M12 8V4l8 8-8 8v-4H4V8z" fill="#1E88E5"/>
                 <path d="M0 0h24v24H0z" fill="none"/>
@@ -75,11 +75,13 @@
 
 <script>
 import StatePreview from "./StatePreview.vue";
+import StateDetail from "./StateDetail.vue";
 
 export default {
     props: ["job", "context", "socket"],
     components: {
-        statePreview: StatePreview
+        statePreview: StatePreview,
+        stateDetail: StateDetail
     },
     data() {
         return {
