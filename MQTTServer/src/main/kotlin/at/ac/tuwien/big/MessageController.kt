@@ -79,22 +79,22 @@ class MessageController(private val mqtt: MQTT,
 
                 val detection = File.createTempFile("detection", ".png")
                 detection.writeBytes(fromBase64(message))
-                objectTracker.track(detection, {
+                objectTracker.track(detection) {
                     sendWebSocketMessageDetectionCamera("{\"image\": \"$message\", \"tracking\": ${gson.toJson(it)}}")
                     detection.delete()
-                })
+                }
             }
             pickupCamera -> {
                 val pickup = File.createTempFile("pickup", ".png")
                 pickup.writeBytes(fromBase64(message))
-                objectTracker.track(pickup, {
+                objectTracker.track(pickup) {
                     val tracking = it.firstOrNull()
                     val detected = tracking != null
                     val inPickupWindow = tracking != null && 36 < tracking.x && tracking.x < 125 && 60 < tracking.y && tracking.y < 105
                     controller.update(ConveyorState(detected = detected, inPickupWindow = inPickupWindow))
                     sendWebSocketMessagePickupCamera("{\"image\": \"$message\", \"tracking\": ${gson.toJson(it)}}")
                     pickup.delete()
-                })
+                }
             }
         }
     }

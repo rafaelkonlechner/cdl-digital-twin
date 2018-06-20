@@ -2,7 +2,7 @@ group 'at.ac.tuwien.big'
 version = '0.0.1-SNAPSHOT'
 
 buildscript {
-    ext.kotlin_version = '1.2.41'
+    ext.kotlin_version = '1.2.50'
 
     repositories {
         mavenCentral()
