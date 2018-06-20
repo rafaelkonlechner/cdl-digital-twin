@@ -2,6 +2,7 @@
   {
     "name": "Job 1",
     "id": "4a64b65d",
+    "target": "Hedgehog",
     "states": [
       {
         "name": "Idle",
@@ -44,9 +45,10 @@
   {
     "name": "Job 2",
     "id": "04b881dd",
+    "target": "Hedgehog",
     "states": [
       {
-        "name": "New",
+        "name": "State 1",
         "entity": "RoboticArm",
         "basePosition": 1.8,
         "mainArmPosition": 1.5,
@@ -59,7 +61,7 @@
         "handPosition": null
       },
       {
-        "name": "New",
+        "name": "State 2",
         "entity": "RoboticArm",
         "basePosition": 1.8,
         "mainArmPosition": 1.2,
@@ -72,7 +74,7 @@
         "handPosition": null
       },
       {
-        "name": "New",
+        "name": "State 3",
         "entity": "RoboticArm",
         "basePosition": 1.8,
         "mainArmPosition": 0.93,
@@ -85,7 +87,7 @@
         "handPosition": null
       },
       {
-        "name": "New",
+        "name": "State 4",
         "entity": "RoboticArm",
         "basePosition": 1.8,
         "mainArmPosition": 0.9,
@@ -98,7 +100,7 @@
         "handPosition": null
       },
       {
-        "name": "New",
+        "name": "State 5",
         "entity": "RoboticArm",
         "basePosition": 1.8,
         "mainArmPosition": 0.93,
@@ -111,7 +113,7 @@
         "handPosition": null
       },
       {
-        "name": "New",
+        "name": "State 6",
         "entity": "RoboticArm",
         "basePosition": 2.34,
         "mainArmPosition": 1.5,
@@ -124,7 +126,7 @@
         "handPosition": null
       },
       {
-        "name": "New",
+        "name": "State 7",
         "entity": "RoboticArm",
         "basePosition": 2.47,
         "mainArmPosition": 1.35,
@@ -137,7 +139,7 @@
         "handPosition": null
       },
       {
-        "name": "New",
+        "name": "State 8",
         "entity": "RoboticArm",
         "basePosition": 2.47,
         "mainArmPosition": 1.35,
@@ -150,7 +152,7 @@
         "handPosition": null
       },
       {
-        "name": "New",
+        "name": "State 9",
         "entity": "RoboticArm",
         "basePosition": 2.47,
         "mainArmPosition": 1.35,
@@ -163,7 +165,7 @@
         "handPosition": null
       },
       {
-        "name": "New",
+        "name": "State 10",
         "entity": "RoboticArm",
         "basePosition": 2.47,
         "mainArmPosition": 1.57,
@@ -176,7 +178,7 @@
         "handPosition": null
       },
       {
-        "name": "New",
+        "name": "State 11",
         "entity": "RoboticArm",
         "basePosition": 2.47,
         "mainArmPosition": 0.67,
@@ -189,7 +191,7 @@
         "handPosition": null
       },
       {
-        "name": "New",
+        "name": "State 12",
         "entity": "RoboticArm",
         "basePosition": 0.92,
         "mainArmPosition": 0.67,
@@ -202,7 +204,7 @@
         "handPosition": null
       },
       {
-        "name": "New",
+        "name": "State 13",
         "entity": "RoboticArm",
         "basePosition": 0.92,
         "mainArmPosition": 0.67,
@@ -219,6 +221,7 @@
   {
     "name": "Job 3",
     "id": "e191049b",
+    "target": "Hedgehog",
     "states": [
       {
         "name": "Idle",
