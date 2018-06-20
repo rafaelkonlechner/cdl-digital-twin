@@ -23,7 +23,6 @@ object StateMachine {
                 basePosition = 1.5,
                 mainArmPosition = 1.5,
                 secondArmPosition = 2.9,
-                secondArmRotation = 1.1,
                 headMountPosition = 3.00,
                 headPosition = 1.82,
                 gripperPosition = 1.0
@@ -34,7 +33,6 @@ object StateMachine {
                 basePosition = 1.52,
                 mainArmPosition = 1.98,
                 secondArmPosition = 2.18,
-                secondArmRotation = 1.1,
                 headMountPosition = 2.22,
                 headPosition = 1.82,
                 gripperPosition = 0.48
@@ -44,7 +42,6 @@ object StateMachine {
                 basePosition = 1.52,
                 mainArmPosition = 1.9,
                 secondArmPosition = 2.24,
-                secondArmRotation = 1.1,
                 headMountPosition = 2.22,
                 headPosition = 1.82,
                 gripperPosition = 1.2

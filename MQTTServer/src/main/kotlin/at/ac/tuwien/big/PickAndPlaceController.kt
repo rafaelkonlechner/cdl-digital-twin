@@ -155,9 +155,8 @@ object PickAndPlaceController {
                         "base-goto ${target.basePosition} ${transition.baseSpeed}",
                         "main-arm-goto ${target.mainArmPosition} ${transition.mainArmSpeed}",
                         "second-arm-goto ${target.secondArmPosition} ${transition.secondArmSpeed}",
-                        "second-arm-roto ${target.secondArmRotation} ${transition.secondArmSpeed}",
-                        "wrist-goto ${target.headMountPosition}",
                         "head-goto ${target.headPosition}",
+                        "head-mount-goto ${target.headMountPosition}",
                         "gripper-goto ${target.gripperPosition}"
                 )
             }
