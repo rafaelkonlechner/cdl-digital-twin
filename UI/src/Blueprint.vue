@@ -62,12 +62,12 @@
 <div class="blueprint">
     <button class="tabs" v-bind:class="{'active-tab': show2D}" @click="show2D = true; show3D = false;">Default</button>
     <button class="tabs" v-bind:class="{'active-tab': show3D}" @click="show2D = false; show3D = true;">3D</button>
-    <div class="absolute" style="top: 30%; left: 2%;">
+    <div class="absolute" style="top: 15%; left: 2%;">
         <work-item-information :socket="socket"></work-item-information>
     </div>
     <div v-if="selected" class="absolute blueprint-text small" style="top: 14%; left: 85%; height: 35px; text-align: left;">
         <h2>{{selected.name}}</h2>
-        <p><small>Current: {{selected.value}}</small></p>
+        <p v-if="selectedData.length > 0"><small>Current: {{selectedData[selectedData.length - 1].y}}</small></p>
         <line-chart width="200" height="200" min="0" max="3.14" :data="selectedData"></line-chart>
     </div>
     <div class="blueprint-main">

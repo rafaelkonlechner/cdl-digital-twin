@@ -1,10 +1,10 @@
 <style scoped>
 </style>
 <template>
-<div style="max-width: 320px;">
+<div style="width: 320px;">
     <h6>Work Item Information</h6>
-    <div style="display: inline-block;">
-        <table>
+    <div>
+        <table style="text-align: left; margin-left: 40px;">
             <tr>
                 <td width="100">
                     <strong>ID</strong>
@@ -34,9 +34,7 @@
             </tr>
         </table>
     </div>
-    <div style="display: inline-block; float: right; margin-left: 40px;">
-        <img v-if="qrCode.base64" style="width: 75px; height: 75px; margin: 0; border-style: solid; border-width: 3px; border-color: black;" v-bind:src="qrCode.base64" />
-    </div>
+    <img v-if="qrCode.base64" style="width: 75px; height: 75px; margin-top: 20px; border-style: solid; border-width: 3px; border-color: black;" v-bind:src="qrCode.base64" />
 </div>
 </template>
 <script>
