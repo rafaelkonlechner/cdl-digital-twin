@@ -29,53 +29,93 @@
 }
 
 .new {
+    display: inline-block;
     border: 0px solid white;
-    border-radius: 10px;
+    border-radius: 5px;
     box-shadow: 1px 1px 10px grey;
-    padding: 2px;
-    width: 64px;
-    height: 64px;
+    padding: 1px;
+    text-align: center;
+    font-size: 0.6em;
 }
 
 .new i {
     font-size: 4em;
     color: darkslategray;
 }
+
+.row {
+    display: inline-block;
+    vertical-align: top;
+}
 </style>
 <template>
 <div class="state-machine">
     <div v-if="showPopup" @click="showPopup = false;" class="dim">
         <div class="popup">
-            <div v-if="selectedState">
+            <div v-if="selectedState && !showChoiceSettings">
                 <state-detail :state="selectedState"></state-detail>
             </div>
-            <div v-if="selectedTransition">
-                <h1>{{selectedTransition.first.name}} &rarr; {{selectedTransition.second.name}}</h1>
+            <div v-if="showChoiceSettings">
+                <p>Test</p>
+            </div>
+            <button>Done</button>
+        </div>
+    </div>
+    <div>
+        <div v-for="(s, index) in job.states" class="row">
+            <div v-if="!s.choices" style="width: 260px; padding-top: 75px;">
+                <state-preview v-on:click.native="showState(s)" :state="s" :index="index" :active="s.active" :context="context" :socket="socket" v-on:moveLeft="moveLeft($event)" v-on:moveRight="moveRight($event)" v-on:remove="remove($event)" v-on:recordPosition="saveChanges()">
+                </state-preview>
+                <div style="color: darkslategray; display: inline-block; vertical-align: top; margin-left: 20px;">
+                    <i @click="toggleChoice(index)" v-if="!s.choices && index < job.states.length - 1 && !job.states[index + 1].choices" class="material-icons" style="font-size: 3em; position: relative; top: 45px;">arrow_right_alt</i>
+                    <div style="display: inline-block; vertical-align: top;" v-if="index < job.states.length - 1 && job.states[index + 1].choices">
+                        <div><i @click="choiceSettings(s)" class="material-icons" style="font-size: 2em; position: relative; top: 15px; left: 5px;">settings</i></div>
+                        <div><i @click="toggleChoice(index)" class="material-icons" style="transform: rotate(90deg); font-size: 3em; position: relative; top: 15px;">call_split</i></div>
+                    </div>
+                </div>
+            </div>
+            <div v-if="s.choices">
+                <div style="display: inline-block; vertical-align: top; margin-right: -40px;">
+                    <div>
+                        <div v-for="(s1, i1) in s.choices.first" style="display: inline-block; vertical-align: top; width: 260px;">
+                            <state-preview v-on:click.native="showState(s)" :state="s1" :index="i1" :active="s.active" :context="context" :socket="socket" v-on:moveLeft="moveLeftChoice(s.choices.first, $event)" v-on:moveRight="moveRightChoice(s.choices.first,
+                    $event)" v-on:remove="removeChoice(s, s.choices.first, $event, index)" v-on:recordPosition="saveChanges()">
+                            </state-preview>
+                            <div v-if="i1 < s.choices.first.length - 1" style="display: inline; position: relative; left: 20px; top: 44px;">
+                                <i class="material-icons" style="font-size: 3em; color: darkslategrey;">arrow_right_alt</i>
+                            </div>
+                            <button class="new" style="position: relative; top: 45px; left: 20px;" v-if="i1 == s.choices.first.length - 1 && index == job.states.length - 1" @click="addStateChoice(s.choices.first)"><i class="material-icons">add</i></button>
+                        </div>
+                    </div>
+                    <div>
+                        <div v-for="(s2, i2) in s.choices.second" style="display: inline-block; vertical-align: top; width: 260px;">
+                            <state-preview v-on:click.native="showState(s)" :state="s2" :index="i2" :active="s.active" :context="context" :socket="socket" v-on:moveLeft="moveLeftChoice(s.choices.second, $event)" v-on:moveRight="moveRightChoice(s.choices.second,
+                    $event)" v-on:remove="removeChoice(s, s.choices.second, $event, index)" v-on:recordPosition="saveChanges()">
+                            </state-preview>
+                            <div v-if="i2 < s.choices.second.length - 1" style="display: inline; position: relative; left: 20px; top: 44px;">
+                                <i class="material-icons" style="font-size: 3em; color: darkslategrey;">arrow_right_alt</i>
+                            </div>
+                            <button class="new" style="position: relative; top: 45px; left: 20px;" v-if="i2 == s.choices.second.length - 1  && index == job.states.length - 1" @click="addStateChoice(s.choices.second)"><i class="material-icons">add</i></button>
+                        </div>
+                    </div>
+                </div>
+                <div style="display: inline-block; position: relative; top: 115px; left: -20px;">
+                    <i class="material-icons" style="font-size: 40px; color: darkslategrey; transform: rotate(90deg);">call_merge</i>
+                </div>
             </div>
         </div>
+        <button @click="addState()" class="new" style="margin-top: 120px;">
+        <i class="material-icons">add</i>
+    </button>
     </div>
-    <div class="mdl-grid">
-        <div v-for="(s, index) in job.states" class="mdl-cell--3-col" style="position: relative;">
-            <svg @click="showTransition(index)" xmlns="http://www.w3.org/2000/svg" style="position: absolute; top: 25%; left: 82%;" width="24" height="24">
-                <path v-show="!s.active" d="M12 8V4l8 8-8 8v-4H4V8z" fill="#888"/>
-                <path v-show="s.active" d="M12 8V4l8 8-8 8v-4H4V8z" fill="#1E88E5"/>
-                <path d="M0 0h24v24H0z" fill="none"/>
-            </svg>
-            <state-preview v-on:click.native="showState(s)" :state="s" :index="index" :active="s.active" :context="context" :socket="socket" v-on:moveLeft="moveLeft($event)" v-on:moveRight="moveRight($event)" v-on:remove="remove($event)" v-on:recordPosition="saveChanges()">
-            </state-preview>
-        </div>
-        <div class="mdl-cell--3-col">
-            <button @click="addState" class="new" style="position: relative; top: 32%;">
-                    <i class="material-icons">add</i>
-            </button>
-        </div>
-    </div>
+</div>
 </div>
 </template>
 
 <script>
 import StatePreview from "./StatePreview.vue";
 import StateDetail from "./StateDetail.vue";
+import Vue from "vue";
 
 export default {
     props: ["job", "context", "socket"],
@@ -87,6 +127,7 @@ export default {
         return {
             editName: false,
             showPopup: false,
+            showChoiceSettings: false,
             selectedState: null,
             selectedTransition: null
         }
@@ -110,10 +151,41 @@ export default {
         });
     },
     methods: {
+        toggleChoice(index) {
+            var state = this.job.states[index + 1];
+            if (!state.choices) {
+                var choices = {
+                    first: [],
+                    second: []
+                };
+                state.choices = choices;
+                Vue.set(state, 'choices', choices);
+                state.choices.first.push({
+                    name: "New"
+                });
+                state.choices.second.push({
+                    name: "New"
+                });
+            } else if (state.choices.first.length == 1 && state.choices.second.length == 1) {
+                delete state.choices;
+            }
+            this.$forceUpdate();
+        },
+        choiceSettings(s) {
+            this.selectedState = s;
+            this.showPopup = true;
+            this.showChoiceSettings = true;
+        },
         addState() {
             this.job.states.push({
                 name: "New"
             })
+        },
+        addStateChoice(s) {
+            s.push({
+                name: "New"
+            });
+            this.$forceUpdate();
         },
         moveLeft(i) {
             event.stopPropagation()
@@ -125,6 +197,17 @@ export default {
             this.$emit('changes')
             this.saveChanges();
         },
+        moveLeftChoice(s, i) {
+            event.stopPropagation()
+            if (i - 1 < 0) return;
+            var elem = s[i];
+            var right = s[i - 1];
+            s.splice(i, 1, right)
+            s.splice(i - 1, 1, elem)
+            this.$emit('changes')
+            this.saveChanges();
+            this.$forceUpdate();
+        },
         moveRight(i) {
             event.stopPropagation()
             if (i + 1 > this.job.states.length - 1) return;
@@ -135,11 +218,43 @@ export default {
             this.$emit('changes')
             this.saveChanges();
         },
+        moveRightChoice(s, i) {
+            event.stopPropagation()
+            if (i + 1 > s.length - 1) return;
+            var elem = s[i];
+            var right = s[i + 1];
+            s.splice(i, 1, right)
+            s.splice(i + 1, 1, elem)
+            this.$emit('changes')
+            this.saveChanges();
+            this.$forceUpdate();
+        },
         remove(i) {
             event.stopPropagation()
             this.job.states.splice(i, 1);
             this.$emit('changes')
             this.saveChanges();
+        },
+        removeChoice(s, choices, localIndex, globalIndex) {
+            event.stopPropagation()
+            choices.splice(localIndex, 1);
+            if (choices.length === 0) {
+                if (s.choices.first.length === 0) {
+                    var c = s.choices.second
+                    console.log("second")
+                } else {
+                    console.log(s)
+                    var c = s.choices.first
+                    console.log("first")
+                }
+                for (var a = 0; a < c.length; a++) {
+                    this.job.states.splice(globalIndex + a, 0, c[a])
+                }
+            }
+
+            this.$emit('changes')
+            this.saveChanges();
+            this.$forceUpdate();
         },
         saveChanges() {
             var xhr = new XMLHttpRequest();

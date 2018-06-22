@@ -1,6 +1,9 @@
 <style scoped>
 .state {
-    width: 70%;
+    display: inline-block;
+    vertical-align: top;
+    width: 180px;
+    height: 120px;
     margin-bottom: 30px;
     border-radius: 10px;
     box-shadow: 1px 1px 10px grey;
@@ -12,7 +15,7 @@
 }
 
 .state-head {
-    padding: 10px;
+    padding: 10px 10px 0 10px;
 }
 
 .state-content {
@@ -32,6 +35,10 @@
     font-size: 1.1em;
     color: darkslategray;
 }
+
+h3 {
+    line-height: 10px;
+}
 </style>
 <template>
 <div v-bind:class="{ 'active': active, 'state': true }">
@@ -48,7 +55,6 @@
     </div>
     <div class="state-content">
         <div style="text-align: center;" v-if="Object.keys(state).length <= 1">
-            <p>Use <b>Arrow keys</b> to reposition robot</p>
             <key-controls :socket="socket"></key-controls>
             <button style="font-size: 1.2em;" @click="savePosition()">Save</button>
         </div>

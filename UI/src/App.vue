@@ -102,7 +102,6 @@ article {
                         <button class="control-button" @click="toggleAutoPlay()"><i class="material-icons" v-if="!autoPlay">play_arrow</i><i class="material-icons" v-if="autoPlay">pause</i></button>
                         <button class="control-button"><i class="material-icons">stop</i></button>
                         <button class="control-button" @click="reset()"><i class="material-icons">replay</i></button>
-                        <em style="position: relative; bottom: 7px;">Changes saved ...</em>
                     </div>
                 </div>
                 <state-machine :job="selectedJob" :context="context" :socket="socket"></state-machine>
@@ -127,6 +126,7 @@ import SensorMonitor from "./SensorMonitor.vue";
 import StateChart from "./StateChart.vue";
 import BluePrint from "./Blueprint.vue";
 import CameraSignal from "./CameraSignal.vue";
+import jobs from "./jobs.json";
 
 export default {
     name: "app",
@@ -145,7 +145,7 @@ export default {
             autoPlay: false,
             newJobTitle: "New Job",
             editTitle: false,
-            jobs: [],
+            jobs: jobs,
             selectedJob: null,
             context: {
                 roboticArmState: {
@@ -209,7 +209,7 @@ export default {
         }
         xhr.open("GET", 'http://localhost:8080/jobs', true);
         xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
-        xhr.send();
+        //xhr.send();
         this.socket.addEventListener("open", function(event) {
             console.log("Connected");
         });
