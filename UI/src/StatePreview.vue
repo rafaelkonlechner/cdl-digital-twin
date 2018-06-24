@@ -46,10 +46,7 @@ h3 {
         <i @click="remove(index)" style="float: right; cursor: default;" class="material-icons">delete</i>
         <i @click="moveRight(index)" style="float: right; cursor: default;" class="material-icons">arrow_right</i>
         <i @click="moveLeft(index)" style="float: right; cursor: default;" class="material-icons">arrow_left</i>
-        <!--<i v-if="index === 0" style="float: right;" class="material-icons">check_circle</i>
-        <i v-if="index === 1" style="float: right;" class="material-icons">cached</i>
-        <i v-if="index >= 2" style="float: right;" class="material-icons">schedule</i>
-        <i v-if="false" style="float: right;" class="material-icons">offline_bolt</i>-->
+        <i @click="open(index)" style="float: right; cursor: default;" class="material-icons">info</i>
         <h3 v-if="!editName" @click="event.stopPropagation(); editName=true;">{{state.name}}</h3>
         <input style="color: darkslategray; font-family: 'Roboto'; font-size: 14px; margin-top: 14px; width: 80px;" v-if="editName" v-on:keyup.enter="editName=false" v-model="state.name" />
     </div>
@@ -84,6 +81,9 @@ export default {
         },
         remove(i) {
             this.$emit('remove', i);
+        },
+        open(i) {
+            this.$emit('open', i);
         },
         savePosition() {
             event.stopPropagation();

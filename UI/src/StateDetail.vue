@@ -4,11 +4,17 @@
 <div>
     <h1>{{state.name}}</h1>
     <span v-if="Object.keys(state).length > 1" class="attribute" v-for="(value,key) in state">{{key}}: {{value}}</br></span>
+    <button @click="close()">Done</button>
 </div>
 </template>
 
 <script>
 export default {
     props: ["state", "context", "socket"],
+    methods: {
+        close() {
+            this.$emit('close');
+        }
+    }
 }
 </script>

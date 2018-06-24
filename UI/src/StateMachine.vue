@@ -22,7 +22,7 @@
     top: 20vw;
     left: 30vw;
     width: 40vw;
-    height: 40vh;
+    height: 440px;
     background: white;
     border-radius: 10px;
     z-index: 11;
@@ -50,27 +50,26 @@
 </style>
 <template>
 <div class="state-machine">
-    <div v-if="showPopup" @click="showPopup = false;" class="dim">
+    <div v-if="showPopup" class="dim">
         <div class="popup">
             <div v-if="selectedState && !showChoiceSettings">
-                <state-detail :state="selectedState"></state-detail>
+                <state-detail :state="selectedState" v-on:close="showPopup = false;"></state-detail>
             </div>
             <div v-if="showChoiceSettings">
-                <p>Test</p>
+                <choice-settings :state="selectedState" :followupState="followupState" v-on:close="showPopup = false; showChoiceSettings = false;"></choice-settings>
             </div>
-            <button>Done</button>
         </div>
     </div>
     <div>
         <div v-for="(s, index) in job.states" class="row">
             <div v-if="!s.choices" style="width: 260px; padding-top: 75px;">
-                <state-preview v-on:click.native="showState(s)" :state="s" :index="index" :active="s.active" :context="context" :socket="socket" v-on:moveLeft="moveLeft($event)" v-on:moveRight="moveRight($event)" v-on:remove="remove($event)" v-on:recordPosition="saveChanges()">
+                <state-preview v-on:open="showState(s)" :state="s" :index="index" :active="s.active" :context="context" :socket="socket" v-on:moveLeft="moveLeft($event)" v-on:moveRight="moveRight($event)" v-on:remove="remove($event)" v-on:recordPosition="saveChanges()">
                 </state-preview>
                 <div style="color: darkslategray; display: inline-block; vertical-align: top; margin-left: 20px;">
                     <i @click="toggleChoice(index)" v-if="!s.choices && index < job.states.length - 1 && !job.states[index + 1].choices" class="material-icons" style="font-size: 3em; position: relative; top: 45px;">arrow_right_alt</i>
                     <div style="display: inline-block; vertical-align: top;" v-if="index < job.states.length - 1 && job.states[index + 1].choices">
-                        <div><i @click="choiceSettings(s)" class="material-icons" style="font-size: 2em; position: relative; top: 15px; left: 5px;">settings</i></div>
-                        <div><i @click="toggleChoice(index)" class="material-icons" style="transform: rotate(90deg); font-size: 3em; position: relative; top: 15px;">call_split</i></div>
+                        <div><i @click="choiceSettings(s, index)" class="material-icons" style="cursor: default; font-size: 2em; position: relative; top: 15px; left: 5px;">info</i></div>
+                        <div><i @click="toggleChoice(index)" class="material-icons" style="cursor: default; transform: rotate(90deg); font-size: 3em; position: relative; top: 15px;">call_split</i></div>
                     </div>
                 </div>
             </div>
@@ -78,7 +77,7 @@
                 <div style="display: inline-block; vertical-align: top; margin-right: -40px;">
                     <div>
                         <div v-for="(s1, i1) in s.choices.first" style="display: inline-block; vertical-align: top; width: 260px;">
-                            <state-preview v-on:click.native="showState(s)" :state="s1" :index="i1" :active="s.active" :context="context" :socket="socket" v-on:moveLeft="moveLeftChoice(s.choices.first, $event)" v-on:moveRight="moveRightChoice(s.choices.first,
+                            <state-preview v-on:open="showState(s)" :state="s1" :index="i1" :active="s.active" :context="context" :socket="socket" v-on:moveLeft="moveLeftChoice(s.choices.first, $event)" v-on:moveRight="moveRightChoice(s.choices.first,
                     $event)" v-on:remove="removeChoice(s, s.choices.first, $event, index)" v-on:recordPosition="saveChanges()">
                             </state-preview>
                             <div v-if="i1 < s.choices.first.length - 1" style="display: inline; position: relative; left: 20px; top: 44px;">
@@ -89,7 +88,7 @@
                     </div>
                     <div>
                         <div v-for="(s2, i2) in s.choices.second" style="display: inline-block; vertical-align: top; width: 260px;">
-                            <state-preview v-on:click.native="showState(s)" :state="s2" :index="i2" :active="s.active" :context="context" :socket="socket" v-on:moveLeft="moveLeftChoice(s.choices.second, $event)" v-on:moveRight="moveRightChoice(s.choices.second,
+                            <state-preview v-on:open="showState(s)" :state="s2" :index="i2" :active="s.active" :context="context" :socket="socket" v-on:moveLeft="moveLeftChoice(s.choices.second, $event)" v-on:moveRight="moveRightChoice(s.choices.second,
                     $event)" v-on:remove="removeChoice(s, s.choices.second, $event, index)" v-on:recordPosition="saveChanges()">
                             </state-preview>
                             <div v-if="i2 < s.choices.second.length - 1" style="display: inline; position: relative; left: 20px; top: 44px;">
@@ -100,7 +99,7 @@
                     </div>
                 </div>
                 <div style="display: inline-block; position: relative; top: 115px; left: -20px;">
-                    <i class="material-icons" style="font-size: 40px; color: darkslategrey; transform: rotate(90deg);">call_merge</i>
+                    <i class="material-icons" style="font-size: 34px; color: darkslategrey; transform: rotate(90deg);">call_merge</i>
                 </div>
             </div>
         </div>
@@ -115,13 +114,15 @@
 <script>
 import StatePreview from "./StatePreview.vue";
 import StateDetail from "./StateDetail.vue";
+import ChoiceSettings from "./ChoiceSettings.vue";
 import Vue from "vue";
 
 export default {
     props: ["job", "context", "socket"],
     components: {
         statePreview: StatePreview,
-        stateDetail: StateDetail
+        stateDetail: StateDetail,
+        choiceSettings: ChoiceSettings
     },
     data() {
         return {
@@ -129,6 +130,7 @@ export default {
             showPopup: false,
             showChoiceSettings: false,
             selectedState: null,
+            followupState: null,
             selectedTransition: null
         }
     },
@@ -171,8 +173,9 @@ export default {
             }
             this.$forceUpdate();
         },
-        choiceSettings(s) {
+        choiceSettings(s, i) {
             this.selectedState = s;
+            this.followupState = this.job.states[i + 1];
             this.showPopup = true;
             this.showChoiceSettings = true;
         },
@@ -241,12 +244,10 @@ export default {
             if (choices.length === 0) {
                 if (s.choices.first.length === 0) {
                     var c = s.choices.second
-                    console.log("second")
                 } else {
-                    console.log(s)
                     var c = s.choices.first
-                    console.log("first")
                 }
+                this.job.states.splice(globalIndex, 1);
                 for (var a = 0; a < c.length; a++) {
                     this.job.states.splice(globalIndex + a, 0, c[a])
                 }
