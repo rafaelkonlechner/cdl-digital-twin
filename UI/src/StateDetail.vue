@@ -25,7 +25,7 @@ p {
     <div class="third">
         <h2>Testing Rig <input type="checkbox" v-model="testingRig"></h2>
         <div v-bind:class="{ disabled: !testingRig }">
-            <p>Plate Temp.: <input type="number" step="0.1" style="width: 45px;">°C</p>
+            <p>Plate Temp.: <input type="number" step="0.1" style="width: 45px;" :disabled="!testingRig">°C</p>
         </div>
     </div>
     <div class="third">
@@ -37,13 +37,13 @@ p {
                 <key-controls :socket="socket"></key-controls>
                 <button style="font-size: 1.2em;" @click="savePosition()">Save</button>
             </div>
-            <p>Gripper: <select><option>Open</option><<option>Closed</option></select></p>
+            <p>Gripper: <select :disabled="!roboticArm"><option>Open</option><<option>Closed</option></select></p>
         </div>
     </div>
     <div class="third">
         <h2>Conveyor <input type="checkbox" v-model="conveyor"></h2>
         <div v-bind:class="{ disabled: !conveyor }">
-            <p>Adjuster: <select><option>Pushed</option><<option>Open</option></select></p>
+            <p>Adjuster: <select :disabled="!conveyor"><option>Pushed</option><<option>Open</option></select></p>
         </div>
     </div>
     <button @click="close()">Done</button>
