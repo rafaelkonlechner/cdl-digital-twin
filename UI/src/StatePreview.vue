@@ -43,8 +43,8 @@ h3 {
         <i @click="moveRight(index)" style="float: right; cursor: default;" class="material-icons">arrow_right</i>
         <i @click="moveLeft(index)" style="float: right; cursor: default;" class="material-icons">arrow_left</i>
         <i @click="open(index)" style="float: right; cursor: default;" class="material-icons">info</i>
-        <h3 v-if="!editName" @click="event.stopPropagation(); editName=true;">{{state.name}}</h3>
-        <input style="color: darkslategray; font-family: 'Roboto'; font-size: 14px; margin-top: 14px; width: 80px;" v-if="editName" v-on:keyup.enter="editName=false" v-model="state.name" />
+        <h3 v-if="!editName" @click="editName=true;">{{state.name}}</h3>
+        <input style="color: darkslategray; font-family: 'Roboto'; font-size: 14px; width: 75px;" v-if="editName" v-on:keyup.enter="editName=false" v-model="state.name" />
     </div>
     <div class="state-content">
         <div style="text-align: center;" v-if="Object.keys(state).length <= 1">
