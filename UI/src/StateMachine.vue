@@ -53,7 +53,7 @@
     <div v-if="showPopup" class="dim">
         <div class="popup">
             <div v-if="selectedState && !showChoiceSettings">
-                <state-detail :state="selectedState" v-on:close="showPopup = false;"></state-detail>
+                <state-detail :state="selectedState" :socket="socket" v-on:close="showPopup = false;"></state-detail>
             </div>
             <div v-if="showChoiceSettings">
                 <choice-settings :state="selectedState" :followupState="followupState" v-on:close="showPopup = false; showChoiceSettings = false;"></choice-settings>
@@ -77,7 +77,7 @@
                 <div style="display: inline-block; vertical-align: top; margin-right: -40px;">
                     <div>
                         <div v-for="(s1, i1) in s.choices.first" style="display: inline-block; vertical-align: top; width: 260px;">
-                            <state-preview v-on:open="showState(s)" :state="s1" :index="i1" :active="s.active" :context="context" :socket="socket" v-on:moveLeft="moveLeftChoice(s.choices.first, $event)" v-on:moveRight="moveRightChoice(s.choices.first,
+                            <state-preview v-on:open="showState(s1)" :state="s1" :index="i1" :active="s.active" :context="context" :socket="socket" v-on:moveLeft="moveLeftChoice(s.choices.first, $event)" v-on:moveRight="moveRightChoice(s.choices.first,
                     $event)" v-on:remove="removeChoice(s, s.choices.first, $event, index)" v-on:recordPosition="saveChanges()">
                             </state-preview>
                             <div v-if="i1 < s.choices.first.length - 1" style="display: inline; position: relative; left: 20px; top: 44px;">
@@ -88,7 +88,7 @@
                     </div>
                     <div>
                         <div v-for="(s2, i2) in s.choices.second" style="display: inline-block; vertical-align: top; width: 260px;">
-                            <state-preview v-on:open="showState(s)" :state="s2" :index="i2" :active="s.active" :context="context" :socket="socket" v-on:moveLeft="moveLeftChoice(s.choices.second, $event)" v-on:moveRight="moveRightChoice(s.choices.second,
+                            <state-preview v-on:open="showState(s2)" :state="s2" :index="i2" :active="s.active" :context="context" :socket="socket" v-on:moveLeft="moveLeftChoice(s.choices.second, $event)" v-on:moveRight="moveRightChoice(s.choices.second,
                     $event)" v-on:remove="removeChoice(s, s.choices.second, $event, index)" v-on:recordPosition="saveChanges()">
                             </state-preview>
                             <div v-if="i2 < s.choices.second.length - 1" style="display: inline; position: relative; left: 20px; top: 44px;">

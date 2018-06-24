@@ -22,10 +22,6 @@
     padding: 0px 12px 10px 12px;
 }
 
-.attribute {
-    font-family: 'Roboto Mono' monospace;
-}
-
 .material-icons {
     font-size: 1.5em;
     color: darkslategrey;

@@ -6,10 +6,9 @@
     <div style="text-align: center; padding: 10px;">
         <p>Sensor:
             <select v-model="state.sensor">
-                        <option value="qr">QR Code</option>
-                        <option value="pickup">Pickup Camera</option>
-                        <option value="heater">Heat Plate</option>
-                    </select>
+                <option value="qr">QR Code</option>
+                <option value="pickup">Pickup Camera</option>
+            </select>
         </p>
     </div>
     <div>
@@ -22,13 +21,6 @@
                         <option>Class 1</option>
                         <option>Class 2</option>
                     </select>
-                </p>
-                <p v-if="state.sensor == 'heater'">
-                    Condition: <select>
-                        <option>&lt;</option>
-                        <option>&gt;</option>
-                        <option>=</option>
-                    </select><input type="number" step="0.1" placeholder="Insert temperature">°C
                 </p>
                 <p v-if="state.sensor == 'pickup'">
                     Condition: <select>
@@ -46,13 +38,6 @@
                         <option>Class 1</option>
                         <option>Class 2</option>
                     </select>
-                </p>
-                <p v-if="state.sensor=='heater' ">
-                    Condition: <select>
-                        <option>&lt;</option>
-                        <option>&gt;</option>
-                        <option>=</option>
-                    </select><input type="number " step="0.1 " placeholder="Insert temperature ">°C
                 </p>
                 <p v-if="state.sensor=='pickup' ">
                     Condition: <select>
