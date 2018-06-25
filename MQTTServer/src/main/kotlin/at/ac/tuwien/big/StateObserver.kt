@@ -1,32 +1,35 @@
 package at.ac.tuwien.big
 
+import at.ac.tuwien.big.entity.state.Environment
 import at.ac.tuwien.big.entity.state.RoboticArmState
 import at.ac.tuwien.big.entity.state.StateEvent
 import at.ac.tuwien.big.entity.transition.*
+import at.ac.tuwien.big.sm.BasicState
+import at.ac.tuwien.big.sm.ChoiceState
 
 /**
  * This controller holds the core logic of the production steps during a simulation by searching the defined
  * successor state for a given input state.
  */
-object StateObserver : Observable<RoboticArmState>() {
+object StateObserver : Observable<BasicState>() {
 
     var stateMachine: StateMachineHedgehog? = null
 
     /**
      * Most recently observed state
      */
-    private var snapshot: RoboticArmState = RoboticArmState()
+    private var snapshot: Environment = Environment()
 
     /**
      * Latest matching state, given the current job
      */
-    var latestMatch: RoboticArmState = RoboticArmState()
+    var latestMatch: Pair<BasicState, Boolean> = Pair(BasicState(), true)
         private set
 
     /**
-     * Successor state, given the latest maching state
+     * Successor state, given the latest matching state
      */
-    var targetState: StateEvent = RoboticArmState()
+    var targetState: BasicState = BasicState()
         private set
 
     /**
@@ -35,11 +38,15 @@ object StateObserver : Observable<RoboticArmState>() {
     fun update(e: StateEvent) {
         when (e) {
             is RoboticArmState -> {
-                snapshot = e
+                snapshot = snapshot.copy(roboticArmState = e)
                 val match = matchState(snapshot)
                 if (match != null && latestMatch != match) {
                     latestMatch = match
-                    notify(latestMatch)
+                    if (match.second) {
+                        notify(latestMatch.first)
+                    } else if (latestMatch.first.altEnvironment != null) {
+                        notify(latestMatch.first)
+                    }
                 }
             }
         }
@@ -49,10 +56,10 @@ object StateObserver : Observable<RoboticArmState>() {
      * Return the defined successor state of the latest matching state, according to the state machine
      */
     fun next(): Transition? {
-        val successor = stateMachine?.successor(latestMatch)
+        val successor = stateMachine?.successor(latestMatch.first, latestMatch.second)
         if (successor != null) {
             targetState = successor
-            return RoboticArmTransition(latestMatch, successor)
+            return RoboticArmTransition(latestMatch.first.environment.roboticArmState!!, successor.environment.roboticArmState!!)
         } else {
             return null
         }
@@ -62,10 +69,12 @@ object StateObserver : Observable<RoboticArmState>() {
      * Return the defined successor state of the latest matching state, according to the state machine
      */
     fun reset(): Transition {
-        return RoboticArmTransition(latestMatch, stateMachine?.states?.first() ?: RoboticArmState())
+        return RoboticArmTransition(latestMatch.first.environment.roboticArmState
+                ?: RoboticArmState(), (stateMachine?.states?.first() as BasicState).environment.roboticArmState
+                ?: RoboticArmState())
     }
 
-    fun atEndState() = stateMachine?.isEndState(latestMatch) ?: true
+    fun atEndState() = stateMachine?.isEndState(latestMatch.first) ?: true
 
     /**
      * Transform successor into 'goto' commands for the MQTT API
@@ -112,7 +121,26 @@ object StateObserver : Observable<RoboticArmState>() {
      * Match the given state against all states defined in this class and returns a match
      * @return the matching state or null, if no match was found
      */
-    private fun matchState(roboticArmState: RoboticArmState): RoboticArmState? {
-        return stateMachine?.states?.firstOrNull { roboticArmState.match(it, doubleAccuracy) }
+    private fun matchState(env: Environment): Pair<BasicState, Boolean>? {
+
+        val basicStates = stateMachine?.states
+                ?.filter { it is BasicState }
+                ?.map { it as BasicState }
+                ?: emptyList()
+        val choiceStates = stateMachine?.states
+                ?.filter { it is ChoiceState }
+                ?.map { it as ChoiceState }
+                ?.flatMap { it.choices.first + it.choices.second }
+                ?: emptyList()
+
+        val match = (basicStates + choiceStates).firstOrNull {
+            env.matches(it.environment) || (it.altEnvironment != null && env.matches(it.altEnvironment!!))
+        }
+
+        return if (match != null) {
+            Pair(match, env.matches(match.environment))
+        } else {
+            null
+        }
     }
 }

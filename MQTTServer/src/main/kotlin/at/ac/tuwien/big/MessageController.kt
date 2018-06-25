@@ -101,7 +101,7 @@ class MessageController(private val mqtt: MQTT,
 
     private fun observe() {
         if (autoPlay) {
-            val latest = controller.latestMatch
+            val latest = controller.latestMatch.first
             val transition = if (!controller.atEndState()) {
                 controller.next()
             } else {
@@ -120,7 +120,7 @@ class MessageController(private val mqtt: MQTT,
     }
 
     fun reset() {
-        val latest = controller.latestMatch
+        val latest = controller.latestMatch.first
         val transition = controller.reset()
         println("Resetting: ${latest.name} -> ${transition.targetState.name}")
         val context = controller.latestMatch

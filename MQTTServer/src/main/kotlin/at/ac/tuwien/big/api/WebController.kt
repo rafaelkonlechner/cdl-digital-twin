@@ -6,8 +6,12 @@ import at.ac.tuwien.big.entity.state.RoboticArmState
 import at.ac.tuwien.big.entity.state.SliderState
 import at.ac.tuwien.big.entity.state.TestingRigState
 import at.ac.tuwien.big.entity.transition.*
+import at.ac.tuwien.big.sm.BasicState
+import at.ac.tuwien.big.sm.ChoiceState
 import at.ac.tuwien.big.sm.Job
+import at.ac.tuwien.big.sm.StateBase
 import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import io.javalin.ApiBuilder.*
 import io.javalin.Javalin
 import kotlinx.coroutines.experimental.channels.Channel
@@ -29,7 +33,13 @@ class WebController(private val mqtt: MQTT,
     private var app: Javalin = Javalin.create()
 
     private var session: Session? = null
-    private val gson = Gson()
+    private val gson: Gson = GsonBuilder()
+            .registerTypeAdapterFactory(
+                    RuntimeTypeAdapterFactory.of(StateBase::class.java, "type")
+                            .registerSubtype(BasicState::class.java, "BasicState")
+                            .registerSubtype(ChoiceState::class.java, "ChoiceState")
+            )
+            .create()
 
     init {
         messageController.subscribe(this::pushToWebSocket)
@@ -105,6 +115,15 @@ class WebController(private val mqtt: MQTT,
             get("/recording") { ctx -> ctx.json(messageController.recording) }
             put("/recording") { ctx -> messageController.recording = ctx.body().toBoolean() }
             put("/resetData") { timeSeriesDatabase.resetDatabase() }
+            post("/moveRoboticArm") { ctx ->
+                run {
+                    val newState = gson.fromJson(ctx.body(), RoboticArmState::class.java)
+                    val commands = StateObserver.transform(RoboticArmTransition(RoboticArmState(), newState))
+                    for (c in commands) {
+                        mqtt.send(c)
+                    }
+                }
+            }
             get("/all") { ctx -> ctx.json(s.all) }
             get("/roboticArmState") { ctx -> ctx.json(PickAndPlaceController.roboticArmSnapshot) }
             get("/sliderState") { ctx -> ctx.json(PickAndPlaceController.sliderSnapshot) }
@@ -148,15 +167,19 @@ class WebController(private val mqtt: MQTT,
             }
             put("/jobs/:id") { ctx ->
                 run {
-                    val id = ctx.param("id") ?: ""
-                    val job = jobController.getJob(id)
-                    if (job != null) {
-                        val newJob = gson.fromJson(ctx.body(), Job::class.java)
-                        jobController.setJob(newJob)
-                        StateObserver.stateMachine = StateMachineHedgehog(newJob.states)
-                        ctx.status(200)
-                    } else {
-                        ctx.status(404)
+                    try {
+                        val id = ctx.param("id") ?: ""
+                        val job = jobController.getJob(id)
+                        if (job != null) {
+                            val newJob = gson.fromJson(ctx.body(), Job::class.java)
+                            jobController.setJob(newJob)
+                            StateObserver.stateMachine = StateMachineHedgehog(newJob.states)
+                            ctx.status(200)
+                        } else {
+                            ctx.status(404)
+                        }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
                     }
                 }
             }
