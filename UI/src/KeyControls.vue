@@ -108,16 +108,16 @@ export default {
         },
         yKey: function(newYKey) {
             if (newYKey === true) {
-                this.sendSocketMessage("release-gripper");
+                //this.sendSocketMessage("release-gripper");
             } else {
-                this.sendSocketMessage("stop-release-gripper");
+                //this.sendSocketMessage("stop-release-gripper");
             }
         },
         xKey: function(newXKey) {
             if (newXKey === true) {
-                this.sendSocketMessage("grip-gripper");
+                //this.sendSocketMessage("grip-gripper");
             } else {
-                this.sendSocketMessage("stop-grip-gripper");
+                //this.sendSocketMessage("stop-grip-gripper");
             }
         },
         messageRate: function(newValue) {
