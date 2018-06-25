@@ -33,7 +33,7 @@
 }
 
 h3 {
-    line-height: 10px;
+    line-height: 1.2em;
 }
 </style>
 <template>
@@ -47,7 +47,7 @@ h3 {
         <input style="color: darkslategray; font-family: 'Roboto'; font-size: 14px; width: 75px;" v-if="editName" v-on:keyup.enter="editName=false" v-model="state.name" />
     </div>
     <div class="state-content">
-        <div style="text-align: center;" v-if="Object.keys(state).length <= 1">
+        <div style="text-align: center;" v-if="state.environment.roboticArmState == null">
             <key-controls :socket="socket"></key-controls>
             <button style="font-size: 1.2em;" @click="savePosition()">Save</button>
         </div>
@@ -68,6 +68,9 @@ export default {
             editName: false
         }
     },
+    mounted() {
+        console.log(this.state)
+    },
     methods: {
         moveLeft(i) {
             this.$emit('moveLeft', i);
@@ -82,15 +85,16 @@ export default {
             this.$emit('open', i);
         },
         savePosition() {
-            event.stopPropagation();
-            var r = this.context.roboticArmState
-            this.state.basePosition = r.basePosition.toFixed(2);
-            this.state.mainArmPosition = r.mainArmPosition.toFixed(2);
-            this.state.secondArmPosition = r.secondArmPosition.toFixed(2);
-            this.state.headPosition = r.headPosition.toFixed(2);
-            this.state.headMountPosition = r.headMountPosition.toFixed(2);
-            this.state.gripperPosition = r.gripperPosition.toFixed(2);
-            console.log(this.state)
+            console.log(this.context)
+            var context = this.context.roboticArmState
+            this.state.environment.roboticArmState = {}
+            var r = this.state.environment.roboticArmState
+            r.basePosition = context.basePosition.toFixed(2);
+            r.mainArmPosition = context.mainArmPosition.toFixed(2);
+            r.secondArmPosition = context.secondArmPosition.toFixed(2);
+            r.headPosition = context.headPosition.toFixed(2);
+            r.headMountPosition = context.headMountPosition.toFixed(2);
+            r.gripperPosition = context.gripperPosition.toFixed(2);
             this.$emit('recordPosition');
             this.$forceUpdate();
         }

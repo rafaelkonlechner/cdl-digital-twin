@@ -90,6 +90,10 @@ article {
                 </div>
                 <div class="job" style="text-align: center;">
                     <button @click="newJob()" class="new-job"><i class="material-icons" style="color: darkslategrey;">add</i></button>
+                    <div style="margin-top: 20px; color: darkslategray;">
+                        <label>Import Job</label>
+                        <input type="file" value="Import Job" accept="application/json" @change="importJob($event)">
+                    </div>
                 </div>
             </div>
             <div class="mdl-cell--10-col">
@@ -100,8 +104,9 @@ article {
                     </div>
                     <div style="display: inline-block; margin-left: 70px;">
                         <button class="control-button" @click="toggleAutoPlay()"><i class="material-icons" v-if="!autoPlay">play_arrow</i><i class="material-icons" v-if="autoPlay">pause</i></button>
-                        <button class="control-button"><i class="material-icons">stop</i></button>
                         <button class="control-button" @click="reset()"><i class="material-icons">replay</i></button>
+                        <button class="control-button" @click="exportJob()"><i class="material-icons">move_to_inbox</i></button>
+                        <a @mouseleave="downloadLink = ''" v-if="downloadLink" :download="selectedJob.name + '.json'" :href="downloadLink" style="margin-left: 20px;">Download Job</a>
                     </div>
                 </div>
                 <state-machine :job="selectedJob" :context="context" :socket="socket"></state-machine>
@@ -126,7 +131,6 @@ import SensorMonitor from "./SensorMonitor.vue";
 import StateChart from "./StateChart.vue";
 import BluePrint from "./Blueprint.vue";
 import CameraSignal from "./CameraSignal.vue";
-import jobs from "./jobs.json";
 
 export default {
     name: "app",
@@ -145,8 +149,9 @@ export default {
             autoPlay: false,
             newJobTitle: "New Job",
             editTitle: false,
-            jobs: jobs,
+            jobs: [],
             selectedJob: null,
+            downloadLink: "",
             context: {
                 roboticArmState: {
                     name: "Snapshot",
@@ -209,7 +214,7 @@ export default {
         }
         xhr.open("GET", 'http://localhost:8080/jobs', true);
         xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
-        //xhr.send();
+        xhr.send();
         this.socket.addEventListener("open", function(event) {
             console.log("Connected");
         });
@@ -307,6 +312,13 @@ export default {
         },
         gotoIdle() {
             this.sendSocketMessage("idle");
+        },
+        exportJob() {
+            var json = JSON.stringify(this.selectedJob)
+            this.downloadLink = 'data:application/json;charset=utf-8,' + encodeURIComponent(json);
+        },
+        importJob(e) {
+            console.log(e);
         }
     }
 };

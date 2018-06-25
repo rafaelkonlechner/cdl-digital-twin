@@ -53,7 +53,7 @@
     <div v-if="showPopup" class="dim">
         <div class="popup">
             <div v-if="selectedState && !showChoiceSettings">
-                <state-detail :state="selectedState" :socket="socket" v-on:close="showPopup = false;"></state-detail>
+                <state-detail :state="selectedState" :socket="socket" :context="context" v-on:close="showPopup = false;" v-on:recordPosition="saveChanges()"></state-detail>
             </div>
             <div v-if="showChoiceSettings">
                 <choice-settings :state="selectedState" :followupState="followupState" v-on:close="showPopup = false; showChoiceSettings = false;"></choice-settings>
@@ -163,10 +163,17 @@ export default {
                 state.choices = choices;
                 Vue.set(state, 'choices', choices);
                 state.choices.first.push({
-                    name: "New"
+                    name: state.name,
+                    type: "BasicState",
+                    environment: state.environment
                 });
                 state.choices.second.push({
-                    name: "New"
+                    name: "New",
+                    environment: {
+                        roboticArmState: null,
+                        conveyorState: null,
+                        testingRigState: null
+                    }
                 });
             } else if (state.choices.first.length == 1 && state.choices.second.length == 1) {
                 delete state.choices;
@@ -181,12 +188,24 @@ export default {
         },
         addState() {
             this.job.states.push({
-                name: "New"
+                name: "New",
+                type: "BasicState",
+                environment: {
+                    roboticArmState: null,
+                    conveyorState: null,
+                    testingRigState: null
+                }
             })
         },
         addStateChoice(s) {
             s.push({
-                name: "New"
+                name: "New",
+                type: "ChoiceState",
+                environment: {
+                    roboticArmState: null,
+                    conveyorState: null,
+                    testingRigState: null
+                }
             });
             this.$forceUpdate();
         },

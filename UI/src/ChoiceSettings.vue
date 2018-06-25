@@ -16,10 +16,10 @@
             <h2>Condition</h2>
             <div style="height: 75px; padding-top: 45px;">
                 <p v-if="state.sensor == 'qr'">
-                    Scanning: <select>
-                        <option>Empty</option>
-                        <option>Class 1</option>
-                        <option>Class 2</option>
+                    Scanning: <select v-model="state.environment.testingRigState.objectCategory">
+                        <option value="NONE">None</option>
+                        <option value="GREEN">Class 1</option>
+                        <option value="RED">Class 2</option>
                     </select>
                 </p>
                 <p v-if="state.sensor == 'pickup'">
@@ -71,6 +71,14 @@ export default {
     props: ["state", "followupState"],
     components: {
         statePreview: StatePreview
+    },
+    created() {
+        if (this.state.environment.testingRigState.objectCategory === undefined) {
+            this.state.environment.testingRigState.objectCategory = 'NONE'
+        }
+        if (this.state.altEnvironment.testingRigState.objectCategory === undefined) {
+            this.state.altEnvironment.testingRigState.objectCategory = 'NONE'
+        }
     },
     methods: {
         close: function() {
