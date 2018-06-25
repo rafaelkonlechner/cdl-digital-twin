@@ -156,7 +156,6 @@ export default {
     },
     computed: {
         selectedData() {
-            console.log(this.selected)
             return this.data[this.selected.component]
         }
     },
