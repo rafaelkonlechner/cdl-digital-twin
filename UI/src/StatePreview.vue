@@ -68,9 +68,6 @@ export default {
             editName: false
         }
     },
-    mounted() {
-        console.log(this.state)
-    },
     methods: {
         moveLeft(i) {
             this.$emit('moveLeft', i);
