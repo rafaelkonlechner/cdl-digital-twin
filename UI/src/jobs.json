@@ -2,7 +2,6 @@
         "name": "Job 1",
         "states": [{
                 "name": "Idle",
-                "active": true,
                 "basePosition": 1.5,
                 "mainArmPosition": 1.5,
                 "secondArmPosition": 2.9,
