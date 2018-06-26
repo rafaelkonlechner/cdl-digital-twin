@@ -215,7 +215,6 @@ object PickAndPlaceControllerSimulation {
      */
     private fun matchState(testingRigState: TestingRigState): TestingRigState? {
         return s.testingRig.values
-                .filter { testingRigState.match(it, singleAccuracy) }
-                .find { it.criterion(testingRigState) }
+                .find { testingRigState.match(it, singleAccuracy) }
     }
 }

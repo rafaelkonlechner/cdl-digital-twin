@@ -1,10 +1,7 @@
 package at.ac.tuwien.big.api
 
 import at.ac.tuwien.big.*
-import at.ac.tuwien.big.entity.state.ConveyorState
-import at.ac.tuwien.big.entity.state.RoboticArmState
-import at.ac.tuwien.big.entity.state.SliderState
-import at.ac.tuwien.big.entity.state.TestingRigState
+import at.ac.tuwien.big.entity.state.*
 import at.ac.tuwien.big.entity.transition.*
 import at.ac.tuwien.big.sm.BasicState
 import at.ac.tuwien.big.sm.ChoiceState
@@ -117,10 +114,23 @@ class WebController(private val mqtt: MQTT,
             get("/recording") { ctx -> ctx.json(messageController.recording) }
             put("/recording") { ctx -> messageController.recording = ctx.body().toBoolean() }
             put("/resetData") { timeSeriesDatabase.resetDatabase() }
-            post("/moveRoboticArm") { ctx ->
+            post("/moveEnvironment") { ctx ->
                 run {
-                    val newState = gson.fromJson(ctx.body(), RoboticArmState::class.java)
-                    val commands = StateObserver.transform(RoboticArmTransition(RoboticArmState(), newState))
+                    val env = gson.fromJson(ctx.body(), Environment::class.java)
+                    val commands = mutableListOf<String>();
+                    if (env.roboticArmState != null) {
+                        commands.addAll(StateObserver.transform(RoboticArmTransition(RoboticArmState(), env.roboticArmState)))
+                    }
+                    if (env.conveyorState != null) {
+                        commands.addAll(StateObserver.transform(ConveyorTransition(ConveyorState(), env.conveyorState)))
+                    }
+                    if (env.sliderState != null) {
+                        commands.addAll(StateObserver.transform(SliderTransition(SliderState(), env.sliderState)))
+                    }
+                    if (env.testingRigState != null) {
+                        commands.addAll(StateObserver.transform(TestingRigTransition(TestingRigState(), env.testingRigState)))
+                    }
+
                     for (c in commands) {
                         mqtt.send(c)
                     }

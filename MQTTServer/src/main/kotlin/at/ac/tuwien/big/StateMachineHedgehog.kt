@@ -22,23 +22,27 @@ class StateMachineHedgehog(val states: List<StateBase>) {
             return null
         } else {
             val choices = states.filter { it is ChoiceState }.map { it as ChoiceState }
-            val choice = choices.find { it.choices.first.contains(state) || it.choices.second.contains(state) }!!
-            val first = choice.choices.first
-            val second = choice.choices.second
-            return if (first.contains(state)) {
-                val index = first.indexOf(state)
-                if (index in 0 until first.lastIndex) {
-                    first[index + 1]
+            val choice = choices.find { it.choices.first.contains(state) || it.choices.second.contains(state) }
+            if (choice != null) {
+                val first = choice.choices.first
+                val second = choice.choices.second
+                return if (first.contains(state)) {
+                    val index = first.indexOf(state)
+                    if (index in 0 until first.lastIndex) {
+                        first[index + 1]
+                    } else {
+                        states[currentIndex + 1] as BasicState
+                    }
                 } else {
-                    states[currentIndex + 1] as BasicState
+                    val index = second.indexOf(state)
+                    if (index in 0 until second.lastIndex) {
+                        second[index + 1]
+                    } else {
+                        states[currentIndex + 1] as BasicState
+                    }
                 }
             } else {
-                val index = second.indexOf(state)
-                if (index in 0 until second.lastIndex) {
-                    second[index + 1]
-                } else {
-                    states[currentIndex + 1] as BasicState
-                }
+                return null
             }
         }
     }

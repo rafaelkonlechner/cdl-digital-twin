@@ -8,8 +8,7 @@ data class TestingRigState(
         override var entity: String = "TestingRig",
         val objectCategory: ObjectCategory? = null,
         val platformPosition: Double? = null,
-        val heatplateTemperature: Double? = null,
-        val criterion: (TestingRigState) -> Boolean = { _ -> true }
+        val heatplateTemperature: Double? = null
 ) : StateEvent {
 
     override fun match(other: StateEvent, similar: (Double, Double) -> Boolean): Boolean {

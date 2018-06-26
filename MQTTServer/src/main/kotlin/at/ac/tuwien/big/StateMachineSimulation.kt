@@ -163,16 +163,12 @@ object StateMachineSimulation {
         /*
          * Testing rig states
          */
-        val none = TestingRigState("None", objectCategory = ObjectCategory.NONE, criterion = { _ -> true })
-        val green = TestingRigState("Green", objectCategory = ObjectCategory.GREEN, criterion = { x ->
-            x.heatplateTemperature != null && !similar(x.heatplateTemperature, 130.0, 0.1)
-        })
-        val red = TestingRigState("Red", objectCategory = ObjectCategory.RED, criterion = { x ->
-            x.heatplateTemperature != null && !similar(x.heatplateTemperature, 150.0, 0.1)
-        })
-        val green_heated = TestingRigState("Green Heated", objectCategory = ObjectCategory.GREEN, heatplateTemperature = 130.0, criterion = { x -> x.heatplateTemperature != null })
-        val red_heated = TestingRigState("Red Heated", objectCategory = ObjectCategory.RED, heatplateTemperature = 150.0, criterion = { x -> x.heatplateTemperature != null })
-        val tilted = TestingRigState("Tilted", platformPosition = -1.0, criterion = { _ -> true })
+        val none = TestingRigState("None", objectCategory = ObjectCategory.NONE)
+        val green = TestingRigState("Green", objectCategory = ObjectCategory.GREEN)
+        val red = TestingRigState("Red", objectCategory = ObjectCategory.RED)
+        val green_heated = TestingRigState("Green Heated", objectCategory = ObjectCategory.GREEN, heatplateTemperature = 130.0)
+        val red_heated = TestingRigState("Red Heated", objectCategory = ObjectCategory.RED, heatplateTemperature = 150.0)
+        val tilted = TestingRigState("Tilted", platformPosition = -1.0)
         val testingRig = createMap(s.none, s.green, s.red, s.green_heated, s.red_heated, s.tilted)
 
         val all = roboticArm.values union slider.values union conveyor.values union testingRig.values
