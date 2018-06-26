@@ -36,19 +36,29 @@ input {
     <div class="third">
         <h2>Testing Rig <input type="checkbox" v-model="testingRig"></h2>
         <div v-bind:class="{ disabled: !testingRig}">
-            <p>Plate Temp.: <input type="number" step="0.1" style="width: 45px;" :disabled="!testingRig" v-model="heatplateTemperature">°C</p>
+            <h3>Sensors</h3>
+            <p>QR Code:
+                <select style="float: right;" v-model="state.environment.testingRigState.objectCategory" v-if="testingRig">
+                    <option value="NONE">None</option>
+                    <option value="GREEN">Class 1</option>
+                    <option value="RED">Class 2</option>
+                </select>
+            </p>
+            <h3>Actuators</h3>
+            <p>Plate Temp.: <input type="number" step="0.1" style="width: 45px;" v-if="testingRig" v-model="state.environment.testingRigState.heatplateTemperature">°C</p>
         </div>
     </div>
     <div class="third">
-        <h2>Robotic Arm <input type="checkbox" v-model="roboticArm"></h2>
+        <h2>Robotic Arm</h2>
         <div v-bind:class="{ disabled: !roboticArm}">
+            <h3>Actuators</h3>
             <div v-if="state.environment.roboticArmState">
                 <p>Base: <input v-model="state.environment.roboticArmState.basePosition" type="number" step="0.01"></p>
                 <p>Main Arm: <input v-model="state.environment.roboticArmState.mainArmPosition" type="number" step="0.01"></p>
                 <p>Second Arm: <input v-model="state.environment.roboticArmState.secondArmPosition" type="number" step="0.01"></p>
                 <p>Head: <input v-model="state.environment.roboticArmState.headPosition" type="number" step="0.01"></p>
                 <p>Head Mount: <input v-model="state.environment.roboticArmState.headMountPosition" type="number" step="0.01"></p>
-                <p>Gripper: <select v-model="state.environment.roboticArmState" :disabled="!roboticArm"><option>Open</option><<option>Closed</option></select></p>
+                <p>Gripper: <select style="float: right;" v-model="state.environment.roboticArmState.gripperPosition" :disabled="!roboticArm"><option value="1.50">Open</option><<option value="-0.40">Closed</option></select></p>
                 <button @click="move()">Move to Position</button>
             </div>
             <div v-if="isEmpty(state.environment)" style="margin-bottom: 10px;">
@@ -61,11 +71,17 @@ input {
     <div class="third">
         <h2>Conveyor <input type="checkbox" v-model="conveyor"></h2>
         <div v-bind:class="{ disabled: !conveyor}">
-            <p>Adjuster: <select :disabled="!conveyor" v-model="adjusterPosition"><option>Open</option><<option>Pushed</option></select></p>
-            <p>Slider: <select :disabled="!conveyor" v-model="sliderPosition"><option>Open</option><<option>Pushed</option></select></p>
+            <h3>Sensors</h3>
+            <p>Object Detectected: <input v-if="conveyor" style="float: right;" type="checkbox" v-model="state.environment.conveyorState.detected"></p>
+            <p>Object In Window: <input v-if="conveyor" style="float: right;" type="checkbox" v-model="state.environment.conveyorState.inPickupWindow"></p>
+            <h3>Actuators</h3>
+            <p>Adjuster: <select v-if="conveyor" style="float: right;" v-model="state.environment.conveyorState.adjusterPosition"><option value="1.67">Open</option><option value="1.91">Pushed</option></select></p>
+            <p>Activate Slider: <input style="float: right;" type="checkbox" v-model="slider"></p>
+            <p>Slider: <select v-if="slider" style="float: right;" v-model="state.environment.sliderState.sliderPosition"><option value="0.08">Home</option><option value="0.42">Pushed</option></select></p>
         </div>
     </div>
-    <button @click="close()">Done</button>
+    <button @click="save()">Save</button>
+    <button @click="close()">Close</button>
 </div>
 </template>
 
@@ -82,15 +98,46 @@ export default {
             testingRig: this.state.environment.testingRigState != null,
             roboticArm: this.state.environment.roboticArmState != null,
             conveyor: this.state.environment.conveyorState != null,
-            heatplateTemperature: 0,
-            adjusterPosition: 'Open',
-            sliderPosition: 'Open'
+            slider: this.state.environment.sliderState != null
+        }
+    },
+    watch: {
+        testingRig(val) {
+            if (val) {
+                this.state.environment.testingRigState = {
+                    heatplateTemperature: null,
+                    objectCategory: null
+                }
+            } else {
+                this.state.environment.testingRigState = null
+            }
+        },
+        conveyor(val) {
+            if (val) {
+                this.state.environment.conveyorState = {
+                    detected: null,
+                    inPickupWindow: null
+                }
+            } else {
+                this.state.environment.conveyorState = null
+            }
+        },
+        slider(val) {
+            if (val) {
+                this.state.environment.sliderState = {
+                    sliderPosition: null
+                }
+            } else {
+                this.state.environment.sliderState = null
+            }
         }
     },
     methods: {
         close() {
-            this.$emit('recordPosition');
             this.$emit('close');
+        },
+        save() {
+            this.$emit('recordPosition');
         },
         isEmpty(env) {
             return env.testingRigState == null &&
@@ -113,9 +160,9 @@ export default {
         },
         move() {
             var xhr = new XMLHttpRequest();
-            xhr.open("POST", 'http://localhost:8080/moveRoboticArm', true);
+            xhr.open("POST", 'http://localhost:8080/moveEnvironment', true);
             xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
-            xhr.send(JSON.stringify(this.state.environment.roboticArmState));
+            xhr.send(JSON.stringify(this.state.environment));
         }
     }
 }
