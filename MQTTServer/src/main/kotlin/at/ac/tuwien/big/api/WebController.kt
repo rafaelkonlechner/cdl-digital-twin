@@ -16,7 +16,9 @@ import io.javalin.ApiBuilder.*
 import io.javalin.Javalin
 import kotlinx.coroutines.experimental.channels.Channel
 import kotlinx.coroutines.experimental.runBlocking
+import org.apache.commons.io.IOUtils
 import org.eclipse.jetty.websocket.api.Session
+import java.io.StringWriter
 import at.ac.tuwien.big.StateMachineSimulation.States as s
 
 /**
@@ -186,6 +188,16 @@ class WebController(private val mqtt: MQTT,
             post("/jobs") { ctx ->
                 run {
                     val newJob = gson.fromJson(ctx.body(), Job::class.java)
+                    val id = jobController.addJob(newJob)
+                    StateObserver.stateMachine = StateMachineHedgehog(newJob.states)
+                    ctx.json(id)
+                }
+            }
+            post("/jobFile") { ctx ->
+                run {
+                    val writer = StringWriter()
+                    IOUtils.copy(ctx.uploadedFile("job")?.content, writer)
+                    val newJob = gson.fromJson(writer.toString(), Job::class.java)
                     val id = jobController.addJob(newJob)
                     StateObserver.stateMachine = StateMachineHedgehog(newJob.states)
                     ctx.json(id)

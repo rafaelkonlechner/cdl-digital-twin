@@ -90,9 +90,10 @@ article {
                 </div>
                 <div class="job" style="text-align: center;">
                     <button @click="newJob()" class="new-job"><i class="material-icons" style="color: darkslategrey;">add</i></button>
-                    <div style="margin-top: 20px; color: darkslategray;">
-                        <label>Import Job</label>
+                    <div style="margin-top: 40px; color: darkslategray;">
+                        <label style="font-size: 12px;">Import Job</label>
                         <input type="file" value="Import Job" accept="application/json" @change="importJob($event)">
+                        <button v-if="file" @click="uploadJob()">Import</button>
                     </div>
                 </div>
             </div>
@@ -152,6 +153,7 @@ export default {
             jobs: [],
             selectedJob: null,
             downloadLink: "",
+            file: null,
             context: {
                 roboticArmState: {
                     name: "Snapshot",
@@ -275,7 +277,8 @@ export default {
             var self = this;
             xhr.onreadystatechange = function() {
                 console.log(this.responseText)
-                self.jobs[self.jobs.length - 1].id = this.responseText
+                job.id = this.responseText.slice(1, -1)
+                console.log(job)
             }
             xhr.open("POST", 'http://localhost:8080/jobs', true);
             xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
@@ -304,6 +307,7 @@ export default {
         },
         selectJob(job) {
             this.selectedJob = job;
+            console.log(job)
             console.log(this.selectedJob.id)
             var xhr = new XMLHttpRequest();
             xhr.open("PUT", 'http://localhost:8080/selectedJob/', true);
@@ -318,7 +322,17 @@ export default {
             this.downloadLink = 'data:application/json;charset=utf-8,' + encodeURIComponent(json);
         },
         importJob(e) {
+            this.file = e.target.files[0];
             console.log(e);
+        },
+        uploadJob() {
+            var xhr = new XMLHttpRequest();
+            var self = this;
+            xhr.open("POST", 'http://localhost:8080/jobFile/', true);
+            var formData = new FormData();
+            formData.append("job", this.file)
+            console.log(formData)
+            xhr.send(formData);
         }
     }
 };
