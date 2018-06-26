@@ -202,7 +202,7 @@ export default {
         },
         addStateChoice(s) {
             s.push({
-                name: "New " + (this.job.states.length + 1),
+                name: "New " + (s.length + 1),
                 type: "ChoiceState",
                 environment: {
                     roboticArmState: null,
