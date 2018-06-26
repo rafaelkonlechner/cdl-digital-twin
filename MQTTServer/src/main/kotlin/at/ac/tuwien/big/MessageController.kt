@@ -1,6 +1,7 @@
 package at.ac.tuwien.big
 
 import at.ac.tuwien.big.entity.state.*
+import at.ac.tuwien.big.entity.transition.RoboticArmTransition
 import com.google.gson.Gson
 import java.io.File
 import java.util.*
@@ -102,18 +103,22 @@ class MessageController(private val mqtt: MQTT,
     private fun observe() {
         if (autoPlay) {
             val latest = controller.latestMatch.first
-            val transition = if (!controller.atEndState()) {
+            val transitions = if (!controller.atEndState()) {
                 controller.next()
             } else {
                 controller.reset()
             }
-            if (transition != null) {
-                println("Next: ${latest.name} -> ${transition.targetState.name}")
-                val context = controller.latestMatch
-                sendWebSocketMessageContext(gson.toJson(context))
-                val commands = controller.transform(transition)
-                for (c in commands) {
-                    mqtt.send(c)
+            if (transitions.isNotEmpty()) {
+                for (transition in transitions) {
+                    if (transition is RoboticArmTransition) {
+                        println("Next: ${latest.name} -> ${transition.targetState.name}")
+                    }
+                    val context = controller.latestMatch
+                    sendWebSocketMessageContext(gson.toJson(context))
+                    val commands = controller.transform(transition)
+                    for (c in commands) {
+                        mqtt.send(c)
+                    }
                 }
             }
         }
@@ -121,13 +126,15 @@ class MessageController(private val mqtt: MQTT,
 
     fun reset() {
         val latest = controller.latestMatch.first
-        val transition = controller.reset()
-        println("Resetting: ${latest.name} -> ${transition.targetState.name}")
-        val context = controller.latestMatch
-        sendWebSocketMessageContext(gson.toJson(context))
-        val commands = controller.transform(transition)
-        for (c in commands) {
-            mqtt.send(c)
+        val transitions = controller.reset()
+        for (transition in transitions) {
+            println("Resetting: ${latest.name} -> ${transition.targetState.name}")
+            val context = controller.latestMatch
+            sendWebSocketMessageContext(gson.toJson(context))
+            val commands = controller.transform(transition)
+            for (c in commands) {
+                mqtt.send(c)
+            }
         }
     }
 

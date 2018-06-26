@@ -17,11 +17,7 @@ class StateMachineHedgehog(val states: List<StateBase>) {
             val next = states[currentIndex + 1]
             return if (next is ChoiceState) {
                 if (useFirstChoice!!) next.choices.first.first() else next.choices.second.first()
-            } else if (next is BasicState) {
-                next
-            } else {
-                null
-            }
+            } else next as? BasicState
         } else if (currentIndex == states.lastIndex) {
             return null
         } else {

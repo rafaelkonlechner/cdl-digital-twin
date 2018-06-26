@@ -1,8 +1,6 @@
 package at.ac.tuwien.big
 
-import at.ac.tuwien.big.entity.state.Environment
-import at.ac.tuwien.big.entity.state.RoboticArmState
-import at.ac.tuwien.big.entity.state.StateEvent
+import at.ac.tuwien.big.entity.state.*
 import at.ac.tuwien.big.entity.transition.*
 import at.ac.tuwien.big.sm.BasicState
 import at.ac.tuwien.big.sm.ChoiceState
@@ -36,42 +34,88 @@ object StateObserver : Observable<BasicState>() {
      * Update the unit with new sensor information. This includes matching the updated state to the set of defined states.
      */
     fun update(e: StateEvent) {
-        when (e) {
-            is RoboticArmState -> {
-                snapshot = snapshot.copy(roboticArmState = e)
-                val match = matchState(snapshot)
-                if (match != null && latestMatch != match) {
-                    latestMatch = match
-                    if (match.second) {
-                        notify(latestMatch.first)
-                    } else if (latestMatch.first.altEnvironment != null) {
-                        notify(latestMatch.first)
-                    }
+        try {
+            when (e) {
+                is RoboticArmState -> {
+                    snapshot = snapshot.copy(roboticArmState = e)
+                }
+                is SliderState -> {
+                    snapshot = snapshot.copy(sliderState = e)
+                }
+                is ConveyorState -> {
+                    val c = snapshot.conveyorState ?: ConveyorState()
+                    val cNew = c.copy(
+                            adjusterPosition = e.adjusterPosition ?: c.adjusterPosition,
+                            detected = e.detected ?: c.detected,
+                            inPickupWindow = e.inPickupWindow ?: c.inPickupWindow)
+                    snapshot = snapshot.copy(conveyorState = cNew)
+                }
+                is TestingRigState -> {
+                    val t = snapshot.testingRigState ?: TestingRigState()
+                    val tNew = t.copy(
+                            objectCategory = e.objectCategory ?: t.objectCategory,
+                            platformPosition = e.platformPosition ?: t.platformPosition,
+                            heatplateTemperature = e.heatplateTemperature ?: t.heatplateTemperature)
+                    snapshot = snapshot.copy(testingRigState = tNew)
                 }
             }
+            val match = matchState(snapshot)
+            if (match != null && latestMatch != match) {
+                latestMatch = match
+                if (match.second) {
+                    notify(latestMatch.first)
+                } else if (latestMatch.first.altEnvironment != null) {
+                    notify(latestMatch.first)
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 
     /**
      * Return the defined successor state of the latest matching state, according to the state machine
      */
-    fun next(): Transition? {
+    fun next(): List<Transition> {
         val successor = stateMachine?.successor(latestMatch.first, latestMatch.second)
-        if (successor != null) {
+        return if (successor != null) {
             targetState = successor
-            return RoboticArmTransition(latestMatch.first.environment.roboticArmState!!, successor.environment.roboticArmState!!)
+            val env = latestMatch.first.environment
+            val succ = successor.environment
+            val result = mutableListOf<Transition>()
+            if (succ.roboticArmState != null) {
+                result.add(RoboticArmTransition(env.roboticArmState ?: RoboticArmState(), succ.roboticArmState))
+            }
+            if (succ.conveyorState != null) {
+                result.add(ConveyorTransition(env.conveyorState ?: ConveyorState(), succ.conveyorState))
+            }
+            if (succ.testingRigState != null) {
+                result.add(TestingRigTransition(env.testingRigState ?: TestingRigState(), succ.testingRigState))
+            }
+            if (succ.sliderState != null) {
+                result.add(SliderTransition(env.sliderState ?: SliderState(), succ.sliderState))
+            }
+            return result
         } else {
-            return null
+            emptyList()
         }
     }
 
     /**
      * Return the defined successor state of the latest matching state, according to the state machine
      */
-    fun reset(): Transition {
-        return RoboticArmTransition(latestMatch.first.environment.roboticArmState
-                ?: RoboticArmState(), (stateMachine?.states?.first() as BasicState).environment.roboticArmState
-                ?: RoboticArmState())
+    fun reset(): List<Transition> {
+        val env = (stateMachine?.states?.first() as BasicState).environment
+        return listOf(
+                RoboticArmTransition(RoboticArmState(), env.roboticArmState
+                        ?: RoboticArmState()),
+                ConveyorTransition(ConveyorState(), env.conveyorState
+                        ?: ConveyorState()),
+                SliderTransition(SliderState(), env.sliderState
+                        ?: SliderState()),
+                TestingRigTransition(TestingRigState(), env.testingRigState
+                        ?: TestingRigState())
+        )
     }
 
     fun atEndState() = stateMachine?.isEndState(latestMatch.first) ?: true
@@ -133,11 +177,16 @@ object StateObserver : Observable<BasicState>() {
                 ?.flatMap { it.choices.first + it.choices.second }
                 ?: emptyList()
 
-        val match = (basicStates + choiceStates).firstOrNull {
+        val matches = (basicStates + choiceStates).filter {
             env.matches(it.environment) || (it.altEnvironment != null && env.matches(it.altEnvironment!!))
         }
 
-        return if (match != null) {
+        return if (matches.isNotEmpty()) {
+            val match = if (matches.size > 1) {
+                matches.component2()
+            } else {
+                matches.first()
+            }
             Pair(match, env.matches(match.environment))
         } else {
             null

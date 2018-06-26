@@ -374,6 +374,31 @@
             "secondArmPosition": 0.0,
             "headMountPosition": 0.0,
             "gripperPosition": 0.0
+          },
+          "conveyorState": {
+            "adjusterPosition": 1.67
+          },
+          "sliderState": {
+            "sliderPosition": 0.078
+          },
+          "testingRigState": {
+            "heatplateTemperature": 110.0
+          }
+        }
+      },
+      {
+        "name": "Adjust",
+        "type": "BasicState",
+        "environment": {
+          "roboticArmState": {
+            "basePosition": 0.0,
+            "mainArmPosition": 0.0,
+            "secondArmPosition": 0.0,
+            "headMountPosition": 0.0,
+            "gripperPosition": 0.0
+          },
+          "conveyorState": {
+            "adjusterPosition": 1.9
           }
         }
       },
@@ -387,6 +412,15 @@
             "secondArmPosition": -0.12,
             "headMountPosition": 0.0,
             "gripperPosition": 1.5
+          },
+          "conveyorState": {
+            "adjusterPosition": 1.9
+          },
+          "sliderState": {
+            "sliderPosition": 0.42
+          },
+          "testingRigState": {
+            "heatplateTemperature": 120.0
           }
         }
       },
@@ -400,6 +434,9 @@
             "secondArmPosition": -0.12,
             "headMountPosition": 0.0,
             "gripperPosition": -0.40
+          },
+          "conveyorState": {
+            "adjusterPosition": 1.67
           }
         }
       },

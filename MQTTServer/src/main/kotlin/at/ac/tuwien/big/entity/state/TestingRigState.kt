@@ -14,17 +14,19 @@ data class TestingRigState(
 
     override fun match(other: StateEvent, similar: (Double, Double) -> Boolean): Boolean {
         return if (other is TestingRigState) {
-            val platform = if (other.platformPosition != null) {
-                similar(this.platformPosition ?: 0.0, other.platformPosition)
+            val platform = if (this.platformPosition != null && other.platformPosition != null) {
+                similar(this.platformPosition, other.platformPosition)
             } else {
                 true
             }
-            val heatplate = if (other.heatplateTemperature != null) {
-                similar(this.heatplateTemperature ?: 0.0, other.heatplateTemperature)
+            val heatplate = if (this.heatplateTemperature != null && other.heatplateTemperature != null) {
+                similar(this.heatplateTemperature, other.heatplateTemperature)
             } else {
                 true
             }
-            this.objectCategory == other.objectCategory && platform && heatplate
+            val objectCategory = (this.objectCategory == null) || (other.objectCategory == null) || (this.objectCategory == other.objectCategory)
+
+            objectCategory && platform && heatplate
         } else {
             false
         }
