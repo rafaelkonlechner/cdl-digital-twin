@@ -58,8 +58,8 @@ input {
                 <p>Second Arm: <input v-model="state.environment.roboticArmState.secondArmPosition" type="number" step="0.01"></p>
                 <p>Head: <input v-model="state.environment.roboticArmState.headPosition" type="number" step="0.01"></p>
                 <p>Head Mount: <input v-model="state.environment.roboticArmState.headMountPosition" type="number" step="0.01"></p>
-                <p>Gripper: <input v-model="state.environment.roboticArmState.gripperPosition" type="number" step="0.01" </p>
-                    <button @click="move()">Move to Position</button>
+                <p>Gripper: <input v-model="state.environment.roboticArmState.gripperPosition" type="number" step="0.01"></p>
+                <button @click="move()">Move to Position</button>
             </div>
             <div v-if="isEmpty(state.environment)" style="margin-bottom: 10px;">
                 <p>Use the <b>arrow keys</b> to move the robot.</p>
