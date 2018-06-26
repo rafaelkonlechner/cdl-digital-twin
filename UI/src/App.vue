@@ -118,7 +118,7 @@ article {
     <footer>
         <h5>
         <strong>Christian Doppler Laboratory</strong><br/>
-        <small>on Model-Integrated Smart Production</small>
+        <small>for Model-Integrated Smart Production</small>
       </h5>
     </footer>
 </div>
