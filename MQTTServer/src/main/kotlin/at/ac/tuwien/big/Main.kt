@@ -14,7 +14,7 @@ data class HostConfig(
         val mqtt: String,
         val objectTracker: String)
 
-val default = HostConfig("127.0.0.1", "localhost", "localhost")
+val default = HostConfig("192.168.99.100", "192.168.99.100", "192.168.99.100")
 val docker = HostConfig("influx", "mqtt", "object-tracker")
 
 const val simSensor = "Sensor-Simulation"
