@@ -11,7 +11,7 @@ val singleAccuracy = { x: Double, y: Double -> similar(x, y, 0.2) }
 /**
  * Check similarity of floating point numbers with a precision of 0.02
  */
-val doubleAccuracy = { x: Double, y: Double -> similar(x, y, 0.02) }
+val doubleAccuracy = { x: Double, y: Double -> similar(x, y, 0.03) }
 
 /**
  * Equality check with an epsilon of 0.02
