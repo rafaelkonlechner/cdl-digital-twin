@@ -168,7 +168,7 @@ export default {
                     environment: state.environment
                 });
                 state.choices.second.push({
-                    name: "New",
+                    name: "New " + (this.job.states.lengt + 1),
                     environment: {
                         roboticArmState: null,
                         conveyorState: null,
@@ -176,6 +176,9 @@ export default {
                     }
                 });
             } else if (state.choices.first.length == 1 && state.choices.second.length == 1) {
+                state.name = state.choices.first[0].name;
+                state.type = state.choices.first[0].type;
+                state.environment = state.choices.first[0].environment;
                 delete state.choices;
             }
             this.$forceUpdate();
@@ -188,7 +191,7 @@ export default {
         },
         addState() {
             this.job.states.push({
-                name: "New",
+                name: "New " + (this.job.states.length + 1),
                 type: "BasicState",
                 environment: {
                     roboticArmState: null,
@@ -199,7 +202,7 @@ export default {
         },
         addStateChoice(s) {
             s.push({
-                name: "New",
+                name: "New " + (this.job.states.length + 1),
                 type: "ChoiceState",
                 environment: {
                     roboticArmState: null,
