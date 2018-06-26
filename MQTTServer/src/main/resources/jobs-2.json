@@ -399,6 +399,9 @@
           },
           "conveyorState": {
             "adjusterPosition": 1.9
+          },
+          "testingRigState": {
+            "objectCategory": "GREEN"
           }
         }
       },
@@ -414,6 +417,7 @@
             "gripperPosition": 1.5
           },
           "conveyorState": {
+            "detected": true,
             "adjusterPosition": 1.9
           },
           "sliderState": {
@@ -436,7 +440,11 @@
             "gripperPosition": -0.40
           },
           "conveyorState": {
-            "adjusterPosition": 1.67
+            "adjusterPosition": 1.67,
+            "detected": true
+          },
+          "sliderState": {
+            "sliderPosition": 0.0
           }
         }
       },
