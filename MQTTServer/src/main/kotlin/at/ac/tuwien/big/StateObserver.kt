@@ -182,11 +182,7 @@ object StateObserver : Observable<BasicState>() {
         }
 
         return if (matches.isNotEmpty()) {
-            val match = if (matches.size > 1) {
-                matches.component2()
-            } else {
-                matches.first()
-            }
+            val match = matches.first()
             Pair(match, env.matches(match.environment))
         } else {
             null
