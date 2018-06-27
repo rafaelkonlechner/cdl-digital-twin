@@ -18,43 +18,44 @@
                 <p v-if="state.sensor == 'qr'">
                     Scanning: <select v-model="state.environment.testingRigState.objectCategory">
                         <option value="NONE">None</option>
-                        <option value="GREEN">Class 1</option>
-                        <option value="RED">Class 2</option>
+                        <option value="GREEN">Green</option>
+                        <option value="RED">Red</option>
                     </select>
                 </p>
                 <p v-if="state.sensor == 'pickup'">
-                    Condition: <select>
-                        <option>Empty</option>
-                        <option>Detected</option>
-                        <option>in Pickup Window</option>
+                    Condition: <select v-model="pickupSelection">
+                        <option value="empty">Empty</option>
+                        <option value="detected">Detected</option>
+                        <option value="inPickupWindow">in Pickup Window</option>
                     </select>
                 </p>
             </div>
             <p style="margin-bottom: 0px; height: 30px;">&mdash; OR &mdash;</p>
             <div style="height: 110px; padding-top: 40px;">
                 <p v-if="state.sensor=='qr' ">
-                    Scanning: <select>
-                        <option>Empty</option>
-                        <option>Class 1</option>
-                        <option>Class 2</option>
+                    Scanning: <select v-model="state.altEnvironment.testingRigState.objectCategory">
+                        <option value="NONE">None</option>
+                        <option value="GREEN">Green</option>
+                        <option value="RED">Red</option>
                     </select>
                 </p>
                 <p v-if="state.sensor=='pickup' ">
-                    Condition: <select>
-                        <option>Empty</option>
-                        <option>Detected</option>
-                        <option>in Pickup Window</option>
+                    Condition:
+                    <select v-model="altPickupSelection">
+                        <option value="empty">Empty</option>
+                        <option value="detected">Detected</option>
+                        <option value="inPickupWindow">in Pickup Window</option>
                     </select>
                 </p>
             </div>
         </div>
-        <div style="float: right; width: 49%; ">
+        <div style="float: right; width: 49%;">
             <h2>Resulting State</h2>
             <div>
-                <state-preview :state="followupState.choices.first[0] "></state-preview>
+                <state-preview :state="followupState.choices.first[0]"></state-preview>
             </div>
             <div>
-                <state-preview :state="followupState.choices.second[0] "></state-preview>
+                <state-preview :state="followupState.choices.second[0]"></state-preview>
             </div>
         </div>
     </div>
@@ -72,17 +73,70 @@ export default {
     components: {
         statePreview: StatePreview
     },
-    created() {
-        if (this.state.environment.testingRigState.objectCategory === undefined) {
-            this.state.environment.testingRigState.objectCategory = 'NONE'
+    data() {
+        return {
+            pickupSelection: null,
+            altPickupSelection: null
         }
-        if (this.state.altEnvironment.testingRigState.objectCategory === undefined) {
-            this.state.altEnvironment.testingRigState.objectCategory = 'NONE'
+    },
+    changed: {
+        pickupSelection(val) {
+            if (val == 'detected') {
+                this.state.environment.conveyorState.detected = true;
+                this.altPickupSelection = false
+            } else {
+                this.state.environment.conveyorState.detected = false;
+            }
+            if (val == 'inPickupWindow') {
+                this.state.environment.conveyorState.inPickupWindow = true;
+            } else {
+                this.state.environment.conveyorState.inPickupWindow = false;
+            }
+        },
+        altPickupSelection(val) {
+            if (val == 'detected') {
+                this.state.altEnvironment.conveyorState.detected = true;
+            } else {
+                this.state.altEnvironment.conveyorState.detected = false;
+            }
+            if (val == 'inPickupWindow') {
+                this.state.altEnvironment.conveyorState.inPickupWindow = true;
+            } else {
+                this.state.altEnvironment.conveyorState.inPickupWindow = false;
+            }
+        }
+    },
+    mounted() {
+        if (this.state.environment.testingRigState === null) {
+            this.state.environment.testingRigState = {
+                objectCategory: null
+            }
+        }
+        if (this.state.environment.conveyorState === null) {
+            this.state.environment.conveyorState = {
+                detected: null,
+                inPickupWindow: null
+
+            }
+        }
+        if (this.state.altEnvironment.testingRigState === null) {
+            this.state.altEnvironment.testingRigState = {
+                objectCategory: null
+            }
+        }
+        if (this.state.altEnvironment.conveyorState === null) {
+            this.state.altEnvironment.conveyorState = {
+                detected: null,
+                inPickupWindow: null
+            }
         }
     },
     methods: {
         close: function() {
             this.$emit('close');
+        },
+        save: function() {
+            this.$emit('recordPosition');
         }
     }
 }
