@@ -119,247 +119,6 @@
     ]
   },
   {
-    "name": "Job 2",
-    "id": "04b881dd",
-    "target": "Hedgehog",
-    "states": [
-      {
-        "name": "State 1",
-        "type": "BasicState",
-        "entity": "RoboticArm",
-        "environment": {
-          "roboticArmState": {
-            "basePosition": 1.8,
-            "mainArmPosition": 1.5,
-            "secondArmPosition": 1.5,
-            "secondArmRotation": 0.0,
-            "headPosition": 2.6,
-            "headMountPosition": 1.5,
-            "gripperPosition": 2.1,
-            "gripperHasContact": false,
-            "handPosition": null
-          }
-        }
-      },
-      {
-        "name": "State 2",
-        "type": "BasicState",
-        "entity": "RoboticArm",
-        "environment": {
-          "roboticArmState": {
-            "basePosition": 1.8,
-            "mainArmPosition": 1.2,
-            "secondArmPosition": 1.72,
-            "secondArmRotation": 0.0,
-            "headPosition": 1.67,
-            "headMountPosition": 1.42,
-            "gripperPosition": 3.04,
-            "gripperHasContact": false,
-            "handPosition": null
-          }
-        }
-      },
-      {
-        "name": "State 3",
-        "type": "BasicState",
-        "entity": "RoboticArm",
-        "environment": {
-          "roboticArmState": {
-            "basePosition": 1.8,
-            "mainArmPosition": 0.93,
-            "secondArmPosition": 1.68,
-            "secondArmRotation": 0.0,
-            "headPosition": 1.67,
-            "headMountPosition": 1.42,
-            "gripperPosition": 2.82,
-            "gripperHasContact": false,
-            "handPosition": null
-          }
-        }
-      },
-      {
-        "name": "State 4",
-        "type": "BasicState",
-        "entity": "RoboticArm",
-        "environment": {
-          "roboticArmState": {
-            "basePosition": 1.8,
-            "mainArmPosition": 0.9,
-            "secondArmPosition": 1.68,
-            "secondArmRotation": 0.0,
-            "headPosition": 1.67,
-            "headMountPosition": 1.42,
-            "gripperPosition": 2.48,
-            "gripperHasContact": false,
-            "handPosition": null
-          }
-        }
-      },
-      {
-        "name": "State 5",
-        "type": "BasicState",
-        "entity": "RoboticArm",
-        "environment": {
-          "roboticArmState": {
-            "basePosition": 1.8,
-            "mainArmPosition": 0.93,
-            "secondArmPosition": 1.1,
-            "secondArmRotation": 0.0,
-            "headPosition": 2.56,
-            "headMountPosition": 2.88,
-            "gripperPosition": 2.48,
-            "gripperHasContact": false,
-            "handPosition": null
-          }
-        }
-      },
-      {
-        "name": "State 6",
-        "type": "BasicState",
-        "entity": "RoboticArm",
-        "environment": {
-          "roboticArmState": {
-            "basePosition": 2.34,
-            "mainArmPosition": 1.5,
-            "secondArmPosition": 1.88,
-            "secondArmRotation": 0.0,
-            "headPosition": 2.83,
-            "headMountPosition": 2.94,
-            "gripperPosition": 2.48,
-            "gripperHasContact": false,
-            "handPosition": null
-          }
-        }
-      },
-      {
-        "name": "State 7",
-        "type": "BasicState",
-        "entity": "RoboticArm",
-        "environment": {
-          "roboticArmState": {
-            "basePosition": 2.47,
-            "mainArmPosition": 1.35,
-            "secondArmPosition": 2.19,
-            "secondArmRotation": 0.0,
-            "headPosition": 3.14,
-            "headMountPosition": 2.94,
-            "gripperPosition": 2.48,
-            "gripperHasContact": false,
-            "handPosition": null
-          }
-        }
-      },
-      {
-        "name": "State 8",
-        "type": "BasicState",
-        "entity": "RoboticArm",
-        "environment": {
-          "roboticArmState": {
-            "basePosition": 2.47,
-            "mainArmPosition": 1.35,
-            "secondArmPosition": 2.19,
-            "secondArmRotation": 0.0,
-            "headPosition": 3.14,
-            "headMountPosition": 2.94,
-            "gripperPosition": 2.56,
-            "gripperHasContact": false,
-            "handPosition": null
-          }
-        }
-      },
-      {
-        "name": "State 9",
-        "type": "BasicState",
-        "entity": "RoboticArm",
-        "environment": {
-          "roboticArmState": {
-            "basePosition": 2.47,
-            "mainArmPosition": 1.35,
-            "secondArmPosition": 2.19,
-            "secondArmRotation": 0.0,
-            "headPosition": 3.14,
-            "headMountPosition": 2.94,
-            "gripperPosition": 2.96,
-            "gripperHasContact": false,
-            "handPosition": null
-          }
-        }
-      },
-      {
-        "name": "State 10",
-        "type": "BasicState",
-        "entity": "RoboticArm",
-        "environment": {
-          "roboticArmState": {
-            "basePosition": 2.47,
-            "mainArmPosition": 1.57,
-            "secondArmPosition": 0.0,
-            "secondArmRotation": 0.0,
-            "headPosition": 0.47,
-            "headMountPosition": 2.86,
-            "gripperPosition": 2.96,
-            "gripperHasContact": false,
-            "handPosition": null
-          }
-        }
-      },
-      {
-        "name": "State 11",
-        "type": "BasicState",
-        "entity": "RoboticArm",
-        "environment": {
-          "roboticArmState": {
-            "basePosition": 2.47,
-            "mainArmPosition": 0.67,
-            "secondArmPosition": 0.0,
-            "secondArmRotation": 0.0,
-            "headPosition": 1.62,
-            "headMountPosition": 2.86,
-            "gripperPosition": 2.32,
-            "gripperHasContact": false,
-            "handPosition": null
-          }
-        }
-      },
-      {
-        "name": "State 12",
-        "type": "BasicState",
-        "entity": "RoboticArm",
-        "environment": {
-          "roboticArmState": {
-            "basePosition": 0.92,
-            "mainArmPosition": 0.67,
-            "secondArmPosition": 0.0,
-            "secondArmRotation": 0.0,
-            "headPosition": 1.62,
-            "headMountPosition": 2.86,
-            "gripperPosition": 2.26,
-            "gripperHasContact": false,
-            "handPosition": null
-          }
-        }
-      },
-      {
-        "name": "State 13",
-        "type": "BasicState",
-        "entity": "RoboticArm",
-        "environment": {
-          "roboticArmState": {
-            "basePosition": 0.92,
-            "mainArmPosition": 0.67,
-            "secondArmPosition": 0.0,
-            "secondArmRotation": 0.0,
-            "headPosition": 1.62,
-            "headMountPosition": 2.86,
-            "gripperPosition": 2.88,
-            "gripperHasContact": false,
-            "handPosition": null
-          }
-        }
-      }
-    ]
-  },
-  {
     "name": "Job 3",
     "id": "e191049b",
     "target": "Hedgehog",
@@ -387,7 +146,7 @@
         }
       },
       {
-        "name": "Adjust",
+        "name": "Drop Object",
         "type": "BasicState",
         "environment": {
           "roboticArmState": {
@@ -397,11 +156,40 @@
             "headMountPosition": 0.0,
             "gripperPosition": 0.0
           },
+          "sliderState": {
+            "sliderPosition": 0.42
+          }
+        }
+      },
+      {
+        "name": "Slider Home",
+        "type": "BasicState",
+        "environment": {
+          "roboticArmState": {
+            "basePosition": 0.0,
+            "mainArmPosition": 0.1,
+            "secondArmPosition": 0.0,
+            "headMountPosition": 0.0,
+            "gripperPosition": 0.0
+          },
+          "sliderState": {
+            "sliderPosition": 0.078
+          }
+        }
+      },
+      {
+        "name": "Adjust",
+        "type": "BasicState",
+        "environment": {
+          "roboticArmState": {
+            "basePosition": 0.0,
+            "mainArmPosition": 0.2,
+            "secondArmPosition": 0.0,
+            "headMountPosition": 0.0,
+            "gripperPosition": 0.0
+          },
           "conveyorState": {
             "adjusterPosition": 1.9
-          },
-          "testingRigState": {
-            "objectCategory": "GREEN"
           }
         }
       },
@@ -419,9 +207,6 @@
           "conveyorState": {
             "detected": true,
             "adjusterPosition": 1.9
-          },
-          "sliderState": {
-            "sliderPosition": 0.42
           },
           "testingRigState": {
             "heatplateTemperature": 120.0
@@ -442,9 +227,6 @@
           "conveyorState": {
             "adjusterPosition": 1.67,
             "detected": true
-          },
-          "sliderState": {
-            "sliderPosition": 0.0
           }
         }
       },
