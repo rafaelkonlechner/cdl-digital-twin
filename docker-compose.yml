@@ -1,13 +1,13 @@
 version: '2'
 services:
-  server:
-    build: ./MQTTServer
-    ports:
-      - "8080:8080"
-    links:
-      - influx
-      - mqtt
-      - object-tracker
+#  server:
+#    build: ./MQTTServer
+#    ports:
+#      - "8080:8080"
+#    links:
+#      - influx
+#      - mqtt
+#      - object-tracker
   influx:
     image: influxdb
     ports:
