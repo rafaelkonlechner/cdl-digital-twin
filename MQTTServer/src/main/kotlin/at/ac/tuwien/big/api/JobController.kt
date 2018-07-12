@@ -19,7 +19,7 @@ class JobController {
         private set
 
     init {
-        val jobsText = this::class.java.classLoader.getResource("jobs-2.json").readText()
+        val jobsText = this::class.java.classLoader.getResource("jobs.json").readText()
         val jobsType = object : TypeToken<List<Job>>() {}.type
         val gson = GsonBuilder()
                 .registerTypeAdapterFactory(
