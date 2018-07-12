@@ -62,11 +62,7 @@ object StateObserver : Observable<BasicState>() {
             val match = matchState(snapshot)
             if (match != null && latestMatch != match) {
                 latestMatch = match
-                if (match.second) {
-                    notify(latestMatch.first)
-                } else if (latestMatch.first.altEnvironment != null) {
-                    notify(latestMatch.first)
-                }
+                notify(latestMatch.first)
             }
         } catch (e: Exception) {
             e.printStackTrace()
