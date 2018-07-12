@@ -67,7 +67,7 @@
     </div>
     <div v-if="selected" class="absolute blueprint-text small" style="top: 14%; left: 85%; height: 35px; text-align: left;">
         <h2>{{selected.name}}</h2>
-        <p v-if="selectedData.length > 0"><small>Current: {{selectedData[selectedData.length - 1].y}}</small></p>
+        <p v-if="selectedData.length > 0"><small>Value: {{selectedData[selectedData.length - 1].y.toFixed(2)}}</small></p>
         <line-chart width="200" height="200" min="0" max="3.14" :data="selectedData"></line-chart>
     </div>
     <div class="blueprint-main">
