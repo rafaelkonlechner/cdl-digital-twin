@@ -77,7 +77,7 @@
                 <div style="display: inline-block; vertical-align: top; margin-right: -40px;">
                     <div>
                         <div v-for="(s1, i1) in s.choices.first" style="display: inline-block; vertical-align: top; width: 260px;">
-                            <state-preview v-on:open="showState(s1)" :state="s1" :index="i1" :active="s.active" :context="context" :socket="socket" v-on:moveLeft="moveLeftChoice(s.choices.first, $event)" v-on:moveRight="moveRightChoice(s.choices.first,
+                            <state-preview v-on:open="showState(s1)" :state="s1" :index="i1" :active="s1.active" :context="context" :socket="socket" v-on:moveLeft="moveLeftChoice(s.choices.first, $event)" v-on:moveRight="moveRightChoice(s.choices.first,
                     $event)" v-on:remove="removeChoice(s, s.choices.first, $event, index)" v-on:recordPosition="saveChanges()">
                             </state-preview>
                             <div v-if="i1 < s.choices.first.length - 1" style="display: inline; position: relative; left: 20px; top: 44px;">
@@ -88,7 +88,7 @@
                     </div>
                     <div>
                         <div v-for="(s2, i2) in s.choices.second" style="display: inline-block; vertical-align: top; width: 260px;">
-                            <state-preview v-on:open="showState(s2)" :state="s2" :index="i2" :active="s.active" :context="context" :socket="socket" v-on:moveLeft="moveLeftChoice(s.choices.second, $event)" v-on:moveRight="moveRightChoice(s.choices.second,
+                            <state-preview v-on:open="showState(s2)" :state="s2" :index="i2" :active="s2.active" :context="context" :socket="socket" v-on:moveLeft="moveLeftChoice(s.choices.second, $event)" v-on:moveRight="moveRightChoice(s.choices.second,
                     $event)" v-on:remove="removeChoice(s, s.choices.second, $event, index)" v-on:recordPosition="saveChanges()">
                             </state-preview>
                             <div v-if="i2 < s.choices.second.length - 1" style="display: inline; position: relative; left: 20px; top: 44px;">
@@ -140,7 +140,16 @@ export default {
             let msg = JSON.parse(event.data);
             if (msg.topic === "state") {
                 let name = msg.message
-                self.job.states.forEach(function(x) {
+                let jobs = [];
+                for (let j of self.job.states) {
+                    if (j.type === 'BasicState') {
+                        jobs.push(j)
+                    } else {
+                        jobs = jobs.concat(j.choices.first)
+                        jobs = jobs.concat(j.choices.second)
+                    }
+                }
+                jobs.forEach(function(x) {
                     if (x.name === name) {
                         console.log(name)
                         x.active = true;
@@ -155,11 +164,21 @@ export default {
     methods: {
         toggleChoice(index) {
             var state = this.job.states[index + 1];
+            var prevState = this.job.states[index];
             if (!state.choices) {
                 var choices = {
                     first: [],
                     second: []
                 };
+                if (prevState.environment.testingRigState == null) {
+                    prevState.environment.testingRigState = {
+                        objectCategory: "GREEN"
+                    }
+                }
+                prevState.altEnvironment = JSON.parse(JSON.stringify(prevState.environment)) // copy constructor
+                prevState.environment.testingRigState.objectCategory = "GREEN"
+                prevState.altEnvironment.testingRigState.objectCategory = "RED"
+                prevState.sensor = "qr"
                 state.choices = choices;
                 Vue.set(state, 'choices', choices);
                 state.choices.first.push({
@@ -169,11 +188,7 @@ export default {
                 });
                 state.choices.second.push({
                     name: "New " + (this.job.states.length + 1),
-                    environment: {
-                        roboticArmState: null,
-                        conveyorState: null,
-                        testingRigState: null
-                    }
+                    environment: Object.assign({}, state.environment)
                 });
             } else if (state.choices.first.length == 1 && state.choices.second.length == 1) {
                 state.name = state.choices.first[0].name;
