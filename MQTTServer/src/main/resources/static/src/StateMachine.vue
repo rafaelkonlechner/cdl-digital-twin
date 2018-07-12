@@ -168,7 +168,7 @@ export default {
                     environment: state.environment
                 });
                 state.choices.second.push({
-                    name: "New " + (this.job.states.lengt + 1),
+                    name: "New " + (this.job.states.length + 1),
                     environment: {
                         roboticArmState: null,
                         conveyorState: null,
