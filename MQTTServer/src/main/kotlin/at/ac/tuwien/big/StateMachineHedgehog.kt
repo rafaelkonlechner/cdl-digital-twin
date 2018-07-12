@@ -24,6 +24,7 @@ class StateMachineHedgehog(val states: List<StateBase>) {
             val choices = states.filter { it is ChoiceState }.map { it as ChoiceState }
             val choice = choices.find { it.choices.first.contains(state) || it.choices.second.contains(state) }
             if (choice != null) {
+                val choiceIndex = states.indexOf(choice)
                 val first = choice.choices.first
                 val second = choice.choices.second
                 return if (first.contains(state)) {
@@ -31,14 +32,22 @@ class StateMachineHedgehog(val states: List<StateBase>) {
                     if (index in 0 until first.lastIndex) {
                         first[index + 1]
                     } else {
-                        states[currentIndex + 1] as BasicState
+                        if (choiceIndex + 1 in states.indices) {
+                            states[choiceIndex + 1] as BasicState
+                        } else {
+                            null
+                        }
                     }
                 } else {
                     val index = second.indexOf(state)
                     if (index in 0 until second.lastIndex) {
                         second[index + 1]
                     } else {
-                        states[currentIndex + 1] as BasicState
+                        if (choiceIndex + 1 in states.indices) {
+                            states[choiceIndex + 1] as BasicState
+                        } else {
+                            null
+                        }
                     }
                 }
             } else {
