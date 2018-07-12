@@ -1,126 +1,7 @@
 [
   {
-    "name": "Job 1",
-    "id": "4a64b65d",
-    "target": "Blender",
-    "states": [
-      {
-        "name": "Idle",
-        "type": "BasicState",
-        "environment": {
-          "roboticArmState": {
-            "basePosition": 1.5,
-            "mainArmPosition": 1.5,
-            "secondArmPosition": 2.9,
-            "headPosition": 3.00,
-            "headMountPosition": 1.82,
-            "gripperPosition": 1.0
-          },
-          "conveyor": {
-            "detected:": true,
-            "inPickupWindow": false
-          }
-        },
-        "altEnvironment": {
-          "roboticArmState": {
-            "basePosition": 1.5,
-            "mainArmPosition": 1.5,
-            "secondArmPosition": 2.9,
-            "headPosition": 3.00,
-            "headMountPosition": 1.82,
-            "gripperPosition": 1.0
-          },
-          "conveyor": {
-            "detected:": true,
-            "inPickupWindow": true
-          }
-        }
-      },
-      {
-        "name": "Choice 1",
-        "type": "ChoiceState",
-        "choices": {
-          "first": [
-            {
-              "name": "Approach",
-              "type": "BasicState",
-              "environment": {
-                "roboticArmState": {
-                  "basePosition": 1.52,
-                  "mainArmPosition": 1.98,
-                  "secondArmPosition": 2.18,
-                  "headPosition": 2.22,
-                  "headMountPosition": 1.82,
-                  "gripperPosition": 0.4
-                }
-              }
-            },
-            {
-              "name": "Lift 2",
-              "type": "BasicState",
-              "environment": {
-                "roboticArmState": {
-                  "basePosition": 0.86,
-                  "mainArmPosition": 1.9,
-                  "secondArmPosition": -3.71,
-                  "headPosition": 0.08,
-                  "headMountPosition": 0.52,
-                  "gripperPosition": 1.2
-                }
-              }
-            }
-          ],
-          "second": [
-            {
-              "name": "Pickup",
-              "type": "BasicState",
-              "environment": {
-                "roboticArmState": {
-                  "basePosition": 1.52,
-                  "mainArmPosition": 1.9,
-                  "secondArmPosition": 2.24,
-                  "headPosition": 2.22,
-                  "headMountPosition": 1.82,
-                  "gripperPosition": 1.2
-                }
-              }
-            },
-            {
-              "name": "Lift",
-              "type": "BasicState",
-              "environment": {
-                "roboticArmState": {
-                  "basePosition": 0.86,
-                  "mainArmPosition": 1.9,
-                  "secondArmPosition": -3.71,
-                  "headPosition": 0.08,
-                  "headMountPosition": 0.52,
-                  "gripperPosition": 1.2
-                }
-              }
-            }
-          ]
-        }
-      },
-      {
-        "name": "Park",
-        "type": "BasicState",
-        "environment": {
-          "roboticArmState": {
-            "basePosition": 0.86,
-            "mainArmPosition": 1.69,
-            "secondArmPosition": -3.71,
-            "headPosition": 0.08,
-            "headMountPosition": 0.52,
-            "gripperPosition": 1.2
-          }
-        }
-      }
-    ]
-  },
-  {
-    "name": "Job 3",
-    "id": "e191049b",
+    "name": "Pick, Heat & Sort",
+    "id": "i289749g",
     "target": "Hedgehog",
     "states": [
       {
@@ -272,6 +153,7 @@
       {
         "name": "Full Release",
         "type": "BasicState",
+        "sensor": "qr",
         "environment": {
           "roboticArmState": {
             "basePosition": 3.142,
@@ -279,20 +161,96 @@
             "secondArmPosition": -1.334,
             "headMountPosition": -1.5,
             "gripperPosition": 1.0
+          },
+          "testingRigState": {
+            "objectCategory": "GREEN"
+          }
+        },
+        "altEnvironment": {
+          "roboticArmState": {
+            "basePosition": 3.142,
+            "mainArmPosition": 1.36,
+            "secondArmPosition": -1.334,
+            "headMountPosition": -1.5,
+            "gripperPosition": 1.0
+          },
+          "testingRigState": {
+            "objectCategory": "RED"
           }
         }
       },
       {
-        "name": "Wait",
-        "type": "BasicState",
-        "environment": {
-          "roboticArmState": {
-            "basePosition": 3.142,
-            "mainArmPosition": 0.0,
-            "secondArmPosition": 0.0,
-            "headMountPosition": -1.5,
-            "gripperPosition": 1.0
-          }
+        "type": "ChoiceState",
+        "name": "Heat",
+        "choices": {
+          "first": [
+            {
+              "name": "Heat Green 1",
+              "type": "BasicState",
+              "environment": {
+                "roboticArmState": {
+                  "basePosition": 3.142,
+                  "mainArmPosition": 0.0,
+                  "secondArmPosition": 0.0,
+                  "headMountPosition": -1.5,
+                  "gripperPosition": 0.8
+                },
+                "testingRigState": {
+                  "heatplateTemperature": "120.0"
+                }
+              }
+            },
+            {
+              "name": "Heat Green 2",
+              "type": "BasicState",
+              "environment": {
+                "roboticArmState": {
+                  "basePosition": 3.142,
+                  "mainArmPosition": 0.0,
+                  "secondArmPosition": 0.0,
+                  "headMountPosition": -1.5,
+                  "gripperPosition": 0.9
+                },
+                "testingRigState": {
+                  "heatplateTemperature": "120.0"
+                }
+              }
+            }
+          ],
+          "second": [
+            {
+              "name": "Heat Red 1",
+              "type": "BasicState",
+              "environment": {
+                "roboticArmState": {
+                  "basePosition": 3.142,
+                  "mainArmPosition": 0.0,
+                  "secondArmPosition": 0.0,
+                  "headMountPosition": -1.5,
+                  "gripperPosition": 0.7
+                },
+                "testingRigState": {
+                  "heatplateTemperature": "150.0"
+                }
+              }
+            },
+            {
+              "name": "Heat Red 2",
+              "type": "BasicState",
+              "environment": {
+                "roboticArmState": {
+                  "basePosition": 3.142,
+                  "mainArmPosition": 0.0,
+                  "secondArmPosition": 0.0,
+                  "headMountPosition": -1.5,
+                  "gripperPosition": 0.6
+                },
+                "testingRigState": {
+                  "heatplateTemperature": "150.0"
+                }
+              }
+            }
+          ]
         }
       },
       {
@@ -311,6 +269,7 @@
       {
         "name": "Retrieve Grip",
         "type": "BasicState",
+        "sensor": "qr",
         "environment": {
           "roboticArmState": {
             "basePosition": 3.142,
@@ -318,59 +277,84 @@
             "secondArmPosition": -1.30,
             "headMountPosition": -1.5,
             "gripperPosition": -0.4
+          },
+          "testingRigState": {
+            "objectCategory": "GREEN"
           }
-        }
-      },
-      {
-        "name": "Deposit Green",
-        "type": "BasicState",
-        "environment": {
+        },
+        "altEnvironment": {
           "roboticArmState": {
-            "basePosition": 1.745,
-            "mainArmPosition": 0.942,
-            "secondArmPosition": -0.89,
-            "headMountPosition": 1.5,
+            "basePosition": 3.142,
+            "mainArmPosition": 1.30,
+            "secondArmPosition": -1.30,
+            "headMountPosition": -1.5,
             "gripperPosition": -0.4
+          },
+          "testingRigState": {
+            "objectCategory": "RED"
           }
         }
       },
       {
-        "name": "Release Green",
-        "type": "BasicState",
-        "environment": {
-          "roboticArmState": {
-            "basePosition": 1.745,
-            "mainArmPosition": 0.942,
-            "secondArmPosition": -0.89,
-            "headMountPosition": 1.5,
-            "gripperPosition": 0.5
-          }
-        }
-      },
-      {
-        "name": "Deposit Red",
-        "type": "BasicState",
-        "environment": {
-          "roboticArmState": {
-            "basePosition": 1.449,
-            "mainArmPosition": 0.942,
-            "secondArmPosition": -0.89,
-            "headMountPosition": 1.5,
-            "gripperPosition": -0.4
-          }
-        }
-      },
-      {
-        "name": "Release Red",
-        "type": "BasicState",
-        "environment": {
-          "roboticArmState": {
-            "basePosition": 1.449,
-            "mainArmPosition": 0.942,
-            "secondArmPosition": -0.89,
-            "headMountPosition": 1.5,
-            "gripperPosition": 0.5
-          }
+        "type": "ChoiceState",
+        "name": "Unnamed",
+        "choices": {
+          "first": [
+            {
+              "name": "Deposit Green",
+              "type": "BasicState",
+              "environment": {
+                "roboticArmState": {
+                  "basePosition": 1.745,
+                  "mainArmPosition": 0.942,
+                  "secondArmPosition": -0.89,
+                  "headMountPosition": 1.5,
+                  "gripperPosition": -0.4
+                }
+              }
+            },
+            {
+              "name": "Release Green",
+              "type": "BasicState",
+              "environment": {
+                "roboticArmState": {
+                  "basePosition": 1.745,
+                  "mainArmPosition": 0.942,
+                  "secondArmPosition": -0.89,
+                  "headMountPosition": 1.5,
+                  "gripperPosition": 0.5
+                }
+              }
+            }
+          ],
+          "second": [
+            {
+              "name": "Deposit Red",
+              "type": "BasicState",
+              "environment": {
+                "roboticArmState": {
+                  "basePosition": 1.449,
+                  "mainArmPosition": 0.942,
+                  "secondArmPosition": -0.89,
+                  "headMountPosition": 1.5,
+                  "gripperPosition": -0.4
+                }
+              }
+            },
+            {
+              "name": "Release Red",
+              "type": "BasicState",
+              "environment": {
+                "roboticArmState": {
+                  "basePosition": 1.449,
+                  "mainArmPosition": 0.942,
+                  "secondArmPosition": -0.89,
+                  "headMountPosition": 1.5,
+                  "gripperPosition": 0.5
+                }
+              }
+            }
+          ]
         }
       }
     ]
