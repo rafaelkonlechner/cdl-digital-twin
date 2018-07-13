@@ -46,7 +46,7 @@ class JobController {
 
     fun addJob(job: Job): ID {
         val uuid = generateID()
-        jobs[uuid] = job
+        jobs[uuid] = job.copy(id = uuid)
         return uuid
     }
 
