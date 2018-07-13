@@ -174,8 +174,13 @@ object StateObserver : Observable<BasicState>() {
         }
 
         return if (matches.isNotEmpty()) {
-            val match = matches.first()
-            Pair(match, env.matches(match.environment))
+            val latestIndex = all.indexOf(latestMatch.first)
+            val match = matches.find { all.indexOf(it) >= latestIndex }
+            return if (match != null) {
+                Pair(match, env.matches(match.environment))
+            } else {
+                null
+            }
         } else {
             null
         }
