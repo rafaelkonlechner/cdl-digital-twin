@@ -16,7 +16,12 @@ You need these dependencies to get started:
 
 **Setup Blender**
 
-Blender requires a few extra libraries in order to be able to publish and subscribe to MQTT queues and render images. To add the necessary scripts and libraries in your installation, go to **File > User Preferences > File > Scripts** and select the `blender-scripts/` directory from the project. Save the selection by hitting ***Save User Settings***.
+Blender requires a few extra libraries in order to be able to publish and subscribe to MQTT queues and render images. To add the necessary scripts and libraries to your installation, go to **File > User Preferences > File > Scripts**.
+
+* If you are using macOS, select the `blender-scripts/`, located in the project root.
+* If you are using Windows, similarly select `blender-scripts-win64/`. Then copy the directory `blender-scripts/modules/robot` to `blender-scripts-win64/modules/robot`. This is the main robot controller.
+
+Save the selection by hitting ***Save User Settings***.
 
 Finally, open the simulation file `Pick-and-Place-Simulation.blend` with Blender. Make sure to select **Blender Game** in the engine selection on the top &mdash; it might be set to **Blender Render**.
 
@@ -30,18 +35,30 @@ docker-compose up
 
 This will install and run all additional services to control and monitor the robot. After all services started, the dashboard is available at  [http://localhost:8080](http://localhost:8080). In detail, the services are:
 
-* Control Server (`Port 8080`): Collects sensor data and executes the control procedure via MQTT.
-* RabbitMQ with MQTT Plugin (`Port 1883`): MQTT message queue
-* InfluxDB (`Port 8086`): Time series database for recording sensor measurements
-* Camera Object Tracker (`Port 3000`): Image recognition service that identifies and locates objects in images
+* Control Server (`Port: 8080, Service Name: server`): Collects sensor data and executes the control procedure via MQTT.
+* RabbitMQ with MQTT Plugin (`Port 1883, Service Name: mqtt`): MQTT message queue
+* InfluxDB (`Port 8086, Service Name: influx`): Time series database for recording sensor measurements
+* Camera Object Tracker (`Port 3000, Service Name: object-tracker`): Image recognition service that identifies and locates objects in images
+
+If you only want to start a selection of services, compared to all services, run:
+
+```
+docker-compose up service1 service2 ...
+```
+
+This is useful, when developing the server - where the server is updated frequently with code changes. Then it is useful to start all services, except for the service `server`:
+
+```
+docker-compose up object-tracker mqtt influx
+```
 
 ### Running Simulations
 
- Hit `p` in Blender to start a simulation (exit with `Esc`). Now, you can control the robot either manually, by using the arrow keys and `WASD`, or by starting the automatic control procedure. For this, go to the [web dashboard](http://localhost:8080) and hit ***Start*** in the Controls section. This will run the control procedure described below. Clicking ***Record*** in the dashboard toggles the recording of sensor measurements in InfluxDB. For visualizing these time series, you can use [Chronograf](https://portal.influxdata.com/downloads) or [Grafana](http://grafana.com).
+ Hit `p` in Blender to start a simulation (exit with `Esc`). Now, you can control the robot either manually, by using the arrow keys and `WASD`, or by starting a job in the web view. For this, go to the [web view](http://localhost:8080), select a job and hit ***Play*** in the controls section. This will run the job as described below. Clicking ***Record*** in the dashboard toggles the recording of sensor measurements in InfluxDB. For visualizing these time series, you can use [Chronograf](https://portal.influxdata.com/downloads) or [Grafana](http://grafana.com).
 
 #### Control Procedure
 
-If you hit *"Start"*, the unit will loop through this sequence of commands:
+If you select the predefined job "Pick, Heat and Sort", the unit will loop through this sequence of commands:
 
 1. Push item onto conveyor
 2. Adjust item to be in pickup window
