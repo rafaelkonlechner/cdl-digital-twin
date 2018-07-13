@@ -18,8 +18,8 @@ data class ConveyorState(
                 true
             }
             return adjusterSimilar
-                    && (other.detected == null || this.detected == null || this.detected == other.detected)
-                    && (other.inPickupWindow == null || this.inPickupWindow == null || this.inPickupWindow == other.inPickupWindow)
+                    && (other.detected == null || this.detected == other.detected)
+                    && (other.inPickupWindow == null || this.inPickupWindow == other.inPickupWindow)
         } else {
             false
         }
