@@ -35,6 +35,7 @@ run {
         args Eval.me(appArgs)
     }
 }
+
 task installWeb(type: Exec) {
     workingDir 'src/main/resources/static'
     inputs.file("package-lock.json")
@@ -72,6 +73,7 @@ dependencies {
     compile 'com.github.sarxos:webcam-capture:0.3.10'
     testCompile "junit:junit:4.12"
 }
+
 kotlin {
     experimental {
         coroutines "enable"
