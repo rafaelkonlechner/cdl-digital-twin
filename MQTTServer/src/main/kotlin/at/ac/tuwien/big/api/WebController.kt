@@ -53,14 +53,7 @@ class WebController(private val mqtt: MQTT,
                 println("Received: $message")
                 if (message != null) {
                     println("Message: $message")
-                    if (message == "idle") {
-                        val transitions = PickAndPlaceControllerSimulation.transform(StateMachine.Transitions.park_idle)
-                        for (t in transitions) {
-                            mqtt.send(t)
-                        }
-                    } else {
-                        mqtt.send(message)
-                    }
+                    mqtt.send(message)
                 }
             }
             ws.onClose { session, statusCode, reason -> println("Closed $session, $statusCode: $reason") }
@@ -105,14 +98,45 @@ class WebController(private val mqtt: MQTT,
      */
     private fun setupRoutes() {
         app.routes {
+            /**
+             * Set the message rate per second. The message rate defines, how many sensor updates the controllers
+             * (i.e. Blender, Hedgehog) send per second.
+             */
             put("/messageRate") { ctx -> messageController.messageRate = ctx.body().toInt() }
+
+            /**
+             * Get the message rate in messages per second
+             */
             get("/messageRate") { messageController.messageRate }
-            put("/messageRate") { ctx -> messageController.messageRate = ctx.body().toInt() }
+
+            /**
+             * Returns, whether the current job is running or not.
+             */
             get("/autoPlay") { ctx -> ctx.json(messageController.autoPlay) }
+
+            /**
+             * Start or stop the selected job at its current position (`true` for start, `false` for stop)
+             */
             put("/autoPlay") { ctx -> messageController.autoPlay = ctx.body().toBoolean() }
+
+            /**
+             * Returns, whether recording sensor data in the time-series database is activated
+             */
             get("/recording") { ctx -> ctx.json(messageController.recording) }
+
+            /**
+             * Start or stop recording sensor data in the time-series database (`true` for start, `false` for stop)
+             */
             put("/recording") { ctx -> messageController.recording = ctx.body().toBoolean() }
+
+            /**
+             * Reset the time-series database
+             */
             put("/resetData") { timeSeriesDatabase.resetDatabase() }
+
+            /**
+             * Move the system to the position defined in the provided environment
+             */
             post("/moveEnvironment") { ctx ->
                 run {
                     val env = gson.fromJson(ctx.body(), Environment::class.java)
@@ -129,17 +153,40 @@ class WebController(private val mqtt: MQTT,
                     if (env.testingRigState != null) {
                         commands.addAll(StateObserver.transform(TestingRigTransition(TestingRigState(), env.testingRigState)))
                     }
-
                     for (c in commands) {
                         mqtt.send(c)
                     }
                 }
             }
-            get("/all") { ctx -> ctx.json(s.all) }
-            get("/roboticArmState") { ctx -> ctx.json(PickAndPlaceController.roboticArmSnapshot) }
-            get("/sliderState") { ctx -> ctx.json(PickAndPlaceController.sliderSnapshot) }
-            get("/conveyorState") { ctx -> ctx.json(PickAndPlaceController.conveyorSnapshot) }
-            get("/testingRigState") { ctx -> ctx.json(PickAndPlaceController.testingRigSnapshot) }
+
+            /**
+             * Get all states
+             */
+            get("/all") { ctx -> ctx.json(StateObserver.stateMachine?.states!!) }
+
+            /**
+             * Get the current robotic arm state
+             */
+            get("/roboticArmState") { ctx -> ctx.json(StateObserver.latestMatch.first.environment.roboticArmState!!) }
+
+            /**
+             * Get the current slider state
+             */
+            get("/sliderState") { ctx -> ctx.json(StateObserver.latestMatch.first.environment.sliderState!!) }
+
+            /**
+             * Get the current conveyor state
+             */
+            get("/conveyorState") { ctx -> ctx.json(StateObserver.latestMatch.first.environment.conveyorState!!) }
+
+            /**
+             * Get the current testing rig state
+             */
+            get("/testingRigState") { ctx -> ctx.json(StateObserver.latestMatch.first.environment.testingRigState!!) }
+
+            /**
+             * Set the current robotic arm state
+             */
             put("/roboticArmState") { ctx ->
                 run {
                     val match = StateObserver.stateMachine?.all()?.find { it.name == ctx.body() }
@@ -147,6 +194,10 @@ class WebController(private val mqtt: MQTT,
                         send(RoboticArmTransition(RoboticArmState(), match.environment.roboticArmState!!))
                 }
             }
+
+            /**
+             * Set the current slider state
+             */
             put("/sliderState") { ctx ->
                 run {
                     val match = StateObserver.stateMachine?.all()?.find { it.name == ctx.body() }
@@ -154,6 +205,10 @@ class WebController(private val mqtt: MQTT,
                         send(SliderTransition(SliderState(), match.environment.sliderState!!))
                 }
             }
+
+            /**
+             * Set the current conveyor state
+             */
             put("/conveyorState") { ctx ->
                 run {
                     val match = StateObserver.stateMachine?.all()?.find { it.name == ctx.body() }
@@ -161,6 +216,10 @@ class WebController(private val mqtt: MQTT,
                         send(ConveyorTransition(ConveyorState(), match.environment.conveyorState!!))
                 }
             }
+
+            /**
+             * Set urn the current testing rig state
+             */
             put("/testingRigState") { ctx ->
                 run {
                     val match = StateObserver.stateMachine?.all()?.find { it.name == ctx.body() }
@@ -169,13 +228,24 @@ class WebController(private val mqtt: MQTT,
                 }
             }
 
+            /**
+             * Return the list of jobs
+             */
             get("/jobs") { ctx -> ctx.json(jobController.getJobs()) }
+
+            /**
+             * Return a job, given its job id
+             */
             get("/jobs/:id") { ctx ->
                 run {
                     val id = ctx.param("id") ?: ""
                     ctx.json(jobController.getJob(id) ?: Any())
                 }
             }
+
+            /**
+             * Update an existing job
+             */
             put("/jobs/:id") { ctx ->
                 run {
                     try {
@@ -194,6 +264,11 @@ class WebController(private val mqtt: MQTT,
                     }
                 }
             }
+
+            /**
+             * Upload a new job
+             * @return a generated id for the job
+             */
             post("/jobs") { ctx ->
                 run {
                     val newJob = gson.fromJson(ctx.body(), Job::class.java)
@@ -202,6 +277,10 @@ class WebController(private val mqtt: MQTT,
                     ctx.json(id)
                 }
             }
+
+            /**
+             * Upload a job file in JSON format
+             */
             post("/jobFile") { ctx ->
                 run {
                     val writer = StringWriter()
@@ -212,6 +291,10 @@ class WebController(private val mqtt: MQTT,
                     ctx.json(id)
                 }
             }
+
+            /**
+             * Set a new currently selected job
+             */
             put("/selectedJob") { ctx ->
                 run {
                     jobController.setSelectedJob(ctx.body())
@@ -219,9 +302,17 @@ class WebController(private val mqtt: MQTT,
                     StateObserver.stateMachine = StateMachine(jobController.selected.states)
                 }
             }
+
+            /**
+             * Return the currently selected job
+             */
             get("/selectedJob") { ctx ->
                 ctx.json(jobController.selected)
             }
+
+            /**
+             * Reset the system to initial state
+             */
             put("/reset") { ctx ->
                 run {
                     messageController.reset()
