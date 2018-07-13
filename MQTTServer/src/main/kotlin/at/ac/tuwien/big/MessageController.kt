@@ -2,9 +2,13 @@ package at.ac.tuwien.big
 
 import at.ac.tuwien.big.entity.state.*
 import at.ac.tuwien.big.entity.transition.RoboticArmTransition
+import com.github.sarxos.webcam.Webcam
 import com.google.gson.Gson
+import java.awt.Dimension
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.util.*
+import javax.imageio.ImageIO
 import kotlin.concurrent.schedule
 import at.ac.tuwien.big.StateObserver as controller
 
@@ -20,15 +24,20 @@ class MessageController(private val mqtt: MQTT,
     var messageRate: Int = 10
     var autoPlay: Boolean = false
     var recording: Boolean = false
-    //val webcam: Webcam
+    var webcam: Webcam?
 
     init {
         mqtt.subscribe(listOf(simSensor, sensor, detectionCamera, pickupCamera), this::onMessage)
         controller.subscribe {
             sendWebSocketMessageState(it.name)
         }
-        //webcam = Webcam.getWebcams()[1]
-        //webcam.viewSize = Dimension(640, 480)
+        try {
+            webcam = Webcam.getWebcams()[1]
+            webcam?.viewSize = Dimension(640, 480)
+        } catch (e: IndexOutOfBoundsException) {
+            webcam = null
+            println("No web cam detected")
+        }
     }
 
     fun subscribe(callback: (String, String) -> Unit) {
@@ -39,22 +48,27 @@ class MessageController(private val mqtt: MQTT,
         timer.schedule(0, 1000) {
             observe()
         }
-        /*
-        timer.schedule(0, 1000) {
-            webcam.open()
-            val file = File.createTempFile("webcam", ".png")
-            val stream = ByteArrayOutputStream()
-            val img = webcam.image.getSubimage(320, 220, 200, 200)
-            ImageIO.write(img, "PNG", file)
-            ImageIO.write(img, "PNG", stream)
-            webcam.close()
-            objectTracker.track(file) {
-                val base64 = Base64.getEncoder().encodeToString(stream.toByteArray())
-                //sendWebSocketMessagePickupCamera("{\"image\": \"$base64\", \"tracking\": ${gson.toJson(it)}}")
-                file.delete()
+
+        if (webcam != null) {
+            timer.schedule(0, 2000) {
+                webcam?.open()
+                val file = File.createTempFile("webcam", ".png")
+                val stream = ByteArrayOutputStream()
+                val img = webcam?.image?.getSubimage(320, 220, 200, 200)
+                ImageIO.write(img, "PNG", file)
+                ImageIO.write(img, "PNG", stream)
+                webcam?.close()
+                objectTracker.track(file) {
+                    val tracking = it.firstOrNull()
+                    val detected = tracking != null
+                    val inPickupWindow = tracking != null && 36 < tracking.x && tracking.x < 125 && 60 < tracking.y && tracking.y < 105
+                    controller.update(ConveyorState(detected = detected, inPickupWindow = inPickupWindow))
+                    val base64 = Base64.getEncoder().encodeToString(stream.toByteArray())
+                    sendWebSocketMessagePickupCamera("{\"image\": \"$base64\", \"tracking\": ${gson.toJson(it)}}")
+                    file.delete()
+                }
             }
         }
-        */
     }
 
     private fun onMessage(topic: String, message: String) {
