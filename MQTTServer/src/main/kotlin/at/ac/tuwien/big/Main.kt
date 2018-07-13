@@ -30,7 +30,7 @@ fun main(args: Array<String>) {
             HedgehogController.stop()
         }
     })
-    HedgehogController.start()
+    //HedgehogController.start()
     val hosts = if (args.firstOrNull() == "--docker") {
         docker
     } else {
