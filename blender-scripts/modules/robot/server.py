@@ -132,6 +132,7 @@ class Server:
         self.client = mqtt.Client()
         self.client.on_connect = on_connect
         self.client.on_message = on_message
+        #self.client.username_pw_set("test",password="test")
         self.client.connect("localhost", 1883, 60)
         print("Connected")
         self.client.loop_start()
