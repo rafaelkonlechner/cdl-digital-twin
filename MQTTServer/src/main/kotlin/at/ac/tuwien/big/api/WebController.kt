@@ -16,7 +16,6 @@ import kotlinx.coroutines.experimental.runBlocking
 import org.apache.commons.io.IOUtils
 import org.eclipse.jetty.websocket.api.Session
 import java.io.StringWriter
-import at.ac.tuwien.big.StateMachineSimulation.States as s
 
 /**
  * Controller for web-based APIs: Static frontend, HTTP API and WebSocket
@@ -143,30 +142,30 @@ class WebController(private val mqtt: MQTT,
             get("/testingRigState") { ctx -> ctx.json(PickAndPlaceController.testingRigSnapshot) }
             put("/roboticArmState") { ctx ->
                 run {
-                    val match = s.roboticArm[ctx.body()]
+                    val match = StateObserver.stateMachine?.all()?.find { it.name == ctx.body() }
                     if (match != null)
-                        send(RoboticArmTransition(RoboticArmState(), match))
+                        send(RoboticArmTransition(RoboticArmState(), match.environment.roboticArmState!!))
                 }
             }
             put("/sliderState") { ctx ->
                 run {
-                    val match = s.slider[ctx.body()]
+                    val match = StateObserver.stateMachine?.all()?.find { it.name == ctx.body() }
                     if (match != null)
-                        send(SliderTransition(SliderState(), match))
+                        send(SliderTransition(SliderState(), match.environment.sliderState!!))
                 }
             }
             put("/conveyorState") { ctx ->
                 run {
-                    val match = s.conveyor[ctx.body()]
+                    val match = StateObserver.stateMachine?.all()?.find { it.name == ctx.body() }
                     if (match != null)
-                        send(ConveyorTransition(ConveyorState(), match))
+                        send(ConveyorTransition(ConveyorState(), match.environment.conveyorState!!))
                 }
             }
             put("/testingRigState") { ctx ->
                 run {
-                    val match = s.testingRig[ctx.body()]
+                    val match = StateObserver.stateMachine?.all()?.find { it.name == ctx.body() }
                     if (match != null)
-                        send(TestingRigTransition(TestingRigState(), match))
+                        send(TestingRigTransition(TestingRigState(), match.environment.testingRigState!!))
                 }
             }
 
@@ -185,7 +184,7 @@ class WebController(private val mqtt: MQTT,
                         if (job != null) {
                             val newJob = gson.fromJson(ctx.body(), Job::class.java)
                             jobController.setJob(newJob)
-                            StateObserver.stateMachine = StateMachineHedgehog(newJob.states)
+                            StateObserver.stateMachine = StateMachine(newJob.states)
                             ctx.status(200)
                         } else {
                             ctx.status(404)
@@ -199,7 +198,7 @@ class WebController(private val mqtt: MQTT,
                 run {
                     val newJob = gson.fromJson(ctx.body(), Job::class.java)
                     val id = jobController.addJob(newJob)
-                    StateObserver.stateMachine = StateMachineHedgehog(newJob.states)
+                    StateObserver.stateMachine = StateMachine(newJob.states)
                     ctx.json(id)
                 }
             }
@@ -209,7 +208,7 @@ class WebController(private val mqtt: MQTT,
                     IOUtils.copy(ctx.uploadedFile("job")?.content, writer)
                     val newJob = gson.fromJson(writer.toString(), Job::class.java)
                     val id = jobController.addJob(newJob)
-                    StateObserver.stateMachine = StateMachineHedgehog(newJob.states)
+                    StateObserver.stateMachine = StateMachine(newJob.states)
                     ctx.json(id)
                 }
             }
@@ -217,7 +216,7 @@ class WebController(private val mqtt: MQTT,
                 run {
                     jobController.setSelectedJob(ctx.body())
                     messageController.autoPlay = false
-                    StateObserver.stateMachine = StateMachineHedgehog(jobController.selected.states)
+                    StateObserver.stateMachine = StateMachine(jobController.selected.states)
                 }
             }
             get("/selectedJob") { ctx ->
@@ -234,7 +233,7 @@ class WebController(private val mqtt: MQTT,
 
     private fun send(match: Transition?) {
         if (match != null) {
-            val commands = PickAndPlaceControllerSimulation.transform(match)
+            val commands = StateObserver.transform(match)
             for (c in commands) {
                 mqtt.send(c)
             }

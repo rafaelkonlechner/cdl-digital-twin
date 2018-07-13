@@ -3,15 +3,18 @@ package at.ac.tuwien.big
 import at.ac.tuwien.big.entity.state.*
 import at.ac.tuwien.big.entity.transition.*
 import at.ac.tuwien.big.sm.BasicState
-import at.ac.tuwien.big.sm.ChoiceState
 
 /**
- * This controller holds the core logic of the production steps during a simulation by searching the defined
- * successor state for a given input state.
+ * This object maintains the current state of the environment and tries to match the current state to states defined
+ * in the job. By finding successor states to currently matched states, the system follows the control procedure.
+ * Internally, the object uses [StateMachine] to find the correct successor states.
  */
 object StateObserver : Observable<BasicState>() {
 
-    var stateMachine: StateMachineHedgehog? = null
+    /**
+     * State machine used to find correct successor states
+     */
+    var stateMachine: StateMachine? = null
 
     /**
      * Most recently observed state
@@ -102,6 +105,7 @@ object StateObserver : Observable<BasicState>() {
      */
     fun reset(): List<Transition> {
         val env = (stateMachine?.states?.first() as BasicState).environment
+        latestMatch = Pair(BasicState(), true)
         return listOf(
                 RoboticArmTransition(RoboticArmState(), env.roboticArmState
                         ?: RoboticArmState()),
@@ -163,17 +167,9 @@ object StateObserver : Observable<BasicState>() {
      */
     private fun matchState(env: Environment): Pair<BasicState, Boolean>? {
 
-        val basicStates = stateMachine?.states
-                ?.filter { it is BasicState }
-                ?.map { it as BasicState }
-                ?: emptyList()
-        val choiceStates = stateMachine?.states
-                ?.filter { it is ChoiceState }
-                ?.map { it as ChoiceState }
-                ?.flatMap { it.choices.first + it.choices.second }
-                ?: emptyList()
+        val all = stateMachine?.all() ?: emptyList()
 
-        val matches = (basicStates + choiceStates).filter {
+        val matches = all.filter {
             env.matches(it.environment) || (it.altEnvironment != null && env.matches(it.altEnvironment!!))
         }
 
