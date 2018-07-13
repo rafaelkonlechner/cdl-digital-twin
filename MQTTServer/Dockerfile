@@ -8,6 +8,7 @@ COPY . .
 
 USER root
 
+RUN apk add --update nodejs nodejs-npm
 RUN ./gradlew build -x test
 
 EXPOSE 8080

@@ -39,20 +39,22 @@ class MessageController(private val mqtt: MQTT,
         timer.schedule(0, 1000) {
             observe()
         }
-        /*timer.schedule(0, 1000) {
+        /*
+        timer.schedule(0, 1000) {
             webcam.open()
             val file = File.createTempFile("webcam", ".png")
             val stream = ByteArrayOutputStream()
-            val img = webcam.image.getSubimage(320, 220, 260, 260)
+            val img = webcam.image.getSubimage(320, 220, 200, 200)
             ImageIO.write(img, "PNG", file)
             ImageIO.write(img, "PNG", stream)
             webcam.close()
-            objectTracker.track(file, {
+            objectTracker.track(file) {
                 val base64 = Base64.getEncoder().encodeToString(stream.toByteArray())
-                sendWebSocketMessagePickupCamera("{\"image\": \"$base64\", \"tracking\": ${gson.toJson(it)}}")
+                //sendWebSocketMessagePickupCamera("{\"image\": \"$base64\", \"tracking\": ${gson.toJson(it)}}")
                 file.delete()
-            })
-        }*/
+            }
+        }
+        */
     }
 
     private fun onMessage(topic: String, message: String) {

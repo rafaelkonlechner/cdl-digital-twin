@@ -36,6 +36,25 @@ run {
     }
 }
 
+task installWeb(type: Exec) {
+    workingDir 'src/main/resources/static'
+    inputs.file("package-lock.json")
+    inputs.file("package.json")
+    outputs.dir("node_modules")
+    commandLine "npm", "install"
+}
+
+task buildWeb(type: Exec) {
+    workingDir 'src/main/resources/static'
+    inputs.dir("src")
+    inputs.dir("assets")
+    outputs.dir("dist")
+    commandLine "npm", "run", "build"
+}
+
+build.dependsOn buildWeb
+buildWeb.dependsOn installWeb
+
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     compile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
@@ -54,6 +73,7 @@ dependencies {
     compile 'com.github.sarxos:webcam-capture:0.3.10'
     testCompile "junit:junit:4.12"
 }
+
 kotlin {
     experimental {
         coroutines "enable"

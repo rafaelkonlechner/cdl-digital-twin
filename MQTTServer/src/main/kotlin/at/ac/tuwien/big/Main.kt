@@ -14,7 +14,7 @@ data class HostConfig(
         val mqtt: String,
         val objectTracker: String)
 
-val default = HostConfig("192.168.99.100", "192.168.99.100", "192.168.99.100")
+val default = HostConfig("127.0.0.1", "127.0.0.1", "127.0.0.1")
 val docker = HostConfig("influx", "mqtt", "object-tracker")
 
 const val simSensor = "Sensor-Simulation"
@@ -30,7 +30,7 @@ fun main(args: Array<String>) {
             HedgehogController.stop()
         }
     })
-    HedgehogController.start()
+    //HedgehogController.start()
     val hosts = if (args.firstOrNull() == "--docker") {
         docker
     } else {
@@ -46,7 +46,7 @@ fun main(args: Array<String>) {
     val jobs = JobController()
     val web = WebController(mqtt, controller, jobs, influx)
 
-    StateObserver.stateMachine = StateMachineHedgehog(jobs.getJobs().first().states)
+    StateObserver.stateMachine = StateMachine(jobs.getJobs().first().states)
 
     controller.start()
     web.start()

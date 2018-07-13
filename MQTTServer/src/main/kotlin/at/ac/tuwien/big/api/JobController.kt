@@ -19,9 +19,8 @@ class JobController {
         private set
 
     init {
-        val jobsText = this::class.java.classLoader.getResource("jobs-2.json").readText()
+        val jobsText = this::class.java.classLoader.getResource("jobs.json").readText()
         val jobsType = object : TypeToken<List<Job>>() {}.type
-        println(StateBase::class.java)
         val gson = GsonBuilder()
                 .registerTypeAdapterFactory(
                         RuntimeTypeAdapterFactory.of(StateBase::class.java, "type")
@@ -31,8 +30,6 @@ class JobController {
                 .create()
         jobs = gson.fromJson<List<Job>>(jobsText, jobsType).map { Pair(it.id, it) }.toMap().toMutableMap()
         selected = jobs.values.first()
-
-        println(jobs)
     }
 
     fun getJobs(): List<Job> {
