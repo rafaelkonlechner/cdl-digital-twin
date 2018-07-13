@@ -4,7 +4,6 @@ import com.github.kittinunf.fuel.Fuel
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import java.net.InetAddress
-import at.ac.tuwien.big.StateMachineSimulation.States as s
 
 object HedgehogController {
 
