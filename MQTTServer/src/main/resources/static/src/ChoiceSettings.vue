@@ -120,7 +120,6 @@ export default {
             this.state.environment.conveyorState = {
                 detected: null,
                 inPickupWindow: null
-
             }
         }
         if (this.state.altEnvironment.testingRigState === null) {
@@ -136,11 +135,28 @@ export default {
         }
     },
     methods: {
-        close: function() {
+        close() {
+            this.save();
             this.$emit('close');
         },
-        save: function() {
+        save() {
+            var conveyor = this.state.environment.conveyorState
+            var altConveyor = this.state.altEnvironment.conveyorState
+            var testingRig = this.state.environment.testingRigState
+            var altTestingRig = this.state.altEnvironment.altTestingRigState
+            this.removeEmptyAttributes(conveyor)
+            this.removeEmptyAttributes(altConveyor)
+            this.removeEmptyAttributes(testingRig)
+            this.removeEmptyAttributes(altTestingRig)
             this.$emit('recordPosition');
+        },
+        removeEmptyAttributes(obj) {
+            for (var attr in obj) {
+                console.log(attr);
+                if (attr === null || attr === undefined) {
+                    delete conveyor[attr]
+                }
+            }
         }
     }
 }

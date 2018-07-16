@@ -56,7 +56,7 @@
                 <state-detail :state="selectedState" :socket="socket" :context="context" v-on:close="showPopup = false;" v-on:recordPosition="saveChanges()"></state-detail>
             </div>
             <div v-if="showChoiceSettings">
-                <choice-settings :state="selectedState" :followupState="followupState" v-on:close="showPopup = false; showChoiceSettings = false;"></choice-settings>
+                <choice-settings :state="selectedState" :followupState="followupState" v-on:recordPosition="saveChanges()" v-on:close="showPopup = false; showChoiceSettings = false;"></choice-settings>
             </div>
         </div>
     </div>
