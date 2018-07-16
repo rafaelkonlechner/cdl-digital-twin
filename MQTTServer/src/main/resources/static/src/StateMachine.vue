@@ -166,6 +166,7 @@ export default {
             var state = this.job.states[index + 1];
             var prevState = this.job.states[index];
             if (!state.choices) {
+                state.type = "ChoiceState"
                 var choices = {
                     first: [],
                     second: []
@@ -188,13 +189,16 @@ export default {
                 });
                 state.choices.second.push({
                     name: "New " + (this.job.states.length + 1),
+                    type: "BasicState",
                     environment: Object.assign({}, state.environment)
                 });
+                delete state.environment;
             } else if (state.choices.first.length == 1 && state.choices.second.length == 1) {
                 state.name = state.choices.first[0].name;
                 state.type = state.choices.first[0].type;
                 state.environment = state.choices.first[0].environment;
                 delete state.choices;
+                state.type = "BasicState"
             }
             this.$forceUpdate();
         },
