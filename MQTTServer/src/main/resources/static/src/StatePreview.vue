@@ -44,7 +44,7 @@ h3 {
         <i @click="moveLeft(index)" style="float: right; cursor: default;" class="material-icons">arrow_left</i>
         <i @click="open(index)" style="float: right; cursor: default;" class="material-icons">info</i>
         <h3 v-if="!editName" @click="editName=true;">{{state.name}}</h3>
-        <input style="color: darkslategray; font-family: 'Roboto'; font-size: 14px; width: 75px;" v-if="editName" v-on:keyup.enter="editName=false" v-model="state.name" />
+        <input style="color: darkslategray; font-family: 'Roboto'; font-size: 14px; width: 75px;" v-if="editName" v-on:keyup.enter="saveName()" v-model="state.name" />
     </div>
     <div class="state-content">
         <div style="text-align: center;" v-if="state.environment.roboticArmState == null">
@@ -69,6 +69,10 @@ export default {
         }
     },
     methods: {
+        saveName() {
+            this.editName = false;
+            this.$emit('recordPosition');
+        },
         moveLeft(i) {
             this.$emit('moveLeft', i);
         },
