@@ -315,6 +315,7 @@ class WebController(private val mqtt: MQTT,
              */
             put("/reset") { ctx ->
                 run {
+                    messageController.autoPlay = false
                     messageController.reset()
                     ctx.status(200)
                 }
