@@ -154,7 +154,7 @@ class MessageController(private val mqtt: MQTT,
         val nowInTransition = formerTarget.environment.roboticArmState != StateObserver.targetState.environment.roboticArmState
         for (transition in transitions) {
             if (!lastInTransition && nowInTransition) {
-                println("Resetting: ${latest.name} -> ${transition.targetState.name}")
+                println("Resetting: ${latest.name} -> ${StateObserver.targetState.name}")
             }
             val context = StateObserver.latestMatch
             sendWebSocketMessageContext(gson.toJson(context))
