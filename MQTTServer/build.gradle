@@ -1,3 +1,5 @@
+import org.apache.tools.ant.taskdefs.condition.Os
+
 group 'at.ac.tuwien.big'
 version = '0.0.1-SNAPSHOT'
 
@@ -41,7 +43,11 @@ task installWeb(type: Exec) {
     inputs.file("package-lock.json")
     inputs.file("package.json")
     outputs.dir("node_modules")
-    commandLine "npm", "install"
+    if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+        commandLine "cmd", "/c", "npm", "install"
+    } else {
+        commandLine "npm", "install"
+    }
 }
 
 task buildWeb(type: Exec) {
@@ -49,7 +55,12 @@ task buildWeb(type: Exec) {
     inputs.dir("src")
     inputs.dir("assets")
     outputs.dir("dist")
-    commandLine "npm", "run", "build"
+    if (Os.isFamily(Os.FAMILY_WINDOWS)) {
+        commandLine "cmd", "/c", "npm", "run", "build"
+    } else {
+        commandLine "npm", "run", "build"
+    }
+
 }
 
 run.dependsOn buildWeb
