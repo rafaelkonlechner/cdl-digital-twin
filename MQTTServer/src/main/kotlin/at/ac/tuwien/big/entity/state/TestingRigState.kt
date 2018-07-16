@@ -23,7 +23,7 @@ data class TestingRigState(
             } else {
                 !(this.heatplateTemperature == null && other.heatplateTemperature != null)
             }
-            val objectCategory = (this.objectCategory == null) || (this.objectCategory == other.objectCategory)
+            val objectCategory = (other.objectCategory == null) || (this.objectCategory == other.objectCategory)
             objectCategory && platform && heatplate
         } else {
             false
