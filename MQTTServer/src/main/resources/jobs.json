@@ -358,5 +358,85 @@
         }
       }
     ]
+  },
+  {
+    "name": "Test",
+    "id": "31a2269b",
+    "states": [
+      {
+        "name": "New 1",
+        "type": "BasicState",
+        "environment": {
+          "roboticArmState": {
+            "basePosition": "0.00",
+            "mainArmPosition": "0.00",
+            "secondArmPosition": "0.00",
+            "headPosition": "0.00",
+            "headMountPosition": "0.00",
+            "gripperPosition": "0.00"
+          },
+          "testingRigState": {
+            "objectCategory": "NONE"
+          }
+        },
+        "active": false,
+        "altEnvironment": {
+          "roboticArmState": {
+            "basePosition": "0.00",
+            "mainArmPosition": "0.00",
+            "secondArmPosition": "0.00",
+            "headPosition": "0.00",
+            "headMountPosition": "0.00",
+            "gripperPosition": "0.00"
+          },
+          "testingRigState": {
+            "objectCategory": "RED"
+          }
+        },
+        "sensor": "qr"
+      },
+      {
+        "name": "New 2",
+        "type": "ChoiceState",
+        "choices": {
+          "first": [
+            {
+              "name": "Alt 1",
+              "type": "BasicState",
+              "environment": {
+                "roboticArmState": {
+                  "basePosition": "1.00",
+                  "mainArmPosition": "0.00",
+                  "secondArmPosition": "0.00",
+                  "headPosition": "0.00",
+                  "headMountPosition": "0.00",
+                  "gripperPosition": "0.00"
+                },
+                "conveyorState": null,
+                "testingRigState": null
+              }
+            }
+          ],
+          "second": [
+            {
+              "name": "Alt 2",
+              "type": "BasicState",
+              "environment": {
+                "roboticArmState": {
+                  "basePosition": "-1.00",
+                  "mainArmPosition": "0.00",
+                  "secondArmPosition": "0.00",
+                  "headPosition": "0.00",
+                  "headMountPosition": "0.00",
+                  "gripperPosition": "0.00"
+                },
+                "conveyorState": null,
+                "testingRigState": null
+              }
+            }
+          ]
+        }
+      }
+    ]
   }
 ]
