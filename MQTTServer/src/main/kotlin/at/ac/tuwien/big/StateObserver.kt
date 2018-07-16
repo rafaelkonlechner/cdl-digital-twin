@@ -104,18 +104,19 @@ object StateObserver : Observable<BasicState>() {
      * Return the defined successor state of the latest matching state, according to the state machine
      */
     fun reset(): List<Transition> {
-        val env = (stateMachine?.states?.first() as BasicState).environment
-        latestMatch = Pair(BasicState(), true)
-        return listOf(
-                RoboticArmTransition(RoboticArmState(), env.roboticArmState
-                        ?: RoboticArmState()),
-                ConveyorTransition(ConveyorState(), env.conveyorState
-                        ?: ConveyorState()),
-                SliderTransition(SliderState(), env.sliderState
-                        ?: SliderState()),
-                TestingRigTransition(TestingRigState(), env.testingRigState
-                        ?: TestingRigState())
-        )
+        val successor = stateMachine?.states?.first() as BasicState
+        val env = (stateMachine?.states?.first() as BasicState?)?.environment
+        targetState = successor
+        return if (env != null) {
+            listOf(
+                    RoboticArmTransition(RoboticArmState(), env.roboticArmState ?: RoboticArmState()),
+                    ConveyorTransition(ConveyorState(), env.conveyorState ?: ConveyorState()),
+                    SliderTransition(SliderState(), env.sliderState ?: SliderState()),
+                    TestingRigTransition(TestingRigState(), env.testingRigState ?: TestingRigState())
+            )
+        } else {
+            emptyList()
+        }
     }
 
     fun atEndState() = stateMachine?.isEndState(latestMatch.first) ?: true

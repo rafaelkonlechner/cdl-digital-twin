@@ -10,7 +10,6 @@ import java.io.File
 import java.util.*
 import javax.imageio.ImageIO
 import kotlin.concurrent.schedule
-import at.ac.tuwien.big.StateObserver as controller
 
 
 class MessageController(private val mqtt: MQTT,
@@ -19,16 +18,16 @@ class MessageController(private val mqtt: MQTT,
 
     private val gson = Gson()
     private val timer = Timer()
-    private var inTransition = false
     private val subscribers = mutableListOf<(String, String) -> Unit>()
     var messageRate: Int = 10
     var autoPlay: Boolean = false
     var recording: Boolean = false
+    var lastInTransition = false
     var webcam: Webcam?
 
     init {
         mqtt.subscribe(listOf(simSensor, sensor, detectionCamera, pickupCamera), this::onMessage)
-        controller.subscribe {
+        StateObserver.subscribe {
             sendWebSocketMessageState(it.name)
         }
         try {
@@ -62,7 +61,7 @@ class MessageController(private val mqtt: MQTT,
                     val tracking = it.firstOrNull()
                     val detected = tracking != null
                     val inPickupWindow = tracking != null && 36 < tracking.x && tracking.x < 125 && 60 < tracking.y && tracking.y < 105
-                    controller.update(ConveyorState(detected = detected, inPickupWindow = inPickupWindow))
+                    StateObserver.update(ConveyorState(detected = detected, inPickupWindow = inPickupWindow))
                     val base64 = Base64.getEncoder().encodeToString(stream.toByteArray())
                     sendWebSocketMessagePickupCamera("{\"image\": \"$base64\", \"tracking\": ${gson.toJson(it)}}")
                     file.delete()
@@ -77,13 +76,12 @@ class MessageController(private val mqtt: MQTT,
                 val state = parse(message)
                 if (recording) {
                     if (state is RoboticArmState) {
-                        //val ref = StateObserver.getReference(System.currentTimeMillis())
-                        //val inTransition = state.match(StateObserver.targetState, doubleAccuracy)
-                        //val label = if (inTransition) null else StateObserver.targetState.name
-                        //timeSeriesDatabase.savePoint(state, ref, label)
+                        val ref = ResidualError.getReference(System.currentTimeMillis())
+                        val label = if (lastInTransition) null else StateObserver.targetState.name
+                        timeSeriesDatabase.savePoint(state, ref, label)
                     }
                 }
-                controller.update(state)
+                StateObserver.update(state)
                 sendWebSocketMessageSensor(gson.toJson(state))
             }
             detectionCamera -> {
@@ -92,7 +90,7 @@ class MessageController(private val mqtt: MQTT,
                     sendWebSocketMessageQRCodeScanner(gson.toJson(code).toString())
                 }
                 val color = if (code == null) ObjectCategory.NONE else if (code.color == "red") ObjectCategory.RED else ObjectCategory.GREEN
-                controller.update(TestingRigState(objectCategory = color))
+                StateObserver.update(TestingRigState(objectCategory = color))
 
                 val detection = File.createTempFile("detection", ".png")
                 detection.writeBytes(fromBase64(message))
@@ -108,7 +106,7 @@ class MessageController(private val mqtt: MQTT,
                     val tracking = it.firstOrNull()
                     val detected = tracking != null
                     val inPickupWindow = tracking != null && 36 < tracking.x && tracking.x < 125 && 60 < tracking.y && tracking.y < 105
-                    controller.update(ConveyorState(detected = detected, inPickupWindow = inPickupWindow))
+                    StateObserver.update(ConveyorState(detected = detected, inPickupWindow = inPickupWindow))
                     sendWebSocketMessagePickupCamera("{\"image\": \"$message\", \"tracking\": ${gson.toJson(it)}}")
                     pickup.delete()
                 }
@@ -118,40 +116,54 @@ class MessageController(private val mqtt: MQTT,
 
     private fun observe() {
         if (autoPlay) {
-            val latest = controller.latestMatch.first
-            val transitions = if (!controller.atEndState()) {
-                controller.next()
+            val latest = StateObserver.latestMatch.first
+            val formerTarget = StateObserver.targetState
+            val transitions = if (!StateObserver.atEndState()) {
+                StateObserver.next()
             } else {
-                controller.reset()
+                StateObserver.reset()
             }
+            val nowInTransition = formerTarget.environment.roboticArmState != StateObserver.targetState.environment.roboticArmState
             if (transitions.isNotEmpty()) {
                 for (transition in transitions) {
                     if (transition is RoboticArmTransition) {
-                        println("Next: ${latest.name} -> ${transition.targetState.name}")
+                        if (!lastInTransition && nowInTransition) {
+                            println("Next: ${latest.name} -> ${StateObserver.targetState.name}")
+                            ResidualError.start(transition)
+                        }
+                        if (lastInTransition && !nowInTransition) {
+                            ResidualError.stop()
+                        }
                     }
-                    val context = controller.latestMatch
+                    val context = StateObserver.latestMatch
                     sendWebSocketMessageContext(gson.toJson(context))
-                    val commands = controller.transform(transition)
+                    val commands = StateObserver.transform(transition)
                     for (c in commands) {
                         mqtt.send(c)
                     }
                 }
             }
+            lastInTransition = nowInTransition
         }
     }
 
     fun reset() {
-        val latest = controller.latestMatch.first
-        val transitions = controller.reset()
+        val latest = StateObserver.latestMatch.first
+        val formerTarget = StateObserver.targetState
+        val transitions = StateObserver.reset()
+        val nowInTransition = formerTarget.environment.roboticArmState != StateObserver.targetState.environment.roboticArmState
         for (transition in transitions) {
-            println("Resetting: ${latest.name} -> ${transition.targetState.name}")
-            val context = controller.latestMatch
+            if (!lastInTransition && nowInTransition) {
+                println("Resetting: ${latest.name} -> ${transition.targetState.name}")
+            }
+            val context = StateObserver.latestMatch
             sendWebSocketMessageContext(gson.toJson(context))
-            val commands = controller.transform(transition)
+            val commands = StateObserver.transform(transition)
             for (c in commands) {
                 mqtt.send(c)
             }
         }
+        lastInTransition = nowInTransition
     }
 
     private fun parse(payload: String): StateEvent {
