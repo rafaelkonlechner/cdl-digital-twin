@@ -105,6 +105,7 @@ article {
                     </div>
                     <div style="display: inline-block; margin-left: 70px;">
                         <button class="control-button" @click="toggleAutoPlay()"><i class="material-icons" v-if="!autoPlay">play_arrow</i><i class="material-icons" v-if="autoPlay">pause</i></button>
+                        <button class="control-button" @click="toggleRecord()"><i v-bind:style="{ color: recordingColor }" class="material-icons">fiber_manual_record</i></button>
                         <button class="control-button" @click="reset()"><i class="material-icons">replay</i></button>
                         <button class="control-button" @click="exportJob()"><i class="material-icons">move_to_inbox</i></button>
                         <a @mouseleave="downloadLink = ''" v-if="downloadLink" :download="selectedJob.name + '.json'" :href="downloadLink" style="margin-left: 20px;">Download Job</a>
@@ -148,6 +149,8 @@ export default {
             socket: new WebSocket("ws://127.0.0.1:8080/websocket"),
             messageRate: 0,
             autoPlay: false,
+            recording: false,
+            recordingColor: 'darkslategray',
             newJobTitle: "New Job",
             editTitle: false,
             jobs: [],
@@ -278,7 +281,6 @@ export default {
             xhr.onreadystatechange = function() {
                 console.log(this.responseText)
                 job.id = this.responseText.slice(1, -1)
-                console.log(job)
             }
             xhr.open("POST", 'http://localhost:8080/jobs', true);
             xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
@@ -299,7 +301,23 @@ export default {
             xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
             xhr.send(this.autoPlay);
         },
+        toggleRecord() {
+            console.log(this.recording)
+            this.recording = !this.recording;
+            if (this.recording) {
+                this.recordingColor = 'red';
+                console.log(this.recordingColor)
+            } else {
+                this.recordingColor = 'darkslategray';
+                console.log(this.recordingColor)
+            }
+            var xhr = new XMLHttpRequest();
+            xhr.open("PUT", 'http://localhost:8080/recording', true);
+            xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+            xhr.send(this.recording);
+        },
         reset() {
+            this.autoPlay = false;
             var xhr = new XMLHttpRequest();
             xhr.open("PUT", 'http://localhost:8080/reset', true);
             xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
