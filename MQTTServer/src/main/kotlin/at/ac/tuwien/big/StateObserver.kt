@@ -19,7 +19,7 @@ object StateObserver : Observable<BasicState>() {
     /**
      * Most recently observed state
      */
-    private var snapshot: Environment = Environment()
+    private var snapshot: Environment = Environment(RoboticArmState(), SliderState(), ConveyorState(), TestingRigState())
 
     /**
      * Latest matching state, given the current job
@@ -37,38 +37,34 @@ object StateObserver : Observable<BasicState>() {
      * Update the unit with new sensor information. This includes matching the updated state to the set of defined states.
      */
     fun update(e: StateEvent) {
-        try {
-            when (e) {
-                is RoboticArmState -> {
-                    snapshot = snapshot.copy(roboticArmState = e)
-                }
-                is SliderState -> {
-                    snapshot = snapshot.copy(sliderState = e)
-                }
-                is ConveyorState -> {
-                    val c = snapshot.conveyorState ?: ConveyorState()
-                    val cNew = c.copy(
-                            adjusterPosition = e.adjusterPosition ?: c.adjusterPosition,
-                            detected = e.detected ?: c.detected,
-                            inPickupWindow = e.inPickupWindow ?: c.inPickupWindow)
-                    snapshot = snapshot.copy(conveyorState = cNew)
-                }
-                is TestingRigState -> {
-                    val t = snapshot.testingRigState ?: TestingRigState()
-                    val tNew = t.copy(
-                            objectCategory = e.objectCategory ?: t.objectCategory,
-                            platformPosition = e.platformPosition ?: t.platformPosition,
-                            heatplateTemperature = e.heatplateTemperature ?: t.heatplateTemperature)
-                    snapshot = snapshot.copy(testingRigState = tNew)
-                }
+        when (e) {
+            is RoboticArmState -> {
+                snapshot = snapshot.copy(roboticArmState = e)
             }
-            val match = matchState(snapshot)
-            if (match != null && latestMatch != match) {
-                latestMatch = match
-                notify(latestMatch.first)
+            is SliderState -> {
+                snapshot = snapshot.copy(sliderState = e)
             }
-        } catch (e: Exception) {
-            e.printStackTrace()
+            is ConveyorState -> {
+                val c = snapshot.conveyorState ?: ConveyorState()
+                val cNew = c.copy(
+                        adjusterPosition = e.adjusterPosition ?: c.adjusterPosition,
+                        detected = e.detected ?: c.detected,
+                        inPickupWindow = e.inPickupWindow ?: c.inPickupWindow)
+                snapshot = snapshot.copy(conveyorState = cNew)
+            }
+            is TestingRigState -> {
+                val t = snapshot.testingRigState ?: TestingRigState()
+                val tNew = t.copy(
+                        objectCategory = e.objectCategory ?: t.objectCategory,
+                        platformPosition = e.platformPosition ?: t.platformPosition,
+                        heatplateTemperature = e.heatplateTemperature ?: t.heatplateTemperature)
+                snapshot = snapshot.copy(testingRigState = tNew)
+            }
+        }
+        val match = matchState(snapshot)
+        if (match != null && latestMatch != match) {
+            latestMatch = match
+            notify(latestMatch.first)
         }
     }
 
@@ -79,7 +75,11 @@ object StateObserver : Observable<BasicState>() {
         val successor = stateMachine?.successor(latestMatch.first, latestMatch.second)
         return if (successor != null) {
             targetState = successor
-            val env = latestMatch.first.environment
+            val env = if (latestMatch.second) {
+                latestMatch.first.environment
+            } else {
+                latestMatch.first.altEnvironment!!
+            }
             val succ = successor.environment
             val result = mutableListOf<Transition>()
             if (succ.roboticArmState != null) {
@@ -141,7 +141,13 @@ object StateObserver : Observable<BasicState>() {
                 listOf("slider-goto ${transition.targetState.sliderPosition}")
             }
             is ConveyorTransition -> {
-                listOf("adjuster-goto ${transition.targetState.adjusterPosition}")
+                val t = transition.targetState
+                listOf(
+                        if (t.adjusterPosition != null) {
+                            "adjuster-goto ${transition.targetState.adjusterPosition}"
+                        } else {
+                            ""
+                        }).filter { !it.isEmpty() }
             }
             is TestingRigTransition -> {
                 val t = transition.targetState

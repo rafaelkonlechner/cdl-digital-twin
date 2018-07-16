@@ -9,6 +9,7 @@ import at.ac.tuwien.big.entity.state.Environment
 data class BasicState(
         override var name: String = "Snapshot",
         override var type: String = "BasicState",
+        var sensor: String? = null,
         var environment: Environment = Environment(),
         var altEnvironment: Environment? = null
 ) : StateBase()
