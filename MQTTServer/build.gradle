@@ -64,10 +64,10 @@ task buildWeb(type: Exec) {
 }
 
 run.dependsOn buildWeb
-run.dependsOn installWeb
+buildWeb.dependsOn installWeb
 
-jar.dependsOn installWeb
 jar.dependsOn buildWeb
+buildWeb.dependsOn installWeb
 
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
